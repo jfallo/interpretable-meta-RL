@@ -4,21 +4,9 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from generate_data import generate_Q_learning_data, generate_actor_critic_data, generate_batch
 from DisRNN import DisRNN
+from helper_functions import format_matrix
 
 DATA_GENERATOR = generate_Q_learning_data
-
-
-def format_matrix(M, name, row_prefix= 'rule', col_prefix= 'dim'):
-    M = np.atleast_2d(M)
-    n_rows, n_cols = M.shape
-
-    header = '      ' + ' '.join(f'{col_prefix}{j:>2}' for j in range(n_cols))
-    lines = [f'{name}:', header]
-    for i, row in enumerate(M):
-        row_str = ' '.join(f'{v:5.2f}' for v in row)
-        lines.append(f'{row_prefix}{i:>2} | {row_str}')
-    
-    return '\n'.join(lines)
 
 
 # example data for model structure
