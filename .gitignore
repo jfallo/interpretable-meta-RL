@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# data and outputs
+*.pt
+*.pth
+*.npy
+
+# plots
+*.png
+*.pdf
+
+# editor
+.vscode/
+.idea/
+
+# venv
+venv/
+
+# scratch files
+scratch/
