@@ -1,7 +1,6 @@
 import torch
 
 D = torch.rand
-actions = [0, 1]
 
 
 def get_reward(a, probs):
