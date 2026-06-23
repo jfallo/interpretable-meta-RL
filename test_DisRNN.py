@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from generate_data import generate_Q_learning_data, generate_actor_critic_data, generate_batch
 from DisRNN import DisRNN
 
-#DATA_GENERATOR = generate_actor_critic_data
 DATA_GENERATOR = generate_Q_learning_data
 
 
@@ -54,7 +53,7 @@ losses_bottleneck = []
 
 for step in range(steps):
     # update beta
-    beta = beta_max * min(step - beta_warmup_start / beta_warmup_start - beta_warmup_start, 1.0)
+    beta = beta_max * min((step - beta_warmup_start) / (beta_warmup_end - beta_warmup_start), 1.0)
     beta = 0 if step < beta_warmup_start else beta
 
     # put the model in training mode
