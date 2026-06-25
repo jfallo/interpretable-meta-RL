@@ -21,3 +21,6 @@ venv/
 
 # scratch files
 scratch/
+
+# model checkpoints
+checkpoints/
