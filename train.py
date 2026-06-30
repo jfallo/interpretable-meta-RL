@@ -1,114 +1,273 @@
 import torch
-from DisRNN import DisRNN
-from helper_functions import format_matrix
+import torch.nn.functional as F
+import numpy as np
+import random
+from DisRNN import MyDisRNN
+from helper_functions import format_matrix, smooth
 import matplotlib.pyplot as plt
 import os
-os.makedirs('checkpoints', exist_ok= True)
+
+seed = 42
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+
+os.makedirs(f'checkpoints/seed{seed}', exist_ok= True)
+os.makedirs(f'figs/seed{seed}', exist_ok= True)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-# set task space
+# define bandit task spaces
 D = torch.rand
 num_arms = 2
 
-# initialize DisRNN model and Adam optimizer
-hidden_size = 5
-input_size = 2
-model = DisRNN(m= hidden_size, n= 2, q= num_arms)
-optimizer = torch.optim.Adam(model.parameters(), lr= 5e-3)
 
-# setup GPU
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = model.to(device)
+# initialize models and optimizers
+input_size = 2
+
+DisRNN_hidden_size = 5
+DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)
+DisRNN_critic = torch.nn.Linear(DisRNN_hidden_size, 1).to(device)
+DisRNN_optimizer = torch.optim.Adam(
+    list(DisRNN.parameters()) + list(DisRNN_critic.parameters()), 
+    lr= 5e-3
+)
+
+LSTM_hidden_size = 48
+LSTM = torch.nn.LSTM(input_size, LSTM_hidden_size).to(device)
+LSTM_readout = torch.nn.Linear(LSTM_hidden_size, num_arms).to(device)
+LSTM_critic = torch.nn.Linear(LSTM_hidden_size, 1).to(device)
+LSTM_optimizer = torch.optim.Adam(
+    list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters()), 
+    lr= 1e-3
+)
 
 
 # training hyperparameters
-episodes = 20_000
-batch_size = 32
+episodes = 50_000
+batch_size = 64
 batch_idx = torch.arange(batch_size, device= device)
-T = 500
+T = 100
 drift = 0.02
-beta_max = 1e-3
-beta_warmup_start = 1000
-beta_warmup_end = 2000
+beta_e = 1.0
+anneal_end = 1000
+beta_v = 0.05
+beta_max = 5e-4
+warmup_end = 5000
 
+
+# training
+DisRNN_regret_history = []
+LSTM_regret_history = []
 for ep in range(episodes):
-    model.train()
-    optimizer.zero_grad()
-
+    # sample task
     probs = D(batch_size, num_arms, device= device)
 
-    h = torch.zeros(batch_size, hidden_size, device= device)
-    x = torch.zeros(batch_size, input_size, device= device)
 
-    log_probs = []
-    rewards = []
-    bottleneck_losses = {'h': [], 'x': [], 'z': []}
+    # reset DisRNN state
+    DisRNN.train()
+    DisRNN_optimizer.zero_grad()
 
+    DisRNN_h = torch.zeros(batch_size, DisRNN_hidden_size, device= device)
+    DisRNN_x = torch.zeros(batch_size, input_size, device= device)
+
+    DisRNN_log_probs = []
+    DisRNN_rewards = []
+    DisRNN_bottleneck_losses = {'h': [], 'x': [], 'z': []}
+    DisRNN_vals = []
+    DisRNN_entropies = []
+    DisRNN_regrets = []
+
+
+    # reset LSTM state
+    LSTM.train()
+    LSTM_optimizer.zero_grad()
+
+    LSTM_h = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
+    LSTM_c = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
+    LSTM_x = torch.zeros(batch_size, input_size, device= device)
+
+    LSTM_log_probs = []
+    LSTM_rewards = []
+    LSTM_vals = []
+    LSTM_entropies = []
+    LSTM_regrets = []
+
+
+    optimal_rewards = []
+    random_rewards = []
     for t in range(T):
         if t % 50 == 0:
-            h = h.detach()
+            DisRNN_h = DisRNN_h.detach()
+            LSTM_h = LSTM_h.detach()
+            LSTM_c = LSTM_c.detach()
 
-        h, kls = model.step(h, x)
-        logits = model.out(h)
 
-        # sample action and get rewards
-        pi = torch.distributions.Categorical(logits= logits)
-        a = pi.sample()
-        log_prob = pi.log_prob(a)
-        r = (torch.rand(batch_size, device= device) < probs[batch_idx, a]).float()
+        random_rewards.append(probs.mean(dim= -1))
+        optimal_rewards.append(probs.max(dim= -1).values)
+
+
+        # DisRNN step
+        DisRNN_h, kls = DisRNN.step(DisRNN_h, DisRNN_x)
+        DisRNN_logits = DisRNN.out(DisRNN_h)
+
+        DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
+        DisRNN_a = DisRNN_pi.sample()
+        DisRNN_expected_r = probs[batch_idx, DisRNN_a]
+        DisRNN_r = (torch.rand(batch_size, device= device) < DisRNN_expected_r).float()
+
+        DisRNN_log_probs.append(DisRNN_pi.log_prob(DisRNN_a))
+        DisRNN_rewards.append(DisRNN_r)
+        for key, val in kls.items():
+            DisRNN_bottleneck_losses[key].append(val)
+        DisRNN_vals.append(DisRNN_critic(DisRNN_h.detach()).squeeze(-1))
+        DisRNN_entropies.append(DisRNN_pi.entropy())
+        DisRNN_regrets.append(probs.max(dim= -1).values - DisRNN_expected_r)
+
+        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
+
+
+        # LSTM step
+        LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
+        LSTM_logits = LSTM_readout(LSTM_out.squeeze(0))
+
+        LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
+        LSTM_a = LSTM_pi.sample()
+        LSTM_expected_r = probs[batch_idx, LSTM_a]
+        LSTM_r = (torch.rand(batch_size, device= device) < LSTM_expected_r).float()
         
-        # prepare next input
-        x = torch.stack([2*a.float() - 1, 2*r - 1], dim= -1)
+        LSTM_log_probs.append(LSTM_pi.log_prob(LSTM_a))
+        LSTM_rewards.append(LSTM_r)
+        LSTM_vals.append(LSTM_critic(LSTM_out.squeeze(0).detach()).squeeze(-1))
+        LSTM_entropies.append(LSTM_pi.entropy())
+        LSTM_regrets.append(probs.max(dim= -1).values - LSTM_expected_r)
 
-        # apply bounded random drift to probs
+        LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
+
+
+        # drift
         probs += drift * torch.randn(batch_size, num_arms, device= device)
         probs = torch.clamp(probs, 0, 1)
         
-        log_probs.append(log_prob)
-        rewards.append(r)
-        for key, val in kls.items():
-            bottleneck_losses[key].append(val)
-        
-    log_probs = torch.stack(log_probs)
-    rewards = torch.stack(rewards)
-    bottleneck_losses = {key: torch.stack(vals) for key, vals in bottleneck_losses.items()}
-    
-    # REINFORCE with baseline
-    baseline = rewards.mean(dim= 0, keepdim= True)
-    advantage = rewards - baseline
 
-    # update beta
-    beta = beta_max * min((ep - beta_warmup_start) / (beta_warmup_end - beta_warmup_start), 1.0)
-    beta = 0 if ep < beta_warmup_start else beta
+    DisRNN_log_probs = torch.stack(DisRNN_log_probs)
+    DisRNN_rewards = torch.stack(DisRNN_rewards)
+    DisRNN_bottleneck_losses = {key: torch.stack(vals) for key, vals in DisRNN_bottleneck_losses.items()}
+    DisRNN_vals = torch.stack(DisRNN_vals)
+    DisRNN_entropies = torch.stack(DisRNN_entropies)
+    DisRNN_regrets = torch.stack(DisRNN_regrets)
+
+    LSTM_log_probs = torch.stack(LSTM_log_probs)
+    LSTM_rewards = torch.stack(LSTM_rewards)
+    LSTM_vals = torch.stack(LSTM_vals)
+    LSTM_entropies = torch.stack(LSTM_entropies)
+    LSTM_regrets = torch.stack(LSTM_regrets)
+
+    optimal_rewards = torch.stack(optimal_rewards)
+    random_rewards = torch.stack(random_rewards)
+
+
+    # update betas
+    beta_e = max(0.0, 1.0 - ep / anneal_end)
+    beta = beta_max * min(ep / warmup_end, 1.0)
     
-    loss_rl = -(log_probs * advantage).mean()
-    loss_bottleneck = sum(loss.mean() for loss in bottleneck_losses.values())
-    loss = loss_rl + beta * loss_bottleneck
+
+    # A2C
+    DisRNN_advantage = DisRNN_rewards - DisRNN_vals
+
+    DisRNN_loss_policy = -(DisRNN_log_probs * DisRNN_advantage.detach()).mean()
+    DisRNN_loss_entropy = DisRNN_entropies.mean()
+    DisRNN_loss_critic = F.mse_loss(DisRNN_vals, DisRNN_rewards)
+    DisRNN_loss_bottlenecks = sum(loss.mean() for loss in DisRNN_bottleneck_losses.values())
+    DisRNN_loss = (
+        DisRNN_loss_policy 
+        - beta_e * DisRNN_loss_entropy 
+        + beta_v * DisRNN_loss_critic
+        + beta * DisRNN_loss_bottlenecks
+    )
     
-    loss.backward()
-    optimizer.step()
+    DisRNN_loss.backward()
+    torch.nn.utils.clip_grad_norm_(
+        list(DisRNN.parameters()) + list(DisRNN_critic.parameters()),
+        max_norm= 1.0
+    )
+    DisRNN_optimizer.step()
+
+
+    LSTM_advantage = LSTM_rewards - LSTM_vals
+
+    LSTM_loss_policy = -(LSTM_log_probs * LSTM_advantage.detach()).mean()
+    LSTM_loss_entropy = LSTM_entropies.mean()
+    LSTM_loss_critic = F.mse_loss(LSTM_vals, LSTM_rewards)
+    LSTM_loss = (
+        LSTM_loss_policy
+        - beta_e * LSTM_loss_entropy
+        + beta_v * LSTM_loss_critic
+    )
+
+    LSTM_loss.backward()
+    torch.nn.utils.clip_grad_norm_(
+        list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters()),
+        max_norm= 1.0
+    )
+    LSTM_optimizer.step()
+
+
+    random_avg_R = random_rewards.mean().item()
+    optimal_avg_R = optimal_rewards.mean().item()
+    DisRNN_avg_R = DisRNN_rewards.mean().item()
+    LSTM_avg_R = LSTM_rewards.mean().item()
+
+    DisRNN_regret_history.append(DisRNN_regrets.mean().item())
+    LSTM_regret_history.append(LSTM_regrets.mean().item())
+    
 
     if ep % 250 == 0:
-        mean_reward = rewards.mean().item()
-    
-        M_h = torch.sigmoid(model.logit_M_h).detach().cpu().numpy()
-        M_x = torch.sigmoid(model.logit_M_x).detach().cpu().numpy()
-        M_z = torch.sigmoid(model.logit_M_z).detach().cpu().numpy()
-
+        print(f'ep {ep:5d}')
+        print(f'  rand avg R {random_avg_R}')
+        print(f'   opt avg R {optimal_avg_R}')
+        print(f'  LSTM avg R {LSTM_avg_R:.3f} |   LSTM loss {LSTM_loss.item():.4f}')
         print(
-            f'ep {ep:5d} | loss {loss.item():.4f} | '
-            f'RL {loss_rl.item():.4f} | KL {loss_bottleneck.item():.4f} | '
-            f'beta {beta:.2e} | mean_r {mean_reward:.3f}'
+            f'DisRNN avg R {DisRNN_avg_R:.3f} | DisRNN loss {DisRNN_loss.item():.4f} | '
+            f'CE loss {DisRNN_loss_policy.item():.4f} | KL loss {DisRNN_loss_bottlenecks.item():.4f} | beta {beta:.2e} | '
+            
         )
-        print(format_matrix(M_h, 'M_h', row_prefix='rule', col_prefix='lat'))
-        print(format_matrix(M_x, 'M_x', row_prefix='rule', col_prefix='obs'))
-        print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix='lat', col_prefix='lat'))
+        M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
+        M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
+        M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
+        print()
+        print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
+        print()
+        print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
+        print()
+        print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
+        print()
         print()
 
-    if (ep % 1000 == 0 and ep > 0) or ep == episodes - 1:
+    if (ep % 5000 == 0 and ep > 0) or ep == episodes - 1:
         torch.save({
             'ep': ep,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': loss
+            'DisRNN_state_dict': DisRNN.state_dict(),
+            'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
+            'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
+            'LSTM_state_dict': LSTM.state_dict(),
+            'LSTM_readout_state_dict': LSTM_readout.state_dict(),
+            'LSTM_critic_state_dict': LSTM_critic.state_dict(),
+            'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
         }, f'checkpoints/checkpoint_ep{ep}.pt')
+
+
+        DisRNN_regret = np.array(DisRNN_regret_history)
+        LSTM_regret = np.array(LSTM_regret_history)
+        
+        plt.figure(figsize= (8,5))
+        plt.plot(smooth(DisRNN_regret), label= 'DisRNN', color= 'green')
+        plt.plot(DisRNN_regret, alpha= 0.15, color= 'green')
+        plt.plot(smooth(LSTM_regret), label= 'LSTM', color= 'black')
+        plt.plot(LSTM_regret, alpha= 0.15, color= 'black')
+        plt.xlabel('Episode')
+        plt.ylabel('Regret')
+        plt.title('Model Regret Over Time')
+        plt.legend()
+        plt.savefig(f'figs/regret_ep{ep}.png')
+        plt.close()

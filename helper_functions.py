@@ -12,3 +12,7 @@ def format_matrix(M, name, row_prefix= 'rule', col_prefix= 'dim'):
         lines.append(f'{row_prefix}{i:>2} | {row_str}')
     
     return '\n'.join(lines)
+
+
+def smooth(x, window= 200):
+    return np.convolve(x, np.ones(window)/window, mode= 'valid')

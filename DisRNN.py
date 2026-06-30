@@ -4,33 +4,26 @@ import torch.nn as nn
 
 def build_update_MLP(input_size, output_size= 2, hidden_size= 5):
     return nn.Sequential(
-        # h1
         nn.Linear(input_size, hidden_size),
         nn.ReLU(),
-        # h2
         nn.Linear(hidden_size, hidden_size),
         nn.ReLU(),
-        # h3
         nn.Linear(hidden_size, hidden_size),
         nn.ReLU(),
-        # y
         nn.Linear(hidden_size, output_size)
     )
 
 def build_choice_MLP(input_size, output_size, hidden_size= 2):
     return nn.Sequential(
-        # h1
         nn.Linear(input_size, hidden_size),
         nn.ReLU(),
-        # h2
         nn.Linear(hidden_size, hidden_size),
         nn.ReLU(),
-        # y
         nn.Linear(hidden_size, output_size)
     )
 
 
-class DisRNN(nn.Module):
+class MyDisRNN(nn.Module):
     def __init__(self, m, n, q):
         super().__init__()
 
@@ -46,13 +39,13 @@ class DisRNN(nn.Module):
             
         # initialize bottleneck parameters
         self.logit_M_h = nn.Parameter(5 * torch.ones((m,m)))  # M(i,j) -> update rule i's dependence on latent j
-        self.log_sigma_h = nn.Parameter(-2 * torch.ones((m,m)))
+        self.log_sigma_h = nn.Parameter(-5 * torch.ones((m,m)))
 
         self.logit_M_x = nn.Parameter(5 * torch.ones((m,n)))
-        self.log_sigma_x = nn.Parameter(-2 * torch.ones((m,n)))
+        self.log_sigma_x = nn.Parameter(-5 * torch.ones((m,n)))
 
         self.logit_M_z = nn.Parameter(5 *torch.ones(m))
-        self.log_sigma_z = nn.Parameter(-2 * torch.ones(m))
+        self.log_sigma_z = nn.Parameter(-5 * torch.ones(m))
 
 
     def bottleneck(self, x, m, sigma):
