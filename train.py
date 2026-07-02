@@ -7,7 +7,7 @@ from helper_functions import format_matrix, smooth
 import matplotlib.pyplot as plt
 import os
 
-seed = 42
+seed = 43
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -45,15 +45,15 @@ LSTM_optimizer = torch.optim.Adam(
 
 # training hyperparameters
 episodes = 50_000
-batch_size = 64
+batch_size = 32
 batch_idx = torch.arange(batch_size, device= device)
 T = 100
 drift = 0.02
 beta_e = 1.0
-anneal_end = 1000
+anneal_end = 2000
 beta_v = 0.05
-beta_max = 5e-4
-warmup_end = 5000
+beta_max = 1e-3
+warmup_end = 10_000
 
 
 # training
@@ -73,11 +73,10 @@ for ep in range(episodes):
 
     DisRNN_log_probs = []
     DisRNN_rewards = []
-    DisRNN_bottleneck_losses = {'h': [], 'x': [], 'z': []}
-    DisRNN_vals = []
+    DisRNN_expected_rewards = []
     DisRNN_entropies = []
+    DisRNN_bottleneck_losses = {'h': [], 'x': [], 'z': []}
     DisRNN_regrets = []
-
 
     # reset LSTM state
     LSTM.train()
@@ -89,22 +88,16 @@ for ep in range(episodes):
 
     LSTM_log_probs = []
     LSTM_rewards = []
-    LSTM_vals = []
+    LSTM_expected_rewards = []
     LSTM_entropies = []
     LSTM_regrets = []
 
 
-    optimal_rewards = []
-    random_rewards = []
     for t in range(T):
         if t % 50 == 0:
             DisRNN_h = DisRNN_h.detach()
             LSTM_h = LSTM_h.detach()
             LSTM_c = LSTM_c.detach()
-
-
-        random_rewards.append(probs.mean(dim= -1))
-        optimal_rewards.append(probs.max(dim= -1).values)
 
 
         # DisRNN step
@@ -113,16 +106,15 @@ for ep in range(episodes):
 
         DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
         DisRNN_a = DisRNN_pi.sample()
-        DisRNN_expected_r = probs[batch_idx, DisRNN_a]
-        DisRNN_r = (torch.rand(batch_size, device= device) < DisRNN_expected_r).float()
+        DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
 
         DisRNN_log_probs.append(DisRNN_pi.log_prob(DisRNN_a))
         DisRNN_rewards.append(DisRNN_r)
+        DisRNN_expected_rewards.append(DisRNN_critic(DisRNN_h.detach()).squeeze(-1))
+        DisRNN_entropies.append(DisRNN_pi.entropy())
         for key, val in kls.items():
             DisRNN_bottleneck_losses[key].append(val)
-        DisRNN_vals.append(DisRNN_critic(DisRNN_h.detach()).squeeze(-1))
-        DisRNN_entropies.append(DisRNN_pi.entropy())
-        DisRNN_regrets.append(probs.max(dim= -1).values - DisRNN_expected_r)
+        DisRNN_regrets.append(probs.max(dim= -1).values - probs[batch_idx, DisRNN_a])
 
         DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
 
@@ -133,14 +125,13 @@ for ep in range(episodes):
 
         LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
         LSTM_a = LSTM_pi.sample()
-        LSTM_expected_r = probs[batch_idx, LSTM_a]
-        LSTM_r = (torch.rand(batch_size, device= device) < LSTM_expected_r).float()
+        LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
         
         LSTM_log_probs.append(LSTM_pi.log_prob(LSTM_a))
         LSTM_rewards.append(LSTM_r)
-        LSTM_vals.append(LSTM_critic(LSTM_out.squeeze(0).detach()).squeeze(-1))
+        LSTM_expected_rewards.append(LSTM_critic(LSTM_out.squeeze(0).detach()).squeeze(-1))
         LSTM_entropies.append(LSTM_pi.entropy())
-        LSTM_regrets.append(probs.max(dim= -1).values - LSTM_expected_r)
+        LSTM_regrets.append(probs.max(dim= -1).values - probs[batch_idx, LSTM_a])
 
         LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
 
@@ -152,19 +143,16 @@ for ep in range(episodes):
 
     DisRNN_log_probs = torch.stack(DisRNN_log_probs)
     DisRNN_rewards = torch.stack(DisRNN_rewards)
-    DisRNN_bottleneck_losses = {key: torch.stack(vals) for key, vals in DisRNN_bottleneck_losses.items()}
-    DisRNN_vals = torch.stack(DisRNN_vals)
+    DisRNN_expected_rewards = torch.stack(DisRNN_expected_rewards)
     DisRNN_entropies = torch.stack(DisRNN_entropies)
+    DisRNN_bottleneck_losses = {key: torch.stack(expected_rewards) for key, expected_rewards in DisRNN_bottleneck_losses.items()}
     DisRNN_regrets = torch.stack(DisRNN_regrets)
 
     LSTM_log_probs = torch.stack(LSTM_log_probs)
     LSTM_rewards = torch.stack(LSTM_rewards)
-    LSTM_vals = torch.stack(LSTM_vals)
+    LSTM_expected_rewards = torch.stack(LSTM_expected_rewards)
     LSTM_entropies = torch.stack(LSTM_entropies)
     LSTM_regrets = torch.stack(LSTM_regrets)
-
-    optimal_rewards = torch.stack(optimal_rewards)
-    random_rewards = torch.stack(random_rewards)
 
 
     # update betas
@@ -172,12 +160,12 @@ for ep in range(episodes):
     beta = beta_max * min(ep / warmup_end, 1.0)
     
 
-    # A2C
-    DisRNN_advantage = DisRNN_rewards - DisRNN_vals
+    # advantage actor-critic
+    DisRNN_advantage = DisRNN_rewards - DisRNN_expected_rewards
 
     DisRNN_loss_policy = -(DisRNN_log_probs * DisRNN_advantage.detach()).mean()
     DisRNN_loss_entropy = DisRNN_entropies.mean()
-    DisRNN_loss_critic = F.mse_loss(DisRNN_vals, DisRNN_rewards)
+    DisRNN_loss_critic = F.mse_loss(DisRNN_expected_rewards, DisRNN_rewards)
     DisRNN_loss_bottlenecks = sum(loss.mean() for loss in DisRNN_bottleneck_losses.values())
     DisRNN_loss = (
         DisRNN_loss_policy 
@@ -194,11 +182,11 @@ for ep in range(episodes):
     DisRNN_optimizer.step()
 
 
-    LSTM_advantage = LSTM_rewards - LSTM_vals
+    LSTM_advantage = LSTM_rewards - LSTM_expected_rewards
 
     LSTM_loss_policy = -(LSTM_log_probs * LSTM_advantage.detach()).mean()
     LSTM_loss_entropy = LSTM_entropies.mean()
-    LSTM_loss_critic = F.mse_loss(LSTM_vals, LSTM_rewards)
+    LSTM_loss_critic = F.mse_loss(LSTM_expected_rewards, LSTM_rewards)
     LSTM_loss = (
         LSTM_loss_policy
         - beta_e * LSTM_loss_entropy
@@ -213,8 +201,6 @@ for ep in range(episodes):
     LSTM_optimizer.step()
 
 
-    random_avg_R = random_rewards.mean().item()
-    optimal_avg_R = optimal_rewards.mean().item()
     DisRNN_avg_R = DisRNN_rewards.mean().item()
     LSTM_avg_R = LSTM_rewards.mean().item()
 
@@ -224,8 +210,6 @@ for ep in range(episodes):
 
     if ep % 250 == 0:
         print(f'ep {ep:5d}')
-        print(f'  rand avg R {random_avg_R}')
-        print(f'   opt avg R {optimal_avg_R}')
         print(f'  LSTM avg R {LSTM_avg_R:.3f} |   LSTM loss {LSTM_loss.item():.4f}')
         print(
             f'DisRNN avg R {DisRNN_avg_R:.3f} | DisRNN loss {DisRNN_loss.item():.4f} | '
@@ -254,7 +238,7 @@ for ep in range(episodes):
             'LSTM_readout_state_dict': LSTM_readout.state_dict(),
             'LSTM_critic_state_dict': LSTM_critic.state_dict(),
             'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
-        }, f'checkpoints/checkpoint_ep{ep}.pt')
+        }, f'checkpoints/seed{seed}/checkpoint_ep{ep}.pt')
 
 
         DisRNN_regret = np.array(DisRNN_regret_history)
@@ -269,5 +253,5 @@ for ep in range(episodes):
         plt.ylabel('Regret')
         plt.title('Model Regret Over Time')
         plt.legend()
-        plt.savefig(f'figs/regret_ep{ep}.png')
+        plt.savefig(f'figs/seed{seed}/regret_ep{ep}.png')
         plt.close()
