@@ -145,7 +145,7 @@ for ep in range(episodes):
     DisRNN_rewards = torch.stack(DisRNN_rewards)
     DisRNN_expected_rewards = torch.stack(DisRNN_expected_rewards)
     DisRNN_entropies = torch.stack(DisRNN_entropies)
-    DisRNN_bottleneck_losses = {key: torch.stack(expected_rewards) for key, expected_rewards in DisRNN_bottleneck_losses.items()}
+    DisRNN_bottleneck_losses = {key: torch.stack(vals) for key, vals in DisRNN_bottleneck_losses.items()}
     DisRNN_regrets = torch.stack(DisRNN_regrets)
 
     LSTM_log_probs = torch.stack(LSTM_log_probs)

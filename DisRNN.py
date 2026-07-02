@@ -39,13 +39,13 @@ class MyDisRNN(nn.Module):
             
         # initialize bottleneck parameters
         self.logit_M_h = nn.Parameter(5 * torch.ones((m,m)))  # M(i,j) -> update rule i's dependence on latent j
-        self.log_sigma_h = nn.Parameter(-5 * torch.ones((m,m)))
+        self.log_sigma_h = nn.Parameter(-2 * torch.ones((m,m)))
 
         self.logit_M_x = nn.Parameter(5 * torch.ones((m,n)))
-        self.log_sigma_x = nn.Parameter(-5 * torch.ones((m,n)))
+        self.log_sigma_x = nn.Parameter(-2 * torch.ones((m,n)))
 
         self.logit_M_z = nn.Parameter(5 *torch.ones(m))
-        self.log_sigma_z = nn.Parameter(-5 * torch.ones(m))
+        self.log_sigma_z = nn.Parameter(-2 * torch.ones(m))
 
 
     def bottleneck(self, x, m, sigma):
