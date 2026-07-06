@@ -1,8 +1,6 @@
 from config import *
 from models import *
 
-import matplotlib.pyplot as plt
-
 from SMPyBandits.Arms import Bernoulli
 from SMPyBandits.Environment import MAB
 from SMPyBandits.Policies import Thompson, UCB
@@ -85,7 +83,7 @@ for _ in range(num_tests):
             ucb.getReward(ucb_a, ucb_r)
             ucb_regrets.append(optimal.item() - p[ucb_a].item())
             
-            
+
     DisRNN_cumulative_regrets.append(np.array(DisRNN_regrets).cumsum())
     LSTM_cumulative_regrets.append(np.array(LSTM_regrets).cumsum())
     Thompson_cumulative_regrets.append(np.array(thompson_regrets).cumsum())

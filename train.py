@@ -1,15 +1,13 @@
 from config import *
 from models import *
-
-from helper_functions import format_matrix, smooth
-import matplotlib.pyplot as plt
+from helpers import format_matrix, smooth
 import os
 
 os.makedirs(f'checkpoints/seed{seed}', exist_ok= True)
 os.makedirs(f'figs/seed{seed}', exist_ok= True)
 
 
-# initialize models and optimizers
+# initialize training models and optimizers
 DisRNN_critic = torch.nn.Linear(DisRNN_hidden_size, 1).to(device)
 DisRNN_optimizer = torch.optim.Adam(
     list(DisRNN.parameters()) + list(DisRNN_critic.parameters()), 
@@ -176,7 +174,7 @@ for ep in range(episodes):
         DisRNN_avg_reward = DisRNN_rewards.mean().item()
         LSTM_avg_reward = LSTM_rewards.mean().item()
         print(f'ep {ep:5d}')
-        print(f'LSTM avg r {LSTM_avg_reward:.3f} | DisRNN avg R {DisRNN_avg_reward:.3f}')
+        print(f'LSTM avg r {LSTM_avg_reward:.3f} | DisRNN avg r {DisRNN_avg_reward:.3f}')
         M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
         M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
         M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()

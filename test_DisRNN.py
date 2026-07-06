@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from generate_data import generate_Q_learning_data, generate_actor_critic_data, generate_batch
 from DisRNN import DisRNN
-from helper_functions import format_matrix
+from helpers import format_matrix
 
 DATA_GENERATOR = generate_Q_learning_data
 
