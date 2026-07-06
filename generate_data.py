@@ -1,14 +1,12 @@
 import torch
 
-D = torch.rand
-
 
 def get_reward(a, probs):
     return 1 if torch.rand(()) < probs[a] else 0
 
 
 def generate_Q_learning_data(T= 500, alpha= 0.3, beta= 3, drift= 0.02):
-    probs = D(2)
+    probs = torch.rand(2)
     
     q = 0.5 * torch.ones(2)
     
@@ -35,7 +33,7 @@ def generate_Q_learning_data(T= 500, alpha= 0.3, beta= 3, drift= 0.02):
 
 
 def generate_actor_critic_data(T= 500, alpha= 0.8, lr= 0.8, fr= 1e-4, drift= 0.02):
-    probs = D(2)
+    probs = torch.rand(2)
 
     V = torch.tensor(0.0)
     Theta = torch.tensor(0.0)
@@ -75,10 +73,10 @@ def generate_batch(B, data_generator, **kwargs):
     X = torch.tensor(
         [[[2*h['a'] - 1, 2*h['r'] - 1] for h in history] for history in histories],
         dtype= torch.float32
-    ).permute(1, 0, 2)  # (B,T,n) -> (T,B,n)
+    ).permute(1, 0, 2)
     Y = torch.tensor(
         [[h['a'] for h in history] for history in histories],
         dtype= torch.long
-    ).permute(1, 0)  # (B,T) -> (T,B)
+    ).permute(1, 0)
 
     return X, Y

@@ -48,7 +48,7 @@ for _ in range(num_tests):
     thompson_regrets = []
     ucb_regrets = []
     with torch.no_grad():
-        for t in range(T):
+        for t in range(trials):
             optimal = probs.max(dim= -1).values
 
             # DisRNN step
@@ -92,17 +92,17 @@ for _ in range(num_tests):
 
 
 
-def plot_agent(data, color, label):
+def plot_agent(data, color, linestyle, label):
     mean = np.stack(data).mean(axis= 0)
     std = np.stack(data).std(axis= 0)
-    plt.plot(mean, color= color, label= label)
-    plt.fill_between(range(T), mean - std, mean + std, alpha= 0.1, color= color)
+    plt.plot(mean, color= color, linestyle= linestyle, label= label)
+    #plt.fill_between(range(T), mean - std, mean + std, alpha= 0.1, color= color, linestyle= linestyle)
 
 plt.figure(figsize= (8,5))
-plot_agent(DisRNN_cumulative_regrets, 'green', 'DisRNN')
-plot_agent(LSTM_cumulative_regrets, 'black', 'LSTM')
-plot_agent(Thompson_cumulative_regrets, 'gray', 'Thompson')
-plot_agent(UCB_cumulative_regrets, 'blue', 'UCB')
+plot_agent(DisRNN_cumulative_regrets, 'blue', '-', 'DisRNN')
+plot_agent(LSTM_cumulative_regrets, 'green', '-', 'LSTM')
+plot_agent(Thompson_cumulative_regrets, 'gray', '--', 'Thompson')
+plot_agent(UCB_cumulative_regrets, 'lightgray', '--', 'UCB')
 plt.xlabel('Trial')
 plt.ylabel('Cumulative Regret')
 plt.title('Model Cumulative Regret')

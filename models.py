@@ -3,7 +3,7 @@ from DisRNN import MyDisRNN
 
 input_size = 2
 
-DisRNN_hidden_size = 16
+DisRNN_hidden_size = 5
 DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)
 
 LSTM_hidden_size = 48

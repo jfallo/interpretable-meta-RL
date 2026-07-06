@@ -14,4 +14,5 @@ D = torch.rand
 num_arms = 2
 
 episodes = 50_000
-T = 100
+trials = 100
+gamma = 0.99

@@ -20,12 +20,12 @@ LSTM_optimizer = torch.optim.Adam(
     lr= 1e-3
 )
 
-
 # training hyperparameters
 batch_size = 32
 batch_idx = torch.arange(batch_size, device= device)
+steps_unrolled = 100
 beta_e = 1.0
-anneal_end = 2000
+anneal_end = 5000
 beta_v = 0.05
 beta_max = 1e-3
 warmup_start = 0
@@ -69,8 +69,8 @@ for ep in range(episodes):
     LSTM_regrets = []
 
 
-    for t in range(T):
-        if t % 50 == 0:
+    for t in range(trials):
+        if t % steps_unrolled == 0:
             DisRNN_h = DisRNN_h.detach()
             LSTM_h = LSTM_h.detach()
             LSTM_c = LSTM_c.detach()
@@ -83,17 +83,15 @@ for ep in range(episodes):
         DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
         DisRNN_a = DisRNN_pi.sample()
         DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
+        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
 
         DisRNN_log_probs.append(DisRNN_pi.log_prob(DisRNN_a))
         DisRNN_rewards.append(DisRNN_r)
-        DisRNN_expected_rewards.append(DisRNN_critic(DisRNN_h.detach()).squeeze(-1))
+        DisRNN_expected_rewards.append(DisRNN_critic(DisRNN_h).squeeze(-1))
         DisRNN_entropies.append(DisRNN_pi.entropy())
         for key, val in kls.items():
             DisRNN_bottleneck_losses[key].append(val)
         DisRNN_regrets.append(probs.max(dim= -1).values - probs[batch_idx, DisRNN_a])
-
-        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
-
 
         # LSTM step
         LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
@@ -102,14 +100,13 @@ for ep in range(episodes):
         LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
         LSTM_a = LSTM_pi.sample()
         LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
+        LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
         
         LSTM_log_probs.append(LSTM_pi.log_prob(LSTM_a))
         LSTM_rewards.append(LSTM_r)
-        LSTM_expected_rewards.append(LSTM_critic(LSTM_out.squeeze(0).detach()).squeeze(-1))
+        LSTM_expected_rewards.append(LSTM_critic(LSTM_out.squeeze(0)).squeeze(-1))
         LSTM_entropies.append(LSTM_pi.entropy())
         LSTM_regrets.append(probs.max(dim= -1).values - probs[batch_idx, LSTM_a])
-
-        LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
         
 
     DisRNN_log_probs = torch.stack(DisRNN_log_probs)
