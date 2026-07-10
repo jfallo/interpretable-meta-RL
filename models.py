@@ -1,7 +1,7 @@
 from config import *
 from DisRNN import MyDisRNN
 
-input_size = 2
+input_size = 3
 
 DisRNN_hidden_size = 5
 DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)

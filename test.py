@@ -8,14 +8,14 @@ from SMPyBandits.Policies.Posterior import Beta
 
 
 # load trained models
-checkpoint = torch.load(f'checkpoints/seed{seed}/checkpoint_ep{episodes - 1}.pt')
+checkpoint = torch.load(f'checkpoints/seed{seed}/checkpoint_ep{episodes}.pt')
 DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
 LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
 LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
 
 
 # testing
-num_tests = 150
+num_tests = 300
 
 DisRNN_cumulative_regrets = []
 LSTM_cumulative_regrets = []
@@ -26,7 +26,6 @@ for _ in range(num_tests):
     probs = p.unsqueeze(0).to(device)
     env = MAB([Bernoulli(p[i].item()) for i in range(num_arms)])
     
-
     # reset DisRNN state
     DisRNN.eval()
     DisRNN_h = torch.zeros(1, DisRNN_hidden_size, device= device)
@@ -50,6 +49,7 @@ for _ in range(num_tests):
     with torch.no_grad():
         for t in range(trials):
             optimal = probs.max(dim= -1).values
+            t_obs = torch.full((1, ), (t+1)/trials, device= device)
 
             # DisRNN step
             DisRNN_h, kls = DisRNN.step(DisRNN_h, DisRNN_x)
@@ -58,7 +58,7 @@ for _ in range(num_tests):
             DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
             DisRNN_a = DisRNN_pi.sample()
             DisRNN_r = (torch.rand(1, device= device) < probs[0, DisRNN_a]).float()
-            DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
+            DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
             DisRNN_regrets.append((optimal - probs[0, DisRNN_a]).cpu())
 
             # LSTM step
@@ -68,7 +68,7 @@ for _ in range(num_tests):
             LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
             LSTM_a = LSTM_pi.sample()
             LSTM_r = (torch.rand(1, device= device) < probs[0, LSTM_a]).float()
-            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
+            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
             LSTM_regrets.append((optimal - probs[0, LSTM_a]).cpu())
 
             # Thompson step
@@ -96,7 +96,7 @@ def plot_agent(data, color, linestyle, label):
     mean = np.stack(data).mean(axis= 0)
     std = np.stack(data).std(axis= 0)
     plt.plot(mean, color= color, linestyle= linestyle, label= label)
-    #plt.fill_between(range(T), mean - std, mean + std, alpha= 0.1, color= color, linestyle= linestyle)
+    #plt.fill_between(range(trials), mean - std, mean + std, alpha= 0.1, color= color, linestyle= linestyle)
 
 plt.figure(figsize= (8,5))
 plot_agent(DisRNN_cumulative_regrets, 'blue', '-', 'DisRNN')
