@@ -7,20 +7,22 @@ from SMPyBandits.Policies import Thompson, UCB
 from SMPyBandits.Policies.Posterior import Beta
 
 
-# load trained models
-checkpoint = torch.load(f'checkpoints/seed{seed}/checkpoint_ep{episodes}.pt')
-DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
-LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
-LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
+# load best models
+best_DisRNN = torch.load(f'checkpoints/seed{seed}/best_DisRNN.pt')
+DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
+
+best_LSTM = torch.load(f'checkpoints/seed{seed}/best_LSTM.pt')
+LSTM.load_state_dict(best_LSTM['LSTM_state_dict'])
+LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
 
 
 # testing
-num_tests = 300
-
 DisRNN_cumulative_regrets = []
 LSTM_cumulative_regrets = []
 Thompson_cumulative_regrets = []
 UCB_cumulative_regrets = []
+
+num_tests = 300
 for _ in range(num_tests):
     p = D(num_arms)
     probs = p.unsqueeze(0).to(device)

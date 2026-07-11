@@ -3,8 +3,37 @@ from models import *
 from helpers import format_matrix, smooth
 import os
 
+
 os.makedirs(f'checkpoints/seed{seed}', exist_ok= True)
 os.makedirs(f'figs/seed{seed}', exist_ok= True)
+
+# display helpers
+def print_bottleneck_parameters(DisRNN):
+    M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
+    M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
+    M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
+    print()
+    print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
+    print()
+    print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
+    print()
+    print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
+    print()
+    print()
+
+def plot_regret_history(DisRNN_history, LSTM_history):
+    plt.figure(figsize= (8,5))
+    plt.plot(DisRNN_history, label= 'DisRNN', color= 'green')
+    plt.plot(LSTM_history, label= 'LSTM', color= 'black')
+    plt.xlabel('Episode')
+    plt.ylabel('Regret')
+    plt.title('Model Regret Over Time')
+    plt.legend()
+    plt.grid()
+    plt.savefig(f'figs/seed{seed}/training_regret.png')
+    plt.close()
+
+
 
 
 # initialize training models and optimizers
@@ -20,6 +49,7 @@ LSTM_optimizer = torch.optim.Adam(
     lr= 1e-3
 )
 
+
 # training hyperparameters
 batch_size = 32
 batch_idx = torch.arange(batch_size, device= device)
@@ -34,10 +64,19 @@ warmup_start = 5000
 warmup_end = 10_000
 
 
-# training
-DisRNN_regret_history = []
-LSTM_regret_history = []
-for ep in range(episodes + 1):
+# training helpers
+def bottlenecks_converged(model, low= 0.1, high= 0.9):
+    M_h = torch.sigmoid(model.logit_M_h).detach()
+    M_x = torch.sigmoid(model.logit_M_x).detach()
+    M_z = torch.sigmoid(model.logit_M_z).detach()
+    
+    h_converged = ((M_h < low) | (M_h > high)).all()
+    x_converged = ((M_x < low) | (M_x > high)).all()
+    z_converged = ((M_z < low) | (M_z > high)).all()
+    
+    return h_converged and x_converged and z_converged
+
+def run_episode():
     # sample task
     probs = D(batch_size, num_arms, device= device)
 
@@ -117,15 +156,20 @@ for ep in range(episodes + 1):
     DisRNN_entropies = torch.stack(DisRNN_entropies)
     DisRNN_bottleneck_losses = {key: torch.stack(vals) for key, vals in DisRNN_bottleneck_losses.items()}
     DisRNN_regrets = torch.stack(DisRNN_regrets)
-    DisRNN_regret_history.append(DisRNN_regrets.mean().item())
+    
+    DisRNN_regret = DisRNN_regrets.mean().item()
+    DisRNN_total_reward = DisRNN_rewards.sum(dim= 0).mean().item()
 
     LSTM_log_probs = torch.stack(LSTM_log_probs)
     LSTM_rewards = torch.stack(LSTM_rewards)
     LSTM_expected_returns = torch.stack(LSTM_expected_returns)
     LSTM_entropies = torch.stack(LSTM_entropies)
     LSTM_regrets = torch.stack(LSTM_regrets)
-    LSTM_regret_history.append(LSTM_regrets.mean().item())
 
+    LSTM_regret = LSTM_regrets.mean().item()
+    LSTM_total_reward = LSTM_rewards.sum(dim= 0).mean().item()
+    
+    # --- advantage actor-critic ------
 
     # update betas
     beta_e = max(0.0, 1.0 - ep / anneal_end)
@@ -133,8 +177,8 @@ for ep in range(episodes + 1):
         beta = beta_floor
     else:
         beta = beta_floor + (beta_ceil - beta_floor) * min((ep - warmup_start) / (warmup_end - warmup_start), 1.0)
-    
-    # advantage actor-critic
+
+    # DisRNN update
     DisRNN_returns = DisRNN_rewards.clone()
     for t in reversed(range(trials - 1)):
         DisRNN_returns[t] = DisRNN_rewards[t] + gamma * DisRNN_returns[t+1]
@@ -159,7 +203,7 @@ for ep in range(episodes + 1):
     )
     DisRNN_optimizer.step()
 
-
+    # LSTM update
     LSTM_returns = LSTM_rewards.clone()
     for t in reversed(range(trials - 1)):
         LSTM_returns[t] = LSTM_rewards[t] + gamma * LSTM_returns[t+1]
@@ -182,25 +226,29 @@ for ep in range(episodes + 1):
     )
     LSTM_optimizer.step()
 
+
+    return DisRNN_regret, DisRNN_total_reward, LSTM_regret, LSTM_total_reward
+
+
+
+
+# --- Phase 1: train until bottlenecks converge ------
+DisRNN_regret_history = []
+LSTM_regret_history = []
+
+ep = 0
+while not bottlenecks_converged(DisRNN):
+    DisRNN_regret, DisRNN_total_reward, LSTM_regret, LSTM_total_reward = run_episode()
+    DisRNN_regret_history.append(DisRNN_regret)
+    LSTM_regret_history.append(LSTM_regret)
     
-    if ep % 250 == 0:
-        DisRNN_total_reward = DisRNN_rewards.sum(dim= 0).mean().item()
-        LSTM_total_reward = LSTM_rewards.sum(dim= 0).mean().item()
+    if ep % 500 == 0:
         print(f'ep {ep:6d}')
         print(f'LSTM total reward: {LSTM_total_reward:5.2f} | DisRNN total reward: {DisRNN_total_reward:5.2f}')
-        M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
-        M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
-        M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
-        print()
-        print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
-        print()
-        print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
-        print()
-        print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
-        print()
-        print()
+        print_bottleneck_parameters(DisRNN)
 
-    if ep % 5000 == 0 and ep > 0:
+    if ep % 10_000 == 0 and ep > 0:
+        plot_regret_history(smooth(np.array(DisRNN_regret_history)), smooth(np.array(LSTM_regret_history)))
         torch.save({
             'ep': ep,
             'DisRNN_state_dict': DisRNN.state_dict(),
@@ -212,13 +260,52 @@ for ep in range(episodes + 1):
             'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
         }, f'checkpoints/seed{seed}/checkpoint_ep{ep}.pt')
 
-        plt.figure(figsize= (8,5))
-        plt.plot(smooth(np.array(DisRNN_regret_history)), label= 'DisRNN', color= 'green')
-        plt.plot(smooth(np.array(LSTM_regret_history)), label= 'LSTM', color= 'black')
-        plt.xlabel('Episode')
-        plt.ylabel('Regret')
-        plt.title('Model Regret Over Time')
-        plt.legend()
-        plt.grid()
-        plt.savefig(f'figs/seed{seed}/regret_ep{ep}.png')
-        plt.close()
+    ep += 1
+
+
+# display bottleneck parameters and plot regret histories at DisRNN convergence
+print_bottleneck_parameters(DisRNN)
+plot_regret_history(smooth(np.array(DisRNN_regret_history)), smooth(np.array(LSTM_regret_history)))
+torch.save({
+    'ep': ep,
+    'DisRNN_state_dict': DisRNN.state_dict(),
+    'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
+    'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
+    'LSTM_state_dict': LSTM.state_dict(),
+    'LSTM_readout_state_dict': LSTM_readout.state_dict(),
+    'LSTM_critic_state_dict': LSTM_critic.state_dict(),
+    'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
+}, f'checkpoints/seed{seed}/at_convergence.pt')
+
+
+
+
+# --- Phase 2: search for best post-convergence model ------
+converged_DisRNN_regret_history = []
+converged_LSTM_regret_history = []
+
+DisRNN_best_regret = np.inf
+LSTM_best_regret = np.inf
+
+recent_window_len = 500
+search_episodes = 5000
+for search_ep in range(search_episodes):
+    DisRNN_regret, _, LSTM_regret, _ = run_episode()
+    converged_DisRNN_regret_history.append(DisRNN_regret)
+    converged_LSTM_regret_history.append(LSTM_regret)
+
+    if search_ep >= recent_window_len:
+        DisRNN_recent_regret = np.mean(converged_DisRNN_regret_history[-recent_window_len:])
+        if DisRNN_recent_regret < DisRNN_best_regret:
+            DisRNN_best_regret = DisRNN_recent_regret
+            torch.save({
+                'DisRNN_state_dict': DisRNN.state_dict()
+            }, f'checkpoints/seed{seed}/best_DisRNN.pt')
+            
+        LSTM_recent_regret = np.mean(converged_LSTM_regret_history[-recent_window_len:])
+        if LSTM_recent_regret < LSTM_best_regret:
+            LSTM_best_regret = LSTM_recent_regret
+            torch.save({
+                'LSTM_state_dict': LSTM.state_dict(),
+                'LSTM_readout_state_dict': LSTM_readout.state_dict()
+            }, f'checkpoints/seed{seed}/best_LSTM.pt')
