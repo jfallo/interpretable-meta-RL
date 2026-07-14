@@ -1,8 +1,6 @@
 from config import *
 from models import *
 
-from SMPyBandits.Arms import Bernoulli
-from SMPyBandits.Environment import MAB
 from SMPyBandits.Policies import Thompson, UCB
 from SMPyBandits.Policies.Posterior import Beta
 
@@ -19,14 +17,13 @@ LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
 # testing
 DisRNN_cumulative_regrets = []
 LSTM_cumulative_regrets = []
-Thompson_cumulative_regrets = []
-UCB_cumulative_regrets = []
+thompson_cumulative_regrets = []
+ucb_cumulative_regrets = []
 
 num_tests = 300
 for _ in range(num_tests):
     p = D(num_arms)
     probs = p.unsqueeze(0).to(device)
-    env = MAB([Bernoulli(p[i].item()) for i in range(num_arms)])
     
     # reset DisRNN state
     DisRNN.eval()
@@ -53,13 +50,16 @@ for _ in range(num_tests):
             optimal = probs.max(dim= -1).values
             t_obs = torch.full((1, ), (t+1)/trials, device= device)
 
+            # a single reward outcome for all agents for fair evaluation
+            arm_rewards = torch.bernoulli(p).numpy()
+
             # DisRNN step
             DisRNN_h, kls = DisRNN.step(DisRNN_h, DisRNN_x)
             DisRNN_logits = DisRNN.out(DisRNN_h)
 
             DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
             DisRNN_a = DisRNN_pi.sample()
-            DisRNN_r = (torch.rand(1, device= device) < probs[0, DisRNN_a]).float()
+            DisRNN_r = torch.tensor(arm_rewards[DisRNN_a.item()], device= device).unsqueeze(0)
             DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
             DisRNN_regrets.append((optimal - probs[0, DisRNN_a]).cpu())
 
@@ -69,27 +69,27 @@ for _ in range(num_tests):
 
             LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
             LSTM_a = LSTM_pi.sample()
-            LSTM_r = (torch.rand(1, device= device) < probs[0, LSTM_a]).float()
+            LSTM_r = torch.tensor(arm_rewards[LSTM_a.item()], device= device).unsqueeze(0)
             LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
             LSTM_regrets.append((optimal - probs[0, LSTM_a]).cpu())
 
             # Thompson step
             thompson_a = thompson.choice()
-            thompson_r = env.draw(thompson_a)
+            thompson_r = arm_rewards[thompson_a]
             thompson.getReward(thompson_a, thompson_r)
             thompson_regrets.append(optimal.item() - p[thompson_a].item())
 
             # UCB step
             ucb_a = ucb.choice()
-            ucb_r = env.draw(ucb_a)
+            ucb_r = arm_rewards[ucb_a]
             ucb.getReward(ucb_a, ucb_r)
             ucb_regrets.append(optimal.item() - p[ucb_a].item())
             
 
     DisRNN_cumulative_regrets.append(np.array(DisRNN_regrets).cumsum())
     LSTM_cumulative_regrets.append(np.array(LSTM_regrets).cumsum())
-    Thompson_cumulative_regrets.append(np.array(thompson_regrets).cumsum())
-    UCB_cumulative_regrets.append(np.array(ucb_regrets).cumsum())
+    thompson_cumulative_regrets.append(np.array(thompson_regrets).cumsum())
+    ucb_cumulative_regrets.append(np.array(ucb_regrets).cumsum())
 
 
 
@@ -103,8 +103,8 @@ def plot_agent(data, color, linestyle, label):
 plt.figure(figsize= (8,5))
 plot_agent(DisRNN_cumulative_regrets, 'blue', '-', 'DisRNN')
 plot_agent(LSTM_cumulative_regrets, 'green', '-', 'LSTM')
-plot_agent(Thompson_cumulative_regrets, 'gray', '--', 'Thompson')
-plot_agent(UCB_cumulative_regrets, 'lightgray', '--', 'UCB')
+plot_agent(thompson_cumulative_regrets, 'gray', '--', 'Thompson')
+plot_agent(ucb_cumulative_regrets, 'lightgray', '--', 'UCB')
 plt.xlabel('Trial')
 plt.ylabel('Cumulative Regret')
 plt.title('Model Cumulative Regret')

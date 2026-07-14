@@ -3,7 +3,7 @@ import torch
 import random
 import matplotlib.pyplot as plt
 
-seed = 46
+seed = 40
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)

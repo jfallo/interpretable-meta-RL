@@ -54,7 +54,7 @@ LSTM_optimizer = torch.optim.Adam(
 batch_size = 32
 batch_idx = torch.arange(batch_size, device= device)
 steps_unrolled = 100
-gamma = 0.98
+gamma = 0.95
 beta_e = 1.0
 anneal_end = 5000
 beta_v = 0.05
@@ -275,36 +275,82 @@ torch.save({
     'LSTM_readout_state_dict': LSTM_readout.state_dict(),
     'LSTM_critic_state_dict': LSTM_critic.state_dict(),
     'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
-}, f'checkpoints/seed{seed}/at_convergence.pt')
+}, f'checkpoints/seed{seed}/convergence_at_ep{ep}.pt')
 
 
 
 
 # --- Phase 2: search for best post-convergence model ------
-converged_DisRNN_regret_history = []
-converged_LSTM_regret_history = []
-
 DisRNN_best_regret = np.inf
 LSTM_best_regret = np.inf
 
-recent_window_len = 500
+eval_interval = 250
+eval_episodes = 300
 search_episodes = 5000
 for search_ep in range(search_episodes):
-    DisRNN_regret, _, LSTM_regret, _ = run_episode()
-    converged_DisRNN_regret_history.append(DisRNN_regret)
-    converged_LSTM_regret_history.append(LSTM_regret)
+    run_episode()
 
-    if search_ep >= recent_window_len:
-        DisRNN_recent_regret = np.mean(converged_DisRNN_regret_history[-recent_window_len:])
-        if DisRNN_recent_regret < DisRNN_best_regret:
-            DisRNN_best_regret = DisRNN_recent_regret
+    if search_ep % eval_interval == 0:
+        DisRNN.eval()
+        LSTM.eval()
+        
+        DisRNN_eval_regrets = []
+        LSTM_eval_regrets = []
+        with torch.no_grad():
+            for _ in range(eval_episodes):
+                # sample task
+                probs = D(batch_size, num_arms, device= device)
+
+                # reset DisRNN state
+                DisRNN_h = torch.zeros(batch_size, DisRNN_hidden_size, device= device)
+                DisRNN_x = torch.zeros(batch_size, input_size, device= device)
+
+                DisRNN_eval_ep_regrets = []
+
+                # reset LSTM state
+                LSTM_h = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
+                LSTM_c = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
+                LSTM_x = torch.zeros(batch_size, input_size, device= device)
+
+                LSTM_eval_ep_regrets = []
+                
+                for t in range(trials):
+                    optimal = probs.max(dim= -1).values
+                    t_obs = torch.full((batch_size, ), (t+1)/trials, device= device)
+
+                    # DisRNN step
+                    DisRNN_h, kls = DisRNN.step(DisRNN_h, DisRNN_x)
+                    DisRNN_logits = DisRNN.out(DisRNN_h)
+
+                    DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
+                    DisRNN_a = DisRNN_pi.sample()
+                    DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
+                    DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
+                    DisRNN_eval_ep_regrets.append((optimal - probs[batch_idx, DisRNN_a]).cpu())
+
+                    # LSTM step
+                    LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
+                    LSTM_logits = LSTM_readout(LSTM_out.squeeze(0))
+
+                    LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
+                    LSTM_a = LSTM_pi.sample()
+                    LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
+                    LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
+                    LSTM_eval_ep_regrets.append((optimal - probs[batch_idx, LSTM_a]).cpu())
+
+                DisRNN_eval_regrets.append(np.mean(DisRNN_eval_ep_regrets))
+                LSTM_eval_regrets.append(np.mean(LSTM_eval_ep_regrets))
+
+        DisRNN_eval_regret = np.mean(DisRNN_eval_regrets)
+        if DisRNN_eval_regret < DisRNN_best_regret:
+            DisRNN_best_regret = DisRNN_eval_regret
             torch.save({
                 'DisRNN_state_dict': DisRNN.state_dict()
             }, f'checkpoints/seed{seed}/best_DisRNN.pt')
             
-        LSTM_recent_regret = np.mean(converged_LSTM_regret_history[-recent_window_len:])
-        if LSTM_recent_regret < LSTM_best_regret:
-            LSTM_best_regret = LSTM_recent_regret
+        LSTM_eval_regret = np.mean(LSTM_eval_regrets)
+        if LSTM_eval_regret < LSTM_best_regret:
+            LSTM_best_regret = LSTM_eval_regret
             torch.save({
                 'LSTM_state_dict': LSTM.state_dict(),
                 'LSTM_readout_state_dict': LSTM_readout.state_dict()
