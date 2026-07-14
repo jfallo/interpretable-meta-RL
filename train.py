@@ -54,7 +54,6 @@ LSTM_optimizer = torch.optim.Adam(
 batch_size = 32
 batch_idx = torch.arange(batch_size, device= device)
 steps_unrolled = 100
-gamma = 0.95
 beta_e = 1.0
 anneal_end = 5000
 beta_v = 0.05

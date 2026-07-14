@@ -3,6 +3,7 @@ from models import *
 
 from SMPyBandits.Policies import Thompson, UCB
 from SMPyBandits.Policies.Posterior import Beta
+from Gittins import compute_gittins_table, Gittins
 
 
 # load best models
@@ -13,12 +14,16 @@ best_LSTM = torch.load(f'checkpoints/seed{seed}/best_LSTM.pt')
 LSTM.load_state_dict(best_LSTM['LSTM_state_dict'])
 LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
 
+# build gittins table
+gittins_table = compute_gittins_table(max_total= trials+1, gamma= gamma, N= 200, tol= 1e-4)
+
 
 # testing
 DisRNN_cumulative_regrets = []
 LSTM_cumulative_regrets = []
 thompson_cumulative_regrets = []
 ucb_cumulative_regrets = []
+gittins_cumulative_regrets = []
 
 num_tests = 300
 for _ in range(num_tests):
@@ -39,12 +44,14 @@ for _ in range(num_tests):
     # test models
     thompson = Thompson(num_arms, Beta)
     ucb = UCB(num_arms)
+    gittins = Gittins(num_arms, gittins_table)
 
 
     DisRNN_regrets = []
     LSTM_regrets = []
     thompson_regrets = []
     ucb_regrets = []
+    gittins_regrets = []
     with torch.no_grad():
         for t in range(trials):
             optimal = probs.max(dim= -1).values
@@ -84,12 +91,19 @@ for _ in range(num_tests):
             ucb_r = arm_rewards[ucb_a]
             ucb.getReward(ucb_a, ucb_r)
             ucb_regrets.append(optimal.item() - p[ucb_a].item())
+
+            # Gittins step
+            gittins_a = gittins.choice()
+            gittins_r = arm_rewards[gittins_a]
+            gittins.getReward(gittins_a, gittins_r)
+            gittins_regrets.append(optimal.item() - p[gittins_a].item())
             
 
     DisRNN_cumulative_regrets.append(np.array(DisRNN_regrets).cumsum())
     LSTM_cumulative_regrets.append(np.array(LSTM_regrets).cumsum())
     thompson_cumulative_regrets.append(np.array(thompson_regrets).cumsum())
     ucb_cumulative_regrets.append(np.array(ucb_regrets).cumsum())
+    gittins_cumulative_regrets.append(np.array(gittins_regrets).cumsum())
 
 
 
@@ -105,6 +119,7 @@ plot_agent(DisRNN_cumulative_regrets, 'blue', '-', 'DisRNN')
 plot_agent(LSTM_cumulative_regrets, 'green', '-', 'LSTM')
 plot_agent(thompson_cumulative_regrets, 'gray', '--', 'Thompson')
 plot_agent(ucb_cumulative_regrets, 'lightgray', '--', 'UCB')
+plot_agent(gittins_cumulative_regrets, 'black', '--', 'Gittins')
 plt.xlabel('Trial')
 plt.ylabel('Cumulative Regret')
 plt.title('Model Cumulative Regret')
