@@ -1,9 +1,8 @@
 from config import *
-from models import *
 
-from SMPyBandits.Policies import Thompson, UCB
-from SMPyBandits.Policies.Posterior import Beta
-from Gittins import compute_gittins_table, Gittins
+from agents.Thompson import Thompson
+from agents.UCB import UCB
+from agents.Gittins import compute_gittins_table, Gittins
 
 
 # load best models
@@ -14,7 +13,7 @@ best_LSTM = torch.load(f'checkpoints/seed{seed}/best_LSTM.pt')
 LSTM.load_state_dict(best_LSTM['LSTM_state_dict'])
 LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
 
-# build gittins table
+# build Gittins index table
 gittins_table = compute_gittins_table(max_total= trials+1, gamma= gamma, N= 200, tol= 1e-4)
 
 
@@ -27,8 +26,7 @@ gittins_cumulative_regrets = []
 
 num_tests = 300
 for _ in range(num_tests):
-    p = D(num_arms)
-    probs = p.unsqueeze(0).to(device)
+    probs = D(1, num_arms, device= device)
     
     # reset DisRNN state
     DisRNN.eval()
@@ -42,7 +40,7 @@ for _ in range(num_tests):
     LSTM_x = torch.zeros(1, input_size, device= device)
 
     # test models
-    thompson = Thompson(num_arms, Beta)
+    thompson = Thompson(num_arms)
     ucb = UCB(num_arms)
     gittins = Gittins(num_arms, gittins_table)
 
@@ -58,7 +56,7 @@ for _ in range(num_tests):
             t_obs = torch.full((1, ), (t+1)/trials, device= device)
 
             # a single reward outcome for all agents for fair evaluation
-            arm_rewards = torch.bernoulli(p).numpy()
+            arm_rewards = torch.bernoulli(probs).squeeze(0)
 
             # DisRNN step
             DisRNN_h, kls = DisRNN.step(DisRNN_h, DisRNN_x)
@@ -66,7 +64,7 @@ for _ in range(num_tests):
 
             DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
             DisRNN_a = DisRNN_pi.sample()
-            DisRNN_r = torch.tensor(arm_rewards[DisRNN_a.item()], device= device).unsqueeze(0)
+            DisRNN_r = arm_rewards[DisRNN_a.item()].unsqueeze(0)
             DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
             DisRNN_regrets.append((optimal - probs[0, DisRNN_a]).cpu())
 
@@ -76,27 +74,27 @@ for _ in range(num_tests):
 
             LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
             LSTM_a = LSTM_pi.sample()
-            LSTM_r = torch.tensor(arm_rewards[LSTM_a.item()], device= device).unsqueeze(0)
+            LSTM_r = arm_rewards[LSTM_a.item()].unsqueeze(0)
             LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
             LSTM_regrets.append((optimal - probs[0, LSTM_a]).cpu())
 
             # Thompson step
             thompson_a = thompson.choice()
-            thompson_r = arm_rewards[thompson_a]
+            thompson_r = arm_rewards[thompson_a].item()
             thompson.getReward(thompson_a, thompson_r)
-            thompson_regrets.append(optimal.item() - p[thompson_a].item())
+            thompson_regrets.append(optimal.item() - probs[0, thompson_a].item())
 
             # UCB step
             ucb_a = ucb.choice()
-            ucb_r = arm_rewards[ucb_a]
+            ucb_r = arm_rewards[ucb_a].item()
             ucb.getReward(ucb_a, ucb_r)
-            ucb_regrets.append(optimal.item() - p[ucb_a].item())
+            ucb_regrets.append(optimal.item() - probs[0, ucb_a].item())
 
             # Gittins step
             gittins_a = gittins.choice()
-            gittins_r = arm_rewards[gittins_a]
+            gittins_r = arm_rewards[gittins_a].item()
             gittins.getReward(gittins_a, gittins_r)
-            gittins_regrets.append(optimal.item() - p[gittins_a].item())
+            gittins_regrets.append(optimal.item() - probs[0, gittins_a].item())
             
 
     DisRNN_cumulative_regrets.append(np.array(DisRNN_regrets).cumsum())
