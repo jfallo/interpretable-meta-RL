@@ -24,7 +24,7 @@ thompson_cumulative_regrets = []
 ucb_cumulative_regrets = []
 gittins_cumulative_regrets = []
 
-num_tests = 300
+num_tests = 1000
 for _ in range(num_tests):
     probs = D(1, num_arms, device= device)
     
@@ -41,7 +41,7 @@ for _ in range(num_tests):
 
     # test models
     thompson = Thompson(num_arms)
-    ucb = UCB(num_arms)
+    ucb = UCB(num_arms, c)
     gittins = Gittins(num_arms, gittins_table)
 
 
