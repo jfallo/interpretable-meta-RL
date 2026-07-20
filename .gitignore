@@ -4,6 +4,7 @@
 *.pyo
 
 # data and outputs
+*.DS_Store
 *.pt
 *.pth
 *.npy
