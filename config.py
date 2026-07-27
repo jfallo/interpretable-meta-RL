@@ -18,7 +18,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 D = torch.rand
 num_arms = 2
 trials = 100
-gamma = 0.95
 
 
 # training

@@ -24,3 +24,6 @@ scratch/
 
 # model checkpoints
 checkpoints/
+
+# hyperparameter testing results
+figs/hyperparameter_testing
