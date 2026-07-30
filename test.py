@@ -55,7 +55,6 @@ def run_tests(num_tests):
         with torch.no_grad():
             for t in range(trials):
                 optimal = probs.max(dim= -1).values
-                t_obs = torch.full((1, ), (t+1)/trials, device= device)
 
                 # a single reward outcome for all agents for fair evaluation
                 arm_rewards = torch.bernoulli(probs).squeeze(0)
@@ -67,7 +66,7 @@ def run_tests(num_tests):
                 DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
                 DisRNN_a = DisRNN_pi.sample()
                 DisRNN_r = arm_rewards[DisRNN_a.item()].unsqueeze(0)
-                DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
+                DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
                 DisRNN_regrets.append((optimal - probs[0, DisRNN_a]).cpu())
 
                 # LSTM step
@@ -77,7 +76,7 @@ def run_tests(num_tests):
                 LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
                 LSTM_a = LSTM_pi.sample()
                 LSTM_r = arm_rewards[LSTM_a.item()].unsqueeze(0)
-                LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
+                LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
                 LSTM_regrets.append((optimal - probs[0, LSTM_a]).cpu())
 
                 # Thompson step

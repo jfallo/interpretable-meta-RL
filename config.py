@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from agents.DisRNN import MyDisRNN
 
 
-seed = 44
+seed = 36
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -21,7 +21,7 @@ trials = 100
 
 
 # training
-input_size = 3
+input_size = 2
 
 DisRNN_hidden_size = 5
 DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)

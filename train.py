@@ -37,7 +37,7 @@ def plot_regret_history(DisRNN_history, LSTM_history, plot_name):
 
 
 # initialize training models and optimizers
-DisRNN_gamma = 0.99
+DisRNN_gamma = 0.98
 DisRNN_lr = 5e-4
 DisRNN_critic = torch.nn.Linear(DisRNN_hidden_size, 1).to(device)
 DisRNN_optimizer = torch.optim.Adam(
@@ -45,7 +45,7 @@ DisRNN_optimizer = torch.optim.Adam(
     lr= DisRNN_lr
 )
 
-LSTM_gamma = 0.95
+LSTM_gamma = 0.98
 LSTM_lr = 5e-3
 LSTM_critic = torch.nn.Linear(LSTM_hidden_size, 1).to(device)
 LSTM_optimizer = torch.optim.Adam(
@@ -121,7 +121,6 @@ def run_training_episode(phase, train_LSTM= True):
             if train_LSTM:
                 LSTM_h = LSTM_h.detach()
                 LSTM_c = LSTM_c.detach()
-        t_obs = torch.full((batch_size, ), (t+1)/trials, device= device)
 
 
         # DisRNN step
@@ -131,7 +130,7 @@ def run_training_episode(phase, train_LSTM= True):
         DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
         DisRNN_a = DisRNN_pi.sample()
         DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
-        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
+        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
 
         DisRNN_log_probs.append(DisRNN_pi.log_prob(DisRNN_a))
         DisRNN_rewards.append(DisRNN_r)
@@ -149,7 +148,7 @@ def run_training_episode(phase, train_LSTM= True):
             LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
             LSTM_a = LSTM_pi.sample()
             LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
-            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
+            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
             
             LSTM_log_probs.append(LSTM_pi.log_prob(LSTM_a))
             LSTM_rewards.append(LSTM_r)
@@ -268,7 +267,6 @@ def run_eval_episode():
         
         for t in range(trials):
             optimal = probs.max(dim= -1).values
-            t_obs = torch.full((batch_size, ), (t+1)/trials, device= device)
 
             # DisRNN step
             DisRNN_h, _ = DisRNN.step(DisRNN_h, DisRNN_x)
@@ -277,7 +275,7 @@ def run_eval_episode():
             DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
             DisRNN_a = DisRNN_pi.sample()
             DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
-            DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
+            DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
             DisRNN_eval_ep_regrets.append((optimal - probs[batch_idx, DisRNN_a]).cpu())
 
             # LSTM step
@@ -287,7 +285,7 @@ def run_eval_episode():
             LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
             LSTM_a = LSTM_pi.sample()
             LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
-            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1, t_obs], dim= -1)
+            LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
             LSTM_eval_ep_regrets.append((optimal - probs[batch_idx, LSTM_a]).cpu())
 
     return np.mean(DisRNN_eval_ep_regrets), np.mean(LSTM_eval_ep_regrets)
