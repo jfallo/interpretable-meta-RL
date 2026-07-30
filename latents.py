@@ -1,67 +1,141 @@
 from config import *
+from helpers import format_matrix
+
+
+def print_bottleneck_parameters(DisRNN):
+    M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
+    M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
+    M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
+    print()
+    print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
+    print()
+    print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
+    print()
+    print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
+    print()
+    print()
+
+
 
 
 # load best DisRNN
-best_DisRNN = torch.load(f'checkpoints/seed{seed}_test/best_DisRNN.pt')
+best_DisRNN = torch.load(f'checkpoints/seed{seed}/best_DisRNN.pt')
 DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
+print_bottleneck_parameters(DisRNN)
 
-# set task
-probs = D(1, num_arms, device= device)
-        
-# reset DisRNN state
-DisRNN.eval()
-DisRNN_h = torch.zeros(1, DisRNN_hidden_size, device= device)
-DisRNN_x = torch.zeros(1, input_size, device= device)
+trajectories = 0
+for _ in range(trajectories):
+    # set task
+    probs = D(1, num_arms, device= device)
+            
+    # reset DisRNN state
+    DisRNN.eval()
+    h = torch.zeros(1, DisRNN_hidden_size, device= device)
+    x = torch.zeros(1, input_size, device= device)
 
-latent_history = []
-action_history = []
-reward_history = []
-with torch.no_grad():
+    latent_history = []
+    action_history = []
+    reward_history = []
+    with torch.no_grad():
+        for t in range(trials):
+            arm_rewards = torch.bernoulli(probs).squeeze(0)
+
+            # DisRNN step
+            h, _ = DisRNN.step(h, x)
+            logits = DisRNN.out(h)
+
+            pi = torch.distributions.Categorical(logits= logits)
+            a = pi.sample()
+            r = arm_rewards[a.item()].unsqueeze(0)
+            x = torch.stack([2*a.float() - 1, 2*r - 1], dim= -1)
+
+            # track latents
+            latent_history.append(h)
+            action_history.append(a)
+            reward_history.append(r)
+
+    latent_history = torch.stack(latent_history).squeeze(1).cpu().numpy()
+    action_history = torch.stack(action_history).cpu().numpy()
+    reward_history = torch.stack(reward_history).cpu().numpy()
+
+
+    # plot latent trajectories with (a,r) markers
+    plt.figure(figsize= (12,6))
+    for h in range(DisRNN_hidden_size):
+        plt.plot(latent_history[:, h], label= f'Latent {h}')
+    ax = plt.gca()
+    ymin, ymax = ax.get_ylim()
+    margin = 0.02 * (ymax - ymin)
+    y_top = ymax + margin
+    y_bottom = ymin - margin
     for t in range(trials):
-        arm_rewards = torch.bernoulli(probs).squeeze(0)
+        pos = y_top if action_history[t] == 0 else y_bottom
+        color = 'green' if reward_history[t] == 1 else 'red'
+        plt.plot(t, pos, marker= '|', markersize= 8, markeredgewidth= 4, color= color, linestyle= 'None', zorder= 10)
 
-        # DisRNN step
-        t_obs = torch.full((1, ), (t+1)/trials, device= device)
+    plt.ylim(y_bottom - margin, y_top + margin)
+    plt.xlabel('Trial')
+    plt.title('Example Session')
+    plt.text(-8, y_top, 'Left Choices', ha= 'right', va= 'center')
+    plt.text(-8, y_bottom, 'Right Choices', ha= 'right', va= 'center')
+    plt.legend(loc= 'center left', bbox_to_anchor= (1.02, 0.5), borderaxespad= 0.0)
+    plt.tight_layout(rect= [0, 0, 0.85, 1])
+    plt.show()
+    plt.show()
 
-        DisRNN_h, _ = DisRNN.step(DisRNN_h, DisRNN_x)
-        DisRNN_logits = DisRNN.out(DisRNN_h)
 
-        DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
-        DisRNN_a = DisRNN_pi.sample()
-        DisRNN_r = arm_rewards[DisRNN_a.item()].unsqueeze(0)
-        DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1, t_obs], dim= -1)
 
-        # track latents
-        latent_history.append(DisRNN_h)
-        action_history.append(DisRNN_a)
-        reward_history.append(DisRNN_r)
 
-latent_history = torch.stack(latent_history).squeeze(1).cpu().numpy()
-action_history = torch.stack(action_history).cpu().numpy()
-reward_history = torch.stack(reward_history).cpu().numpy()
+# plot latent updates
+conditions = [
+    ('Left, Unrewarded',  -1, -1),
+    ('Left, Rewarded',    -1,  1),
+    ('Right, Unrewarded',  1, -1),
+    ('Right, Rewarded',    1,  1),
+]
+active_rules = [
+    rule for rule in range(DisRNN_hidden_size)
+    if (torch.sigmoid(DisRNN.logit_M_x[rule]) > 0.1).any()
+]
 
-# plot latent trajectories
-plt.figure(figsize= (12,6))
-for h in range(DisRNN_hidden_size):
-    plt.plot(latent_history[:, h], label= f'Latent {h}')
+low, high = -2.0, 2.0
+h_prevs = torch.linspace(low, high, 100, device= device)
 
-# plot (action, reward) markers
-ax = plt.gca()
-ymin, ymax = ax.get_ylim()
-margin = 0.02 * (ymax - ymin)
-y_top = ymax + margin
-y_bottom = ymin - margin
-for t in range(trials):
-    pos = y_top if action_history[t] == 0 else y_bottom
-    color = 'green' if reward_history[t] == 1 else 'red'
-    plt.plot(t, pos, marker= '|', markersize= 8, markeredgewidth= 4, color= color, linestyle= 'None', zorder= 10)
+times = [50]
+for t in times:
+    fig, axes = plt.subplots(len(active_rules), 4, figsize= (12, 3*len(active_rules)), sharex= True, sharey= True)
 
-plt.ylim(y_bottom - margin, y_top + margin)
-plt.xlabel('Trial')
-plt.title('Example Session')
-plt.text(-8, y_top, 'Left Choices', ha= 'right', va= 'center')
-plt.text(-8, y_bottom, 'Right Choices', ha= 'right', va= 'center')
-plt.legend(loc= 'center left', bbox_to_anchor= (1.02, 0.5), borderaxespad= 0.0)
-plt.tight_layout(rect= [0, 0, 0.85, 1])
-plt.show()
-plt.show()
+    M_h = torch.sigmoid(DisRNN.logit_M_h)
+    M_x = torch.sigmoid(DisRNN.logit_M_x)
+
+    with torch.no_grad():
+        for i, rule in enumerate(active_rules):
+            for col, (label, a, r) in enumerate(conditions):
+                ax = axes[i, col]
+
+                h = torch.zeros(len(h_prevs), DisRNN_hidden_size, device= device)
+                h[:, rule] = h_prevs
+                x = torch.tensor([[a, r]], dtype= torch.float32, device= device).repeat(len(h_prevs), 1)
+
+                h = M_h[rule].unsqueeze(0) * h  # no noise
+                x = M_x[rule].unsqueeze(0) * x
+
+                z = torch.cat([h, x], dim= -1)
+                logit_w, u = DisRNN.updateMLPs[rule](z).unbind(dim= -1)
+                w = torch.sigmoid(logit_w)
+
+                z_out = (1 - w) * h_prevs + w * u
+
+                ax.plot([low, high], [low, high], 'k--', linewidth= 1)
+                ax.set_xlabel(f'Latent {rule}')
+                ax.axhline(0, color= 'k', linewidth= 0.8)
+                ax.axvline(0, color= 'k', linewidth= 0.8)
+                ax.plot(h_prevs.cpu(), z_out.cpu(), linewidth= 2.5, color= f'C{rule}')
+                if i == 0:
+                    ax.set_title(label)
+                if col == 0:
+                    ax.set_ylabel(f'Updated Latent {rule}')
+
+    plt.tight_layout()
+    plt.savefig(f'figs/seed{seed}/latent_updates_at_trial{t}.png')
+    plt.close()
