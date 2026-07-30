@@ -1,39 +1,11 @@
 from config import *
-from helpers import format_matrix, smooth
+from helpers import print_bottleneck_parameters, smooth
 import os
 
 os.makedirs(f'checkpoints/seed{seed}', exist_ok= True)
 os.makedirs(f'figs/seed{seed}', exist_ok= True)
 
-
-# display helpers
-def print_bottleneck_parameters(DisRNN):
-    M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
-    M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
-    M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
-    print()
-    print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
-    print()
-    print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
-    print()
-    print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
-    print()
-    print()
-
-
-def plot_regret_history(DisRNN_history, LSTM_history, plot_name):
-    plt.figure(figsize= (8,5))
-    plt.plot(DisRNN_history, label= 'DisRNN', color= 'blue')
-    plt.plot(LSTM_history, label= 'LSTM', color= 'green')
-    plt.xlabel('Episode')
-    plt.ylabel('Regret')
-    plt.title('Model Regret Over Time')
-    plt.legend()
-    plt.grid()
-    plt.savefig(f'figs/seed{seed}/{plot_name}.png')
-    plt.close()
-
-
+m_min = torch.logit(torch.tensor(0.01)).item()
 
 
 # initialize training models and optimizers
@@ -69,6 +41,19 @@ train_LSTM_until_ep = 200_000
 
 
 # training helpers
+def plot_regret_history(DisRNN_history, LSTM_history, plot_name):
+    plt.figure(figsize= (8,5))
+    plt.plot(DisRNN_history, label= 'DisRNN', color= 'blue')
+    plt.plot(LSTM_history, label= 'LSTM', color= 'green')
+    plt.xlabel('Episode')
+    plt.ylabel('Regret')
+    plt.title('Model Regret Over Time')
+    plt.legend()
+    plt.grid()
+    plt.savefig(f'figs/seed{seed}/{plot_name}.png')
+    plt.close()
+
+
 def disentangled(model, low= 0.1, high= 0.9):
     M_h = torch.sigmoid(model.logit_M_h).detach()
     M_x = torch.sigmoid(model.logit_M_x).detach()
@@ -214,6 +199,13 @@ def run_training_episode(phase, train_LSTM= True):
         max_norm= 1.0
     )
     DisRNN_optimizer.step()
+    with torch.no_grad():
+        DisRNN.logit_M_h.clamp_(min= m_min)
+        DisRNN.log_sigma_h.clamp_(max= 0.0)
+        DisRNN.logit_M_x.clamp_(min= m_min)
+        DisRNN.log_sigma_x.clamp_(max= 0.0)
+        DisRNN.logit_M_z.clamp_(min= m_min)
+        DisRNN.log_sigma_z.clamp_(max= 0.0)
 
     # LSTM update
     if train_LSTM:
