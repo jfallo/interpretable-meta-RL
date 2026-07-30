@@ -1,21 +1,5 @@
 from config import *
-from helpers import format_matrix
-
-
-def print_bottleneck_parameters(DisRNN):
-    M_h = torch.sigmoid(DisRNN.logit_M_h).detach().cpu().numpy()
-    M_x = torch.sigmoid(DisRNN.logit_M_x).detach().cpu().numpy()
-    M_z = torch.sigmoid(DisRNN.logit_M_z).detach().cpu().numpy()
-    print()
-    print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
-    print()
-    print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
-    print()
-    print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
-    print()
-    print()
-
-
+from helpers import print_bottleneck_parameters
 
 
 # load best DisRNN
@@ -23,7 +7,7 @@ best_DisRNN = torch.load(f'checkpoints/seed{seed}/best_DisRNN.pt')
 DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
 print_bottleneck_parameters(DisRNN)
 
-trajectories = 0
+trajectories = 5
 for _ in range(trajectories):
     # set task
     probs = D(1, num_arms, device= device)
@@ -84,8 +68,6 @@ for _ in range(trajectories):
     plt.show()
 
 
-
-
 # plot latent updates
 conditions = [
     ('Left, Unrewarded',  -1, -1),
@@ -136,6 +118,7 @@ for t in times:
                 if col == 0:
                     ax.set_ylabel(f'Updated Latent {rule}')
 
+    fig.suptitle(f'Latent Updates at Trial {t}', fontsize= 14)
     plt.tight_layout()
     plt.savefig(f'figs/seed{seed}/latent_updates_at_trial{t}.png')
     plt.close()
