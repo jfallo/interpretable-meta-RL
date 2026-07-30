@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from agents.DisRNN import MyDisRNN
 
 
-seed = 36
+seed = 40
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
