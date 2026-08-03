@@ -7,8 +7,8 @@ best_DisRNN = torch.load(f'checkpoints/seed{seed}/best_DisRNN.pt')
 DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
 print_bottleneck_parameters(DisRNN)
 
-trajectories = 5
-for _ in range(trajectories):
+ex_sessions = 10
+for _ in range(ex_sessions):
     # set task
     probs = D(1, num_arms, device= device)
             

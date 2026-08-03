@@ -5,8 +5,6 @@ import os
 os.makedirs(f'checkpoints/seed{seed}', exist_ok= True)
 os.makedirs(f'figs/seed{seed}', exist_ok= True)
 
-m_min = torch.logit(torch.tensor(0.01)).item()
-
 
 # initialize training models and optimizers
 DisRNN_gamma = 0.98
@@ -17,7 +15,7 @@ DisRNN_optimizer = torch.optim.Adam(
     lr= DisRNN_lr
 )
 
-LSTM_gamma = 0.98
+LSTM_gamma = 0.95
 LSTM_lr = 5e-3
 LSTM_critic = torch.nn.Linear(LSTM_hidden_size, 1).to(device)
 LSTM_optimizer = torch.optim.Adam(
@@ -38,6 +36,9 @@ warmup_start = 5000
 warmup_end = 10_000
 
 train_LSTM_until_ep = 200_000
+
+m_min = torch.logit(torch.tensor(0.01)).item()
+sigma_min = torch.log(torch.tensor(0.01)).item()
 
 
 # training helpers
@@ -201,11 +202,11 @@ def run_training_episode(phase, train_LSTM= True):
     DisRNN_optimizer.step()
     with torch.no_grad():
         DisRNN.logit_M_h.clamp_(min= m_min)
-        DisRNN.log_sigma_h.clamp_(max= 0.0)
+        DisRNN.log_sigma_h.clamp_(min= sigma_min, max= 0.0)
         DisRNN.logit_M_x.clamp_(min= m_min)
-        DisRNN.log_sigma_x.clamp_(max= 0.0)
+        DisRNN.log_sigma_x.clamp_(min= sigma_min, max= 0.0)
         DisRNN.logit_M_z.clamp_(min= m_min)
-        DisRNN.log_sigma_z.clamp_(max= 0.0)
+        DisRNN.log_sigma_z.clamp_(min= sigma_min, max= 0.0)
 
     # LSTM update
     if train_LSTM:

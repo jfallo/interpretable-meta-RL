@@ -143,6 +143,9 @@ def optimal_arm_rate(raw_regrets):
 
 
 
+# build Gittins index table
+gittins_table = compute_gittins_table(max_total= trials+1, gamma= 0.99, N= 200, tol= 1e-4)
+
 # load best models
 best_DisRNN = torch.load(f'checkpoints/seed{seed}/best_DisRNN.pt')
 DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
@@ -150,9 +153,6 @@ DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
 best_LSTM = torch.load(f'checkpoints/seed{seed}/best_LSTM.pt')
 LSTM.load_state_dict(best_LSTM['LSTM_state_dict'])
 LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
-
-# build Gittins index table
-gittins_table = compute_gittins_table(max_total= trials+1, gamma= 0.99, N= 200, tol= 1e-4)
 
 # testing
 results = run_tests(1000)
