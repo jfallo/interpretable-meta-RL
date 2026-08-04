@@ -2,7 +2,7 @@ from config import *
 from helpers import print_bottleneck_parameters
 
 
-def latents(config, checkpoints_path, figs_path):
+def latents_analysis(config, checkpoints_path, figs_path):
     # set task
     D = config['D']
     num_trials = config['num_trials']
@@ -134,3 +134,18 @@ def latents(config, checkpoints_path, figs_path):
         plt.tight_layout()
         plt.savefig(figs_path + f'latent_updates_at_trial{t}.png')
         plt.close()
+
+for exp, config in exps.items():
+    begin_latents_analysis = True
+    checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
+    figs_path = f'figs/{exp}/seed{seed}/latents/'
+    if os.path.exists(figs_path):
+        res = input(
+            f"There is history for experiment: {exp} bandits, seed: {seed}. "
+            "Do you want to overwrite it? (y/n): "
+        )
+        begin_latents_analysis = res.lower() == 'y'
+
+    if begin_latents_analysis:
+        print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
+        latents_analysis(config, checkpoints_path, figs_path)

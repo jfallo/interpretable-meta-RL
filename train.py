@@ -1,6 +1,5 @@
 from config import *
 from helpers import print_bottleneck_parameters, smooth
-import os
 
 
 def train(config, checkpoints_path, figs_path):
@@ -406,7 +405,7 @@ def train(config, checkpoints_path, figs_path):
 
             plot_regret_history(
                 smooth(np.array(DisRNN_regret_history[disentanglement_ep:])), 
-                smooth(np.array(LSTM_regret_history[train_LSTM_until_ep:])),
+                smooth(np.array(LSTM_regret_history[min(train_LSTM_until_ep, disentanglement_ep):])),
                 plot_name= 'training_regret_phase2'
             )
 
@@ -416,10 +415,19 @@ def train(config, checkpoints_path, figs_path):
 
 
 for exp, config in exps.items():
+    begin_training = True
     checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
     figs_path = f'figs/{exp}/seed{seed}/'
+    if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
+        res = input(
+            f"There is history for experiment: {exp} bandits, seed: {seed}. "
+            "Do you want to overwrite it? (y/n): "
+        )
+        begin_training = res.lower() == 'y'
 
-    os.makedirs(checkpoints_path, exist_ok= True)
-    os.makedirs(figs_path, exist_ok= True)
+    if begin_training:
+        os.makedirs(checkpoints_path, exist_ok=True)
+        os.makedirs(figs_path, exist_ok=True)
 
-    train(config, checkpoints_path, figs_path)
+        print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
+        train(config, checkpoints_path, figs_path)
