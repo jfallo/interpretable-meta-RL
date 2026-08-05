@@ -54,6 +54,9 @@ exps = {
     'independent': {
         'D': sample_independent_uniform,
         'num_trials': 100,
+        'restless': False,
+        'drift': 0.0,
+        'dependent_arms': False,
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
@@ -82,6 +85,9 @@ exps = {
     'dependent': {
         'D': sample_dependent_uniform,
         'num_trials': 100,
+        'restless': False,
+        'drift': 0.0,
+        'dependent_arms': True,
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
@@ -110,6 +116,9 @@ exps = {
     'dependent_hard': {
         'D': sample_dependent_hard,
         'num_trials': 100,
+        'restless': False,
+        'drift': 0.0,
+        'dependent_arms': True,
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,

@@ -9,6 +9,9 @@ def test(config, checkpoints_path, figs_path):
     # set task
     D = config['D']
     num_trials = config['num_trials']
+    restless = config['restless']
+    drift = config['drift']
+    dependent_arms = config['dependent_arms']
 
 
     # initialize models
@@ -113,8 +116,16 @@ def test(config, checkpoints_path, figs_path):
                     gittins_r = arm_rewards[gittins_a].item()
                     gittins.getReward(gittins_a, gittins_r)
                     gittins_regrets.append(optimal.item() - probs[0, gittins_a].item())
-                    
 
+
+                    # restless bandits
+                    if restless:
+                        probs += drift * torch.randn(1, num_arms, device= device)
+                        probs = torch.clamp(probs, 0, 1)
+                        if dependent_arms:
+                            probs[:, 1] = 1 - probs[:, 0]
+
+                    
             DisRNN_raw_regrets.append(np.array(DisRNN_regrets))
             LSTM_raw_regrets.append(np.array(LSTM_regrets))
             thompson_raw_regrets.append(np.array(thompson_regrets))
@@ -208,17 +219,22 @@ def test(config, checkpoints_path, figs_path):
 
 
 
-for exp, config in exps.items():
-    begin_testing = True
-    checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
-    figs_path = f'figs/{exp}/seed{seed}/'
-    if os.path.exists(figs_path + 'cumulative_regret.png') or os.path.exists(figs_path  + 'optimal_arm_rate.png'):
-        res = input(
-            f"There is history for experiment: {exp} bandits, seed: {seed}. "
-            "Do you want to overwrite it? (y/n): "
-        )
-        begin_testing = res.lower() == 'y'
+def main():
+    for exp, config in exps.items():
+        begin_testing = True
+        checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
+        figs_path = f'figs/{exp}/seed{seed}/'
+        if os.path.exists(figs_path + 'cumulative_regret.png') or os.path.exists(figs_path  + 'optimal_arm_rate.png'):
+            res = input(
+                f"There is history for experiment: {exp} bandits, seed: {seed}. "
+                "Do you want to overwrite it? (y/n): "
+            )
+            begin_testing = res.lower() == 'y'
 
-    if begin_testing:
-        print(f"Beginning testing for experiment {exp} bandits, seed {seed}.\n")
-        test(config, checkpoints_path, figs_path)
+        if begin_testing:
+            print(f"Beginning testing for experiment {exp} bandits, seed {seed}.\n")
+            test(config, checkpoints_path, figs_path)
+
+
+if __name__ == "__main__":
+    main()

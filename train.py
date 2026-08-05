@@ -6,6 +6,9 @@ def train(config, checkpoints_path, figs_path):
     # set task
     D = config['D']
     num_trials = config['num_trials']
+    restless = config['restless']
+    drift = config['drift']
+    dependent_arms = config['dependent_arms']
 
 
     # initialize training models and optimizers
@@ -154,8 +157,16 @@ def train(config, checkpoints_path, figs_path):
                 LSTM_expected_returns.append(LSTM_critic(LSTM_out.squeeze(0)).squeeze(-1))
                 LSTM_entropies.append(LSTM_pi.entropy())
                 LSTM_regrets.append(probs.max(dim= -1).values - probs[batch_idx, LSTM_a])
-            
 
+
+            # restless bandits
+            if restless:
+                probs += drift * torch.randn(batch_size, num_arms, device= device)
+                probs = torch.clamp(probs, 0, 1)
+                if dependent_arms:
+                    probs[:, 1] = 1 - probs[:, 0]
+
+            
         DisRNN_log_probs = torch.stack(DisRNN_log_probs)
         DisRNN_rewards = torch.stack(DisRNN_rewards)
         DisRNN_expected_returns = torch.stack(DisRNN_expected_returns)
@@ -414,20 +425,25 @@ def train(config, checkpoints_path, figs_path):
 
 
 
-for exp, config in exps.items():
-    begin_training = True
-    checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
-    figs_path = f'figs/{exp}/seed{seed}/'
-    if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
-        res = input(
-            f"There is history for experiment: {exp} bandits, seed: {seed}. "
-            "Do you want to overwrite it? (y/n): "
-        )
-        begin_training = res.lower() == 'y'
+def main():
+    for exp, config in exps.items():
+        begin_training = True
+        checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
+        figs_path = f'figs/{exp}/seed{seed}/'
+        if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
+            res = input(
+                f"There is history for experiment: {exp} bandits, seed: {seed}. "
+                "Do you want to overwrite it? (y/n): "
+            )
+            begin_training = res.lower() == 'y'
 
-    if begin_training:
-        os.makedirs(checkpoints_path, exist_ok=True)
-        os.makedirs(figs_path, exist_ok=True)
+        if begin_training:
+            os.makedirs(checkpoints_path, exist_ok=True)
+            os.makedirs(figs_path, exist_ok=True)
 
-        print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
-        train(config, checkpoints_path, figs_path)
+            print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
+            train(config, checkpoints_path, figs_path)
+
+
+if __name__ == "__main__":
+    main()

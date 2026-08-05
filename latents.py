@@ -6,6 +6,9 @@ def latents_analysis(config, checkpoints_path, figs_path):
     # set task
     D = config['D']
     num_trials = config['num_trials']
+    restless = config['restless']
+    drift = config['drift']
+    dependent_arms = config['dependent_arms']
 
 
     # initialize DisRNN
@@ -50,6 +53,15 @@ def latents_analysis(config, checkpoints_path, figs_path):
                 latent_history.append(h)
                 action_history.append(a)
                 reward_history.append(r)
+
+
+                # restless bandits
+                if restless:
+                    probs += drift * torch.randn(1, num_arms, device= device)
+                    probs = torch.clamp(probs, 0, 1)
+                    if dependent_arms:
+                        probs[:, 1] = 1 - probs[:, 0]
+
 
         latent_history = torch.stack(latent_history).squeeze(1).cpu().numpy()
         action_history = torch.stack(action_history).cpu().numpy()
@@ -135,17 +147,26 @@ def latents_analysis(config, checkpoints_path, figs_path):
         plt.savefig(figs_path + f'latent_updates_at_trial{t}.png')
         plt.close()
 
-for exp, config in exps.items():
-    begin_latents_analysis = True
-    checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
-    figs_path = f'figs/{exp}/seed{seed}/latents/'
-    if os.path.exists(figs_path):
-        res = input(
-            f"There is history for experiment: {exp} bandits, seed: {seed}. "
-            "Do you want to overwrite it? (y/n): "
-        )
-        begin_latents_analysis = res.lower() == 'y'
 
-    if begin_latents_analysis:
-        print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
-        latents_analysis(config, checkpoints_path, figs_path)
+
+
+def main():
+    for exp, config in exps.items():
+        begin_latents_analysis = True
+        checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
+        figs_path = f'figs/{exp}/seed{seed}/latents/'
+        if os.path.exists(figs_path):
+            res = input(
+                f"There is history for experiment: {exp} bandits, seed: {seed}. "
+                "Do you want to overwrite it? (y/n): "
+            )
+            begin_latents_analysis = res.lower() == 'y'
+
+        if begin_latents_analysis:
+            print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
+            latents_analysis(config, checkpoints_path, figs_path)
+
+
+if __name__ == "__main__":
+    main()
+    
