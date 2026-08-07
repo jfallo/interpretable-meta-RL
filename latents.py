@@ -152,16 +152,16 @@ def latents_analysis(config, checkpoints_path, figs_path):
 
 def main():
     for exp, config in exps.items():
-        begin_latents_analysis = True
         checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
         figs_path = f'figs/{exp}/seed{seed}/latents/'
+
+        begin_latents_analysis = os.path.exists(checkpoints_path)
         if os.path.exists(figs_path):
             res = input(
                 f"There is history for experiment: {exp} bandits, seed: {seed}. "
                 "Do you want to overwrite it? (y/n): "
             )
             begin_latents_analysis = res.lower() == 'y'
-
         if begin_latents_analysis:
             print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
             latents_analysis(config, checkpoints_path, figs_path)
