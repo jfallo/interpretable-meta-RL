@@ -187,7 +187,7 @@ def test(config, checkpoints_path, figs_path):
     LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
 
     # testing
-    results = run_tests(1000)
+    results = run_tests(10_000)
 
     # plot cumulative regrets
     plt.figure(figsize= (8,5))
