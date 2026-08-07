@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 from agents.DisRNN import MyDisRNN
+from agents.DisLRU import MyDisLRU
 
 
 seed = 40
@@ -15,15 +16,11 @@ torch.manual_seed(seed)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-# UCB exploration parameter
-c = 0.15
-
-
 # experiments
-def sample_independent_uniform(batch_size, num_arms, device):
+def sample_independent(batch_size, num_arms, device):
     return torch.rand(batch_size, num_arms, device= device)
 
-def sample_dependent_uniform(batch_size, num_arms, device):
+def sample_dependent(batch_size, num_arms, device):
     p1 = torch.rand(batch_size, device= device)
     p2 = 1 - p1
     return torch.stack([p1,p2], dim= 1)
@@ -52,7 +49,7 @@ def sample_dependent_easy(batch_size, num_arms, device):
 num_arms = 2
 exps = {
     'independent': {
-        'D': sample_independent_uniform,
+        'D': sample_independent,
         'num_trials': 100,
         'restless': False,
         'drift': 0.0,
@@ -60,14 +57,18 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'LSTM': 0.95
+            'DisLRU': 0.98,
+            'LSTM': 0.95,
+            'gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
+            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -77,13 +78,50 @@ exps = {
         'beta_v': 0.05,
         'beta_floor': 1e-8,
         'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 200000,
+        'train_LSTM_until_ep': 200_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50000
+        'search_episodes': 50_000,
+        'c': 0.15
+    },
+    'independent/restless': {
+        'D': sample_independent,
+        'num_trials': 100,
+        'restless': True,
+        'drift': 0.02,
+        'dependent_arms': False,
+        'input_size': 2,
+        'hidden_size': {
+            'DisRNN': 5,
+            'DisLRU': 5,
+            'LSTM': 48
+        },
+        'gamma': {
+            'DisRNN': 0.98,
+            'DisLRU': 0.98,
+            'LSTM': 0.95,
+            'gittins': 0.99
+        },
+        'lr': {
+            'DisRNN': 5e-4,
+            'DisLRU': 5e-4,
+            'LSTM': 5e-3
+        },
+        'batch_size': 32,
+        'steps_unrolled': 100,
+        'beta_e_annealed': True,
+        'beta_e': 0.005,
+        'beta_v': 0.05,
+        'beta_floor': 1e-8,
+        'beta_ceil': 1e-4,
+        'train_LSTM_until_ep': 200_000,
+        'eval_interval': 500,
+        'eval_episodes': 1000,
+        'search_episodes': 50_000,
+        'c': 0.15
     },
     'dependent': {
-        'D': sample_dependent_uniform,
+        'D': sample_dependent,
         'num_trials': 100,
         'restless': False,
         'drift': 0.0,
@@ -91,14 +129,18 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'LSTM': 0.95
+            'DisLRU': 0.98,
+            'LSTM': 0.95,
+            'gittins': 0.95
         },
         'lr': {
             'DisRNN': 5e-4,
+            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -108,12 +150,13 @@ exps = {
         'beta_v': 0.05,
         'beta_floor': 1e-8,
         'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 200000,
+        'train_LSTM_until_ep': 100_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50000
+        'search_episodes': 50_000,
+        'c': 0.15
     },
-    'dependent_hard': {
+    'dependent/hard': {
         'D': sample_dependent_hard,
         'num_trials': 100,
         'restless': False,
@@ -122,14 +165,18 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'LSTM': 0.95
+            'DisLRU': 0.98,
+            'LSTM': 0.95,
+            'gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
+            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -139,9 +186,10 @@ exps = {
         'beta_v': 0.05,
         'beta_floor': 1e-8,
         'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 200000,
+        'train_LSTM_until_ep': 100_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50000
+        'search_episodes': 50_000,
+        'c': 0.15
     }
 }
