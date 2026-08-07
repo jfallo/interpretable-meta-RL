@@ -136,7 +136,7 @@ exps = {
             'DisRNN': 0.98,
             'DisLRU': 0.98,
             'LSTM': 0.95,
-            'gittins': 0.95
+            'gittins': 0.98
         },
         'lr': {
             'DisRNN': 5e-4,
