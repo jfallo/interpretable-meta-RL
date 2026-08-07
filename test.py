@@ -14,7 +14,7 @@ def test(config, checkpoints_path, figs_path):
     dependent_arms = config['dependent_arms']
 
 
-    # initialize models
+    # initialize models and model parameters
     input_size = config['input_size']
 
     DisRNN_hidden_size = config['hidden_size']['DisRNN']
@@ -24,11 +24,15 @@ def test(config, checkpoints_path, figs_path):
     LSTM = torch.nn.LSTM(input_size, LSTM_hidden_size).to(device)
     LSTM_readout = torch.nn.Linear(LSTM_hidden_size, num_arms).to(device)
 
+    c = config['c']  # exploration parameter for UCB
+    gamma = config['gamma']['gittins']  # discount factor for Gittins
+
 
     # testing helpers
     def plot_agent(data, color, linestyle, label, plot_std= False):
         mean = np.stack(data).mean(axis= 0)
         plt.plot(mean, color= color, linestyle= linestyle, label= label)
+        print(mean[-1])
         
         if plot_std:
             std = np.stack(data).std(axis= 0, ddof= 1)
@@ -172,7 +176,7 @@ def test(config, checkpoints_path, figs_path):
 
 
     # build Gittins index table
-    gittins_table = compute_gittins_table(max_total= num_trials+1, gamma= 0.99, N= 200, tol= 1e-4)
+    gittins_table = compute_gittins_table(max_total= num_trials+1, gamma= gamma, N= 200, tol= 1e-4)
 
     # load best models
     best_DisRNN = torch.load(checkpoints_path + 'best_DisRNN.pt')
