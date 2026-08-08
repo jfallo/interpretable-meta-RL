@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import os
 
 from agents.DisRNN import MyDisRNN
-from agents.DisLRU import MyDisLRU
 
 
 seed = 40
@@ -57,18 +56,15 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
             'LSTM': 0.95,
             'gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -93,18 +89,15 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
             'LSTM': 0.95,
             'gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -129,18 +122,15 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
             'LSTM': 0.95,
             'gittins': 0.98
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -165,18 +155,15 @@ exps = {
         'input_size': 2,
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
             'LSTM': 0.95,
             'gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
         'batch_size': 32,

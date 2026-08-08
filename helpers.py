@@ -19,20 +19,14 @@ def smooth(x, window= 200):
     return np.convolve(x, np.ones(window)/window, mode= 'valid')
 
 
-def print_bottleneck_parameters(model, model_name):
-    if model_name == 'DisRNN':
-        M_h = torch.sigmoid(model.logit_M_h).detach().cpu().numpy()
-        sigma_h = torch.exp(model.log_sigma_h).detach().cpu().numpy()
-    elif model_name == 'DisLRU':
-        M_h = torch.diag(torch.sigmoid(model.A)).detach().cpu().numpy()
-        sigma_h = torch.ones_like(model.A)
+def print_bottleneck_parameters(model):
+    M_h = torch.sigmoid(model.logit_M_h).detach().cpu().numpy()
+    sigma_h = torch.exp(model.log_sigma_h).detach().cpu().numpy()
     M_x = torch.sigmoid(model.logit_M_x).detach().cpu().numpy()
     sigma_x = torch.exp(model.log_sigma_x).detach().cpu().numpy()
     M_z = torch.sigmoid(model.logit_M_z).detach().cpu().numpy()
     sigma_z = torch.exp(model.log_sigma_z).detach().cpu().numpy()
 
-    print()
-    print(f'{model_name} bottleneck parameters:')
     print()
     print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
     print()
