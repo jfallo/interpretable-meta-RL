@@ -23,8 +23,8 @@ def latents_analysis(config, checkpoints_path, figs_path):
 
 
     # latents analysis
-    ex_sessions = 10
-    for _ in range(ex_sessions):
+    ex_sessions = 3
+    for session in range(ex_sessions):
         # set task
         probs = D(1, num_arms, device)
                 
@@ -89,7 +89,8 @@ def latents_analysis(config, checkpoints_path, figs_path):
         plt.text(-8, y_bottom, 'Right Choices', ha= 'right', va= 'center')
         plt.legend(loc= 'center left', bbox_to_anchor= (1.02, 0.5), borderaxespad= 0.0)
         plt.tight_layout(rect= [0, 0, 0.85, 1])
-        plt.show()
+        plt.savefig(figs_path + f'trajectories_ex{session+1}.png')
+        plt.close()
 
 
     # plot latent updates
@@ -110,6 +111,8 @@ def latents_analysis(config, checkpoints_path, figs_path):
     times = [50]
     for t in times:
         fig, axes = plt.subplots(len(active_rules), 4, figsize= (12, 3*len(active_rules)), sharex= True, sharey= True)
+        if len(active_rules) == 1:
+            axes = axes[np.newaxis, :]
 
         M_h = torch.sigmoid(DisRNN.logit_M_h)
         M_x = torch.sigmoid(DisRNN.logit_M_x)
@@ -144,7 +147,7 @@ def latents_analysis(config, checkpoints_path, figs_path):
 
         fig.suptitle(f'Latent Updates at Trial {t}', fontsize= 14)
         plt.tight_layout()
-        plt.savefig(figs_path + f'latent_updates_at_trial{t}.png')
+        plt.savefig(figs_path + f'updates_at_trial{t}.png')
         plt.close()
 
 
@@ -163,6 +166,8 @@ def main():
             )
             begin_latents_analysis = res.lower() == 'y'
         if begin_latents_analysis:
+            os.makedirs(figs_path, exist_ok= True)
+
             print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
             latents_analysis(config, checkpoints_path, figs_path)
 

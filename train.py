@@ -475,8 +475,8 @@ def main():
             )
             begin_training = res.lower() == 'y'
         if begin_training:
-            os.makedirs(checkpoints_path, exist_ok=True)
-            os.makedirs(figs_path, exist_ok=True)
+            os.makedirs(checkpoints_path, exist_ok= True)
+            os.makedirs(figs_path, exist_ok= True)
             
             print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
             train(config, checkpoints_path, figs_path)
