@@ -21,7 +21,7 @@ class MyDisLRU(nn.Module):
         self.q = q
 
         # build update MLPs and choice MLP
-        self.A = nn.Parameter(torch.zeros(m))  # represent diagonal matrix A of size m x m with vector size m
+        self.A = nn.Parameter(2 * torch.ones(m))  # represent diagonal matrix A of size m x m with vector size m
         self.updateMLPs = nn.ModuleList(
             [nn.Linear(n, 1, bias= False) for _ in range(m)]
         )
