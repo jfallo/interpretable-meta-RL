@@ -2,7 +2,7 @@ from config import *
 from helpers import print_bottleneck_parameters, smooth
 
 
-def train(config, checkpoints_path, figs_path):
+def train(config, checkpoint_path, checkpoints_path, figs_path):
     # set task
     D = config['D']
     num_trials = config['num_trials']
@@ -338,6 +338,22 @@ def train(config, checkpoints_path, figs_path):
 
     ep = 0
 
+    # load checkpoint
+    if checkpoint_path:
+        checkpoint = torch.load(checkpoint_path)
+        ep = checkpoint['ep']
+
+        DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
+        DisRNN_critic.load_state_dict(checkpoint['DisRNN_critic_state_dict'])
+        DisRNN_optimizer.load_state_dict(checkpoint['DisRNN_optimizer_state_dict'])
+        DisRNN_regret_history = checkpoint['DisRNN_regret_history']
+
+        LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
+        LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
+        LSTM_critic.load_state_dict(checkpoint['LSTM_critic_state_dict'])
+        LSTM_optimizer.load_state_dict(checkpoint['LSTM_optimizer_state_dict'])
+        LSTM_regret_history = checkpoint['LSTM_regret_history']
+
     train_DisRNN = not disentangled(DisRNN, 'DisRNN')
     train_LSTM = ep < train_LSTM_until_ep
     while train_DisRNN or train_LSTM:
@@ -394,6 +410,7 @@ def train(config, checkpoints_path, figs_path):
 
 
         ep += 1
+
         train_DisRNN = not disentangled(DisRNN, 'DisRNN')
         train_LSTM = ep < train_LSTM_until_ep 
 
@@ -467,19 +484,42 @@ def main():
         checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
         figs_path = f'figs/{exp}/seed{seed}/'
 
-        begin_training = True
+        train_res = input(f"Begin training for experiment: {exp}, seed {seed}? (y/n): ")
+        if train_res.lower() == 'n':
+            continue
+
+        resume_checkpoint = False
+        checkpoint_path = ''
+
         if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
-            res = input(
-                f"There is history for experiment: {exp} bandits, seed: {seed}. "
-                "Do you want to overwrite it? (y/n): "
-            )
-            begin_training = res.lower() == 'y'
-        if begin_training:
-            os.makedirs(checkpoints_path, exist_ok= True)
-            os.makedirs(figs_path, exist_ok= True)
-            
+            overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it? (y/n): ")
+            if overwrite_res.lower() == 'n':
+                continue
+
+            resume_checkpoint_res = input(f"Do you want to resume training from a checkpoint? (y/n): ")
+            resume_checkpoint = resume_checkpoint_res.lower() == 'y'
+
+            if resume_checkpoint:
+                while True:
+                    checkpoint_path = input("Resume checkpoint path: ")
+                    if os.path.exists(checkpoint_path):
+                        break
+
+                    cont = input(f"Cannot find checkpoint: {checkpoint_path}. Enter another checkpoint? (y/n): ")
+                    if cont.lower() != 'y':
+                        resume_checkpoint = False
+                        checkpoint_path = ''
+                        break
+                                
+        os.makedirs(checkpoints_path, exist_ok= True)
+        os.makedirs(figs_path, exist_ok= True)
+
+        if resume_checkpoint:
+            print(f"Resuming training for experiment {exp} bandits, seed {seed} from checkpoint {checkpoint_path}.\n")
+        else:
             print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
-            train(config, checkpoints_path, figs_path)
+            
+        train(config, checkpoint_path, checkpoints_path, figs_path)
 
 
 if __name__ == "__main__":

@@ -228,14 +228,16 @@ def main():
         checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
         figs_path = f'figs/{exp}/seed{seed}/'
 
-        begin_testing = os.path.exists(checkpoints_path)
-        if os.path.exists(figs_path + 'cumulative_regret.png') or os.path.exists(figs_path  + 'optimal_arm_rate.png'):
-            res = input(
-                f"There is history for experiment: {exp} bandits, seed: {seed}. "
-                "Do you want to overwrite it? (y/n): "
-            )
-            begin_testing = res.lower() == 'y'
-        if begin_testing:
+        if os.path.exists(checkpoints_path):
+            test_res = input(f"Begin testing for experiment: {exp}, seed {seed}? (y/n):")
+            if test_res.lower() == 'n':
+                continue
+
+            if os.path.exists(figs_path + 'cumulative_regret.png') or os.path.exists(figs_path  + 'optimal_arm_rate.png'):
+                overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it? (y/n): ")
+                if overwrite_res.lower() == 'n':
+                    continue
+
             print(f"Beginning testing for experiment {exp} bandits, seed {seed}.\n")
             test(config, checkpoints_path, figs_path)
 

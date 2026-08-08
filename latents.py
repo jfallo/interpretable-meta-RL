@@ -158,15 +158,15 @@ def main():
         checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
         figs_path = f'figs/{exp}/seed{seed}/latents/'
 
-        begin_latents_analysis = os.path.exists(checkpoints_path)
-        if os.path.exists(figs_path):
-            res = input(
-                f"There is history for experiment: {exp} bandits, seed: {seed}. "
-                "Do you want to overwrite it? (y/n): "
-            )
-            begin_latents_analysis = res.lower() == 'y'
-        if begin_latents_analysis:
-            os.makedirs(figs_path, exist_ok= True)
+        if os.path.exists(checkpoints_path):
+            analysis_res = input(f"Begin latents analysis for experiment: {exp}, seed {seed}? (y/n):")
+            if analysis_res.lower() == 'n':
+                continue
+
+            if os.path.exists(figs_path):
+                overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it? (y/n): ")
+                if overwrite_res.lower() == 'n':
+                    continue
 
             print(f"Beginning latents analysis for experiment {exp} bandits, seed {seed}.\n")
             latents_analysis(config, checkpoints_path, figs_path)
