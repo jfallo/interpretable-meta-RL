@@ -229,7 +229,7 @@ def main():
         figs_path = f'figs/{exp}/seed{seed}/'
 
         if os.path.exists(checkpoints_path):
-            test_res = input(f"Begin testing for experiment: {exp}, seed {seed}? (y/n):")
+            test_res = input(f"Begin testing for experiment: {exp}, seed {seed}? (y/n): ")
             if test_res.lower() == 'n':
                 continue
 

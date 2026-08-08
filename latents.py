@@ -159,7 +159,7 @@ def main():
         figs_path = f'figs/{exp}/seed{seed}/latents/'
 
         if os.path.exists(checkpoints_path):
-            analysis_res = input(f"Begin latents analysis for experiment: {exp}, seed {seed}? (y/n):")
+            analysis_res = input(f"Begin latents analysis for experiment: {exp}, seed {seed}? (y/n): ")
             if analysis_res.lower() == 'n':
                 continue
 
