@@ -354,14 +354,14 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
         LSTM_optimizer.load_state_dict(checkpoint['LSTM_optimizer_state_dict'])
         LSTM_regret_history = checkpoint['LSTM_regret_history']
 
-    train_DisRNN = not disentangled(DisRNN, 'DisRNN')
+    train_DisRNN = not disentangled(DisRNN)
     train_LSTM = ep < train_LSTM_until_ep
     while train_DisRNN or train_LSTM:
         training_ep_res = run_training_episode(train_DisRNN, train_LSTM, phase= 1)
 
         if train_DisRNN:
             DisRNN_regret_history.append(training_ep_res['regret']['DisRNN'])
-            DisRNN_disentangled = disentangled(DisRNN, 'DisRNN')
+            DisRNN_disentangled = disentangled(DisRNN)
         if train_LSTM:
             LSTM_regret_history.append(training_ep_res['regret']['LSTM'])
         
@@ -371,7 +371,7 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 f"DisRNN total reward: {training_ep_res['reward']['DisRNN']:5.2f} | "
                 f"LSTM total reward: {training_ep_res['reward']['LSTM']:5.2f}"
             )
-            print_bottleneck_parameters(DisRNN, 'DisRNN')
+            print_bottleneck_parameters(DisRNN)
 
         if ep > 0 and ep % 10_000 == 0:
             plot_regret_history(
@@ -411,12 +411,12 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
 
         ep += 1
 
-        train_DisRNN = not disentangled(DisRNN, 'DisRNN')
+        train_DisRNN = not disentangled(DisRNN)
         train_LSTM = ep < train_LSTM_until_ep 
 
 
     # display bottleneck parameters and plot regret histories at disentanglement
-    print_bottleneck_parameters(DisRNN, 'DisRNN')
+    print_bottleneck_parameters(DisRNN)
     plot_regret_history(
         smooth(np.array(DisRNN_regret_history)), 
         smooth(np.array(LSTM_regret_history)), 
@@ -452,7 +452,7 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 torch.save({
                     'DisRNN_state_dict': DisRNN.state_dict()
                 }, checkpoints_path + 'best_DisRNN.pt')
-                print_bottleneck_parameters(DisRNN, 'DisRNN')
+                print_bottleneck_parameters(DisRNN)
                 
             LSTM_cur_regret = np.mean(LSTM_eval_regrets)
             if LSTM_cur_regret < LSTM_best_regret:
@@ -492,7 +492,7 @@ def main():
         checkpoint_path = ''
 
         if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
-            overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it? (y/n): ")
+            overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it or resume from a checkpoint? (y/n): ")
             if overwrite_res.lower() == 'n':
                 continue
 
