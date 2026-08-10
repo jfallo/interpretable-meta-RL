@@ -7,7 +7,7 @@ import os, copy
 from agents.DisRNN import MyDisRNN
 
 
-seed = 42
+seed = 40
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)

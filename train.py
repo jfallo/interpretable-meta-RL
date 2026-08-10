@@ -403,9 +403,6 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             )
             print_bottleneck_parameters(DisRNN)
 
-            DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
-            prev_state_dict = copy.deepcopy(DisRNN.state_dict())
-
         if ep > 0 and ep % 10_000 == 0:
             plot_regret_history(
                 smooth(np.array(DisRNN_regret_history)), 
@@ -425,6 +422,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
                 'LSTM_regret_history': LSTM_regret_history
             }, checkpoints_dir + f'checkpoint_ep{ep}.pt')
+
+            DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
+            prev_state_dict = copy.deepcopy(DisRNN.state_dict())
 
         ep += 1
 
