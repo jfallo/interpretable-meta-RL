@@ -2,12 +2,12 @@ import numpy as np
 import torch
 import random
 import matplotlib.pyplot as plt
-import os
+import os, copy
 
 from agents.DisRNN import MyDisRNN
 
 
-seed = 40
+seed = 42
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -47,7 +47,7 @@ def sample_dependent_easy(batch_size, num_arms, device):
 
 num_arms = 2
 exps = {
-    'independent': {
+    'independent/standard': {
         'D': sample_independent,
         'num_trials': 100,
         'restless': False,
@@ -77,7 +77,7 @@ exps = {
         'train_LSTM_until_ep': 200_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50_000,
+        'search_episodes': 20_000,
         'c': 0.15
     },
     'independent/restless': {
@@ -110,10 +110,10 @@ exps = {
         'train_LSTM_until_ep': 200_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50_000,
+        'search_episodes': 20_000,
         'c': 0.15
     },
-    'dependent': {
+    'dependent/standard': {
         'D': sample_dependent,
         'num_trials': 100,
         'restless': False,
@@ -143,7 +143,7 @@ exps = {
         'train_LSTM_until_ep': 100_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50_000,
+        'search_episodes': 20_000,
         'c': 0.15
     },
     'dependent/hard': {
@@ -176,7 +176,7 @@ exps = {
         'train_LSTM_until_ep': 100_000,
         'eval_interval': 500,
         'eval_episodes': 1000,
-        'search_episodes': 50_000,
+        'search_episodes': 20_000,
         'c': 0.15
     }
 }
