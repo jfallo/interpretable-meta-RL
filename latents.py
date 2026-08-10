@@ -164,7 +164,7 @@ def main():
                 continue
 
             if os.path.exists(figs_path):
-                overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it? (y/n): ")
+                overwrite_res = input(f"There is history for this experiment. Continue? (y/n): ")
                 if overwrite_res.lower() == 'n':
                     continue
 
