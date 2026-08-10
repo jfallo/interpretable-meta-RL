@@ -2,7 +2,7 @@ from config import *
 from helpers import print_bottleneck_parameters, smooth
 
 
-def train(config, checkpoint_path, checkpoints_path, figs_path):
+def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     # set task
     D = config['D']
     num_trials = config['num_trials']
@@ -67,23 +67,52 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
         plt.title('Model Regret Over Time')
         plt.legend()
         plt.grid()
-        plt.savefig(figs_path + f'{plot_name}.png')
+        plt.savefig(figs_dir + f'{plot_name}.png')
         plt.close()
 
 
     def disentangled(model, low= 0.1, high= 0.9):
-        M_h = torch.sigmoid(model.logit_M_h).detach().cpu().numpy()
-        sigma_h = torch.exp(model.log_sigma_h).detach().cpu().numpy()
-        M_x = torch.sigmoid(model.logit_M_x).detach().cpu().numpy()
-        sigma_x = torch.exp(model.log_sigma_x).detach().cpu().numpy()
-        M_z = torch.sigmoid(model.logit_M_z).detach().cpu().numpy()
-        sigma_z = torch.exp(model.log_sigma_z).detach().cpu().numpy()
+        with torch.no_grad():
+            checks = []
 
-        h_converged = ((M_h <= low) | (M_h >= high)).all() and ((sigma_h <= low) | (sigma_h >= high)).all()
-        x_converged = ((M_x <= low) | (M_x >= high)).all() and ((sigma_x <= low) | (sigma_x >= high)).all()
-        z_converged = ((M_z <= low) | (M_z >= high)).all() and ((sigma_z <= low) | (sigma_z >= high)).all()
-        
-        return h_converged and x_converged and z_converged
+            M_h = torch.sigmoid(model.logit_M_h)
+            sigma_h = torch.exp(model.log_sigma_h)
+            checks.append(((M_h <= low) | (M_h >= high)).all() and ((sigma_h <= low) | (sigma_h >= high)).all())
+
+            M_x = torch.sigmoid(model.logit_M_x)
+            sigma_x = torch.exp(model.log_sigma_x)
+            checks.append(((M_x <= low) | (M_x >= high)).all() and ((sigma_x <= low) | (sigma_x >= high)).all())
+
+            M_z = torch.sigmoid(model.logit_M_z)
+            sigma_z = torch.exp(model.log_sigma_z)
+            checks.append(((M_z <= low) | (M_z >= high)).all() and ((sigma_z <= low) | (sigma_z >= high)).all())
+            
+            return bool(all(checks))
+
+
+    def bottlenecks_converged(model, prev_state_dict, tol= 0.02):
+        with torch.no_grad():
+            checks = []
+
+            M_h = torch.sigmoid(model.logit_M_h)
+            sigma_h = torch.exp(model.log_sigma_h)
+            prev_M_h = torch.sigmoid(prev_state_dict['logit_M_h'])
+            prev_sigma_h = torch.exp(prev_state_dict['log_sigma_h'])
+            checks.append((torch.abs(M_h - prev_M_h) < tol).all() and (torch.abs(sigma_h - prev_sigma_h) < tol).all())
+
+            M_x = torch.sigmoid(model.logit_M_x)
+            sigma_x = torch.exp(model.log_sigma_x)
+            prev_M_x = torch.sigmoid(prev_state_dict['logit_M_x'])
+            prev_sigma_x = torch.exp(prev_state_dict['log_sigma_x'])
+            checks.append((torch.abs(M_x - prev_M_x) < tol).all() and (torch.abs(sigma_x - prev_sigma_x) < tol).all())
+
+            M_z = torch.sigmoid(model.logit_M_z)
+            sigma_z = torch.exp(model.log_sigma_z)
+            prev_M_z = torch.sigmoid(prev_state_dict['logit_M_z'])
+            prev_sigma_z = torch.exp(prev_state_dict['log_sigma_z'])
+            checks.append((torch.abs(M_z - prev_M_z) < tol).all() and (torch.abs(sigma_z - prev_sigma_z) < tol).all())
+            
+            return bool(all(checks))
 
 
     def run_training_episode(train_DisRNN, train_LSTM, phase= 1):
@@ -120,7 +149,6 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
             LSTM_entropies = []
             LSTM_regrets = []
 
-
         for t in range(num_trials):
             if t % steps_unrolled == 0:
                 if train_DisRNN:
@@ -128,7 +156,6 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 if train_LSTM:
                     LSTM_h = LSTM_h.detach()
                     LSTM_c = LSTM_c.detach()
-
 
             # DisRNN step
             if train_DisRNN:
@@ -164,14 +191,12 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 LSTM_entropies.append(LSTM_pi.entropy())
                 LSTM_regrets.append(probs.max(dim= -1).values - probs[batch_idx, LSTM_a])
 
-
             # restless bandits
             if restless:
                 probs += drift * torch.randn(batch_size, num_arms, device= device)
                 probs = torch.clamp(probs, 0, 1)
                 if dependent_arms:
                     probs[:, 1] = 1 - probs[:, 0]
-
 
         if train_DisRNN:
             DisRNN_log_probs = torch.stack(DisRNN_log_probs)
@@ -268,7 +293,6 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
             )
             LSTM_optimizer.step()
 
-
         return {
             'regret': {
                 'DisRNN': DisRNN_regret,
@@ -338,9 +362,13 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
 
     ep = 0
 
+    prev_state_dict = copy.deepcopy(DisRNN.state_dict())
+    DisRNN_converged = False
+    DisRNN_disentanglement_ep = 0
+
     # load checkpoint
     if checkpoint_path:
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(checkpoint_path, map_location= device)
         ep = checkpoint['ep']
 
         DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
@@ -348,30 +376,35 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
         DisRNN_optimizer.load_state_dict(checkpoint['DisRNN_optimizer_state_dict'])
         DisRNN_regret_history = checkpoint['DisRNN_regret_history']
 
+        prev_state_dict = checkpoint['prev_state_dict']
+        DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
+        DisRNN_disentanglement_ep = len(DisRNN_regret_history)
+
         LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
         LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
         LSTM_critic.load_state_dict(checkpoint['LSTM_critic_state_dict'])
         LSTM_optimizer.load_state_dict(checkpoint['LSTM_optimizer_state_dict'])
         LSTM_regret_history = checkpoint['LSTM_regret_history']
 
-    train_DisRNN = not disentangled(DisRNN)
+    train_DisRNN = ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)
     train_LSTM = ep < train_LSTM_until_ep
     while train_DisRNN or train_LSTM:
         training_ep_res = run_training_episode(train_DisRNN, train_LSTM, phase= 1)
-
         if train_DisRNN:
             DisRNN_regret_history.append(training_ep_res['regret']['DisRNN'])
-            DisRNN_disentangled = disentangled(DisRNN)
         if train_LSTM:
             LSTM_regret_history.append(training_ep_res['regret']['LSTM'])
         
-        if ep % 500 == 0:
+        if ep > 0 and ep % 500 == 0:
             print(f'ep {ep:6d}')
             print(
                 f"DisRNN total reward: {training_ep_res['reward']['DisRNN']:5.2f} | "
                 f"LSTM total reward: {training_ep_res['reward']['LSTM']:5.2f}"
             )
             print_bottleneck_parameters(DisRNN)
+
+            DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
+            prev_state_dict = copy.deepcopy(DisRNN.state_dict())
 
         if ep > 0 and ep % 10_000 == 0:
             plot_regret_history(
@@ -385,15 +418,17 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
                 'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
                 'DisRNN_regret_history': DisRNN_regret_history,
+                'prev_state_dict': prev_state_dict,
                 'LSTM_state_dict': LSTM.state_dict(),
                 'LSTM_readout_state_dict': LSTM_readout.state_dict(),
                 'LSTM_critic_state_dict': LSTM_critic.state_dict(),
                 'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
                 'LSTM_regret_history': LSTM_regret_history
-            }, checkpoints_path + f'checkpoint_ep{ep}.pt')
+            }, checkpoints_dir + f'checkpoint_ep{ep}.pt')
 
+        ep += 1
 
-        if train_DisRNN == DisRNN_disentangled:
+        if train_DisRNN and not (ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)):
             DisRNN_disentanglement_ep = ep
             torch.save({
                 'ep': ep,
@@ -401,28 +436,26 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
                 'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
                 'DisRNN_regret_history': DisRNN_regret_history,
+                'prev_state_dict': prev_state_dict,
                 'LSTM_state_dict': LSTM.state_dict(),
                 'LSTM_readout_state_dict': LSTM_readout.state_dict(),
                 'LSTM_critic_state_dict': LSTM_critic.state_dict(),
                 'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
                 'LSTM_regret_history': LSTM_regret_history
-            }, checkpoints_path + f'DisRNN_disentanglement_at_ep{ep}.pt')
+            }, checkpoints_dir + f'DisRNN_disentanglement_at_ep{ep}.pt')
+            
+        train_DisRNN = ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)
+        train_LSTM = ep < train_LSTM_until_ep
 
 
-        ep += 1
-
-        train_DisRNN = not disentangled(DisRNN)
-        train_LSTM = ep < train_LSTM_until_ep 
-
-
-    # display bottleneck parameters and plot regret histories at disentanglement
+    # display bottleneck parameters and plot regret histories after phase 1
     print_bottleneck_parameters(DisRNN)
     plot_regret_history(
         smooth(np.array(DisRNN_regret_history)), 
         smooth(np.array(LSTM_regret_history)), 
         plot_name= 'training_regret_phase1'
     )
-    
+
 
 
 
@@ -451,7 +484,7 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 DisRNN_best_regret = DisRNN_cur_regret
                 torch.save({
                     'DisRNN_state_dict': DisRNN.state_dict()
-                }, checkpoints_path + 'best_DisRNN.pt')
+                }, checkpoints_dir + 'best_DisRNN.pt')
                 print_bottleneck_parameters(DisRNN)
                 
             LSTM_cur_regret = np.mean(LSTM_eval_regrets)
@@ -460,7 +493,7 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
                 torch.save({
                     'LSTM_state_dict': LSTM.state_dict(),
                     'LSTM_readout_state_dict': LSTM_readout.state_dict()
-                }, checkpoints_path + 'best_LSTM.pt')
+                }, checkpoints_dir + 'best_LSTM.pt')
 
             print(f'ep {ep:6d}')
             print(
@@ -481,8 +514,8 @@ def train(config, checkpoint_path, checkpoints_path, figs_path):
 
 def main():
     for exp, config in exps.items():
-        checkpoints_path = f'checkpoints/{exp}/seed{seed}/'
-        figs_path = f'figs/{exp}/seed{seed}/'
+        checkpoints_dir = f'checkpoints/{exp}/seed{seed}/'
+        figs_dir = f'figs/{exp}/seed{seed}/'
 
         train_res = input(f"Begin training for experiment: {exp}, seed {seed}? (y/n): ")
         if train_res.lower() == 'n':
@@ -491,8 +524,8 @@ def main():
         resume_checkpoint = False
         checkpoint_path = ''
 
-        if os.path.exists(checkpoints_path) or os.path.exists(figs_path):
-            overwrite_res = input(f"There is history for this experiment. Do you want to overwrite it or resume from a checkpoint? (y/n): ")
+        if os.path.exists(checkpoints_dir) or os.path.exists(figs_dir):
+            overwrite_res = input(f"There is history for this experiment. Continue? (y/n): ")
             if overwrite_res.lower() == 'n':
                 continue
 
@@ -511,15 +544,15 @@ def main():
                         checkpoint_path = ''
                         break
                                 
-        os.makedirs(checkpoints_path, exist_ok= True)
-        os.makedirs(figs_path, exist_ok= True)
+        os.makedirs(checkpoints_dir, exist_ok= True)
+        os.makedirs(figs_dir, exist_ok= True)
 
         if resume_checkpoint:
             print(f"Resuming training for experiment {exp} bandits, seed {seed} from checkpoint {checkpoint_path}.\n")
         else:
             print(f"Beginning training for experiment {exp} bandits, seed {seed}.\n")
             
-        train(config, checkpoint_path, checkpoints_path, figs_path)
+        train(config, checkpoint_path, checkpoints_dir, figs_dir)
 
 
 if __name__ == "__main__":
