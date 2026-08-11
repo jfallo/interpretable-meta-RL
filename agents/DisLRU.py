@@ -21,7 +21,11 @@ class MyDisLRU(nn.Module):
         self.q = q
 
         # build update MLPs and choice MLP
-        self.A = nn.Parameter(2 * torch.ones(m))  # represent diagonal matrix A of size m x m with vector size m
+        self.logit_A_chosen = nn.Parameter(2 * torch.ones(m))  # represent diagonal matrix A of size m x m with vector size m
+        self.logit_A_unchosen = nn.Parameter(2 * torch.ones(m))
+        self.gates = nn.ModuleList(
+            [nn.Linear(n, 1, bias= False) for _ in range(m)]  # learn conditioning rules per latent
+        )
         self.updateMLPs = nn.ModuleList(
             [nn.Linear(n, 1, bias= False) for _ in range(m)]
         )
@@ -64,8 +68,14 @@ class MyDisLRU(nn.Module):
         # apply update MLPs
         z_outs = []
         for i, MLP in enumerate(self.updateMLPs):
-            a_i = torch.sigmoid(self.A[i])  # |a_i| < 1
+            gate = self.gates[i]
+            theta = torch.sigmoid(gate(x[i]).squeeze(-1))
+
+            a_i_chosen = torch.sigmoid(self.logit_A_chosen[i])  # |a_i| < 1
+            a_i_unchosen = torch.sigmoid(self.logit_A_unchosen[i])
+            a_i = theta * a_i_chosen + (1 - theta) * a_i_unchosen
             b_i = MLP(x[i]).squeeze(-1)
+            
             z_out = a_i * h[:, i] + b_i
             z_outs.append(z_out)
         z = torch.stack(z_outs, dim= -1)
