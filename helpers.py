@@ -20,24 +20,15 @@ def smooth(x, window= 200):
 
 
 def print_bottleneck_parameters(model):
-    M_h = torch.sigmoid(model.logit_M_h).detach().cpu().numpy()
-    sigma_h = torch.exp(model.log_sigma_h).detach().cpu().numpy()
-    M_x = torch.sigmoid(model.logit_M_x).detach().cpu().numpy()
-    sigma_x = torch.exp(model.log_sigma_x).detach().cpu().numpy()
-    M_z = torch.sigmoid(model.logit_M_z).detach().cpu().numpy()
-    sigma_z = torch.exp(model.log_sigma_z).detach().cpu().numpy()
+    M_h = torch.sigmoid(model.logit_M_h)
+    M_x = torch.sigmoid(model.logit_M_x)
+    M_z = torch.sigmoid(model.logit_M_z)
 
     print()
     print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
     print()
-    print(format_matrix(sigma_h, 'sigma_h', row_prefix= 'rule', col_prefix= 'lat'))
-    print()
     print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
     print()
-    print(format_matrix(sigma_x, 'sigma_x', row_prefix= 'rule', col_prefix= 'obs'))
-    print()
     print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
-    print()
-    print(format_matrix(sigma_z, 'sigma_z', row_prefix= 'lat', col_prefix= 'lat'))   
     print()
     print()

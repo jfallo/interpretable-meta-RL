@@ -1,5 +1,5 @@
 from config import *
-from helpers import print_bottleneck_parameters, smooth
+from helpers import format_matrix, smooth
 
 
 def train(config, checkpoint_path, checkpoints_dir, figs_dir):
@@ -12,28 +12,57 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
 
     # initialize training models and optimizers
-    input_size = config['input_size']
+    DisRNN = MyDisRNN(config['hidden_size']['DisRNN'], config['input_size']['DisRNN'], num_arms).to(device)
+    DisRNN_critic = torch.nn.Linear(config['hidden_size']['DisRNN'], 1).to(device)
+    DisRNN_parameters = list(DisRNN.parameters()) + list(DisRNN_critic.parameters())
+    DisRNN_optimizer = torch.optim.Adam(DisRNN_parameters, lr= config['lr']['DisRNN'])
 
-    DisRNN_hidden_size = config['hidden_size']['DisRNN']
-    DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)
-    DisRNN_gamma = config['gamma']['DisRNN']
-    DisRNN_lr = config['lr']['DisRNN']
-    DisRNN_critic = torch.nn.Linear(DisRNN_hidden_size, 1).to(device)
-    DisRNN_optimizer = torch.optim.Adam(
-        list(DisRNN.parameters()) + list(DisRNN_critic.parameters()), 
-        lr= DisRNN_lr
-    )
+    DisLRU = MyDisLRU(config['hidden_size']['DisLRU'], config['input_size']['DisLRU'], num_arms).to(device)
+    DisLRU_critic = torch.nn.Linear(config['hidden_size']['DisLRU'], 1).to(device)
+    DisLRU_parameters = list(DisLRU.parameters()) + list(DisLRU_critic.parameters())
+    DisLRU_optimizer = torch.optim.Adam(DisLRU_parameters, lr= config['lr']['DisLRU'])
 
-    LSTM_hidden_size = config['hidden_size']['LSTM']
-    LSTM = torch.nn.LSTM(input_size, LSTM_hidden_size).to(device)
-    LSTM_readout = torch.nn.Linear(LSTM_hidden_size, num_arms).to(device)
-    LSTM_gamma = config['gamma']['LSTM']
-    LSTM_lr = config['lr']['LSTM']
-    LSTM_critic = torch.nn.Linear(LSTM_hidden_size, 1).to(device)
-    LSTM_optimizer = torch.optim.Adam(
-        list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters()), 
-        lr= LSTM_lr
-    )
+    LSTM = torch.nn.LSTM(config['input_size']['LSTM'], config['hidden_size']['LSTM']).to(device)
+    LSTM_readout = torch.nn.Linear(config['hidden_size']['LSTM'], num_arms).to(device)
+    LSTM_critic = torch.nn.Linear(config['hidden_size']['LSTM'], 1).to(device)
+    LSTM_parameters = list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters())
+    LSTM_optimizer = torch.optim.Adam(LSTM_parameters, lr= config['lr']['LSTM'])
+
+    models = {
+        'DisRNN': {
+            'model': DisRNN,
+            'critic': DisRNN_critic,
+            'parameters': DisRNN_parameters,
+            'optimizer': DisRNN_optimizer,
+            'bottlenecks': ['h', 'x', 'z'],
+            'beta': config['beta']['DisRNN'],
+            'converged': False,
+            'disentangled': False,
+            'disentanglement_ep': 0
+        },
+        'DisLRU': {
+            'model': DisLRU,
+            'critic': DisLRU_critic,
+            'parameters': DisLRU_parameters,
+            'optimizer': DisLRU_optimizer,
+            'bottlenecks': ['x', 'z'],
+            'beta': config['beta']['DisLRU'],
+            'converged': False,
+            'disentangled': False,
+            'disentanglement_ep': 0
+        },
+        'LSTM': {
+            'model': LSTM,
+            'readout': LSTM_readout,
+            'critic': LSTM_critic,
+            'parameters': LSTM_parameters,
+            'optimizer': LSTM_optimizer,
+            'train_until_ep': config['train_until_ep']['LSTM']
+        }
+    }
+
+    m_min = torch.logit(torch.tensor(0.01)).item()
+    sigma_min = torch.log(torch.tensor(0.01)).item()
 
     # training hyperparameters
     batch_size = config['batch_size']
@@ -46,22 +75,17 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     else:
         beta_e = config['beta_e']
     beta_v = config['beta_v']
-    beta_floor = config['beta_floor']
-    beta_ceil = config['beta_ceil']
-    warmup_start = 5000
-    warmup_end = 10_000
-
-    train_LSTM_until_ep = config['train_LSTM_until_ep']
-
-    m_min = torch.logit(torch.tensor(0.01)).item()
-    sigma_min = torch.log(torch.tensor(0.01)).item()
-
 
     # training helpers
-    def plot_regret_history(DisRNN_history, LSTM_history, plot_name):
+    def plot_regret_history(regret_histories, plot_name, colors= None):
+        if colors is None:
+            colors = {}
+        default_colors = ['blue', 'green', 'orange', 'purple', 'red', 'brown']
+
         plt.figure(figsize= (8,5))
-        plt.plot(DisRNN_history, label= 'DisRNN', color= 'blue')
-        plt.plot(LSTM_history, label= 'LSTM', color= 'green')
+        for i, (model, history) in enumerate(regret_histories.items()):
+            color = colors.get(model, default_colors[i % len(default_colors)])
+            plt.plot(history, label= model, color= color)
         plt.xlabel('Episode')
         plt.ylabel('Regret')
         plt.title('Model Regret Over Time')
@@ -71,125 +95,148 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         plt.close()
 
 
+    def print_bottleneck_parameters(model):
+        with torch.no_grad():
+            print()
+            print(model)
+            print()
+            for bottleneck in models[model]['bottlenecks']:
+                m = torch.sigmoid(getattr(models[model]['model'], f'logit_M_{bottleneck}'))
+                print(format_matrix(m, f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
+                print()
+            print()
+
+
+    def build_checkpoint(ep):
+        return {
+            'ep': ep,
+            'DisRNN_state_dict': DisRNN.state_dict(),
+            'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
+            'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
+            'DisRNN_regret_history': regret_histories['DisRNN'],
+            'DisLRU_state_dict': DisLRU.state_dict(),
+            'DisLRU_critic_state_dict': DisLRU_critic.state_dict(),
+            'DisLRU_optimizer_state_dict': DisLRU_optimizer.state_dict(),
+            'DisLRU_regret_history': regret_histories['DisLRU'],
+            'LSTM_state_dict': LSTM.state_dict(),
+            'LSTM_readout_state_dict': LSTM_readout.state_dict(),
+            'LSTM_critic_state_dict': LSTM_critic.state_dict(),
+            'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
+            'LSTM_regret_history': regret_histories['LSTM'],
+            'prev_state_dicts': prev_state_dicts
+        }
+
+
     def disentangled(model, low= 0.1, high= 0.9):
         with torch.no_grad():
             checks = []
+            for bottleneck in models[model]['bottlenecks']:
+                m = torch.sigmoid(getattr(models[model]['model'], f'logit_M_{bottleneck}'))
+                sigma = torch.exp(getattr(models[model]['model'], f'log_sigma_{bottleneck}'))
+                checks.append(((m <= low) | (m >= high)).all() and ((sigma <= low) | (sigma >= high)).all())
 
-            M_h = torch.sigmoid(model.logit_M_h)
-            sigma_h = torch.exp(model.log_sigma_h)
-            checks.append(((M_h <= low) | (M_h >= high)).all() and ((sigma_h <= low) | (sigma_h >= high)).all())
-
-            M_x = torch.sigmoid(model.logit_M_x)
-            sigma_x = torch.exp(model.log_sigma_x)
-            checks.append(((M_x <= low) | (M_x >= high)).all() and ((sigma_x <= low) | (sigma_x >= high)).all())
-
-            M_z = torch.sigmoid(model.logit_M_z)
-            sigma_z = torch.exp(model.log_sigma_z)
-            checks.append(((M_z <= low) | (M_z >= high)).all() and ((sigma_z <= low) | (sigma_z >= high)).all())
-            
             return bool(all(checks))
 
 
-    def bottlenecks_converged(model, prev_state_dict, tol= 0.02):
+    def bottlenecks_converged(model, prev_state_dicts, tol= 0.02):
         with torch.no_grad():
             checks = []
+            for bottleneck in models[model]['bottlenecks']:
+                prev_m = torch.sigmoid(prev_state_dicts[model][f'logit_M_{bottleneck}'])
+                prev_sigma = torch.exp(prev_state_dicts[model][f'log_sigma_{bottleneck}'])
+                m = torch.sigmoid(getattr(models[model]['model'], f'logit_M_{bottleneck}'))
+                sigma = torch.exp(getattr(models[model]['model'], f'log_sigma_{bottleneck}'))
+                checks.append((torch.abs(m - prev_m) < tol).all() and (torch.abs(sigma - prev_sigma) < tol).all())
 
-            M_h = torch.sigmoid(model.logit_M_h)
-            sigma_h = torch.exp(model.log_sigma_h)
-            prev_M_h = torch.sigmoid(prev_state_dict['logit_M_h'])
-            prev_sigma_h = torch.exp(prev_state_dict['log_sigma_h'])
-            checks.append((torch.abs(M_h - prev_M_h) < tol).all() and (torch.abs(sigma_h - prev_sigma_h) < tol).all())
-
-            M_x = torch.sigmoid(model.logit_M_x)
-            sigma_x = torch.exp(model.log_sigma_x)
-            prev_M_x = torch.sigmoid(prev_state_dict['logit_M_x'])
-            prev_sigma_x = torch.exp(prev_state_dict['log_sigma_x'])
-            checks.append((torch.abs(M_x - prev_M_x) < tol).all() and (torch.abs(sigma_x - prev_sigma_x) < tol).all())
-
-            M_z = torch.sigmoid(model.logit_M_z)
-            sigma_z = torch.exp(model.log_sigma_z)
-            prev_M_z = torch.sigmoid(prev_state_dict['logit_M_z'])
-            prev_sigma_z = torch.exp(prev_state_dict['log_sigma_z'])
-            checks.append((torch.abs(M_z - prev_M_z) < tol).all() and (torch.abs(sigma_z - prev_sigma_z) < tol).all())
-            
             return bool(all(checks))
 
 
-    def run_training_episode(train_DisRNN, train_LSTM, phase= 1):
+    def run_training_episode(active_models, phase= 1):
         # sample task
         probs = D(batch_size, num_arms, device)
 
-        # reset DisRNN state
-        if train_DisRNN:
-            DisRNN.train()
-            DisRNN_optimizer.zero_grad()
+        # reset models state
+        for model in active_models:
+            models[model]['model'].train()
+            models[model]['optimizer'].zero_grad()
+        
+        h, c, x = {}, {}, {}
+        if 'DisRNN' in active_models:
+            h['DisRNN'] = torch.zeros(batch_size, config['hidden_size']['DisRNN'], device= device)
+            x['DisRNN'] = torch.zeros(batch_size, config['input_size']['DisRNN'], device= device)
+        if 'DisLRU' in active_models:
+            h['DisLRU'] = torch.zeros(batch_size, config['hidden_size']['DisLRU'], device= device)
+            x['DisLRU'] = torch.zeros(batch_size, config['input_size']['DisLRU'], device= device)
+        if 'LSTM' in active_models:
+            h['LSTM'] = torch.zeros(1, batch_size, config['hidden_size']['LSTM'], device= device)
+            c['LSTM'] = torch.zeros(1, batch_size, config['hidden_size']['LSTM'], device= device)
+            x['LSTM'] = torch.zeros(batch_size, config['input_size']['LSTM'], device= device)
 
-            DisRNN_h = torch.zeros(batch_size, DisRNN_hidden_size, device= device)
-            DisRNN_x = torch.zeros(batch_size, input_size, device= device)
-
-            DisRNN_log_probs = []
-            DisRNN_rewards = []
-            DisRNN_expected_returns = []
-            DisRNN_entropies = []
-            DisRNN_bottleneck_losses = {'h': [], 'x': [], 'z': []}
-            DisRNN_regrets = []
-
-        # reset LSTM state
-        if train_LSTM:
-            LSTM.train()
-            LSTM_optimizer.zero_grad()
-
-            LSTM_h = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
-            LSTM_c = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
-            LSTM_x = torch.zeros(batch_size, input_size, device= device)
-
-            LSTM_log_probs = []
-            LSTM_rewards = []
-            LSTM_expected_returns = []
-            LSTM_entropies = []
-            LSTM_regrets = []
+        log_probs = {model: [] for model in active_models}
+        rewards = {model: [] for model in active_models}
+        expected_returns = {model: [] for model in active_models}
+        entropies = {model: [] for model in active_models}
+        regrets = {model: [] for model in active_models}
+        bottleneck_losses = {
+            model: {bottleneck: [] for bottleneck in models[model]['bottlenecks']} 
+            for model in active_models if 'bottlenecks' in models[model]
+        }
 
         for t in range(num_trials):
             if t % steps_unrolled == 0:
-                if train_DisRNN:
-                    DisRNN_h = DisRNN_h.detach()
-                if train_LSTM:
-                    LSTM_h = LSTM_h.detach()
-                    LSTM_c = LSTM_c.detach()
+                for model in h: 
+                    h[model] = h[model].detach() 
+                for model in c: 
+                    c[model] = c[model].detach() 
 
-            # DisRNN step
-            if train_DisRNN:
-                DisRNN_h, DisRNN_kls = DisRNN.step(DisRNN_h, DisRNN_x)
-                DisRNN_logits = DisRNN.out(DisRNN_h)
+            # step
+            logits = {model: None for model in active_models}
+            kls = {
+                model: {bottleneck: None for bottleneck in models[model]['bottlenecks']} 
+                for model in active_models if 'bottlenecks' in models[model]
+            }
+            critic_inputs = {model: None for model in active_models}
 
-                DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
-                DisRNN_a = DisRNN_pi.sample()
-                DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
-                DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
+            if 'DisRNN' in active_models:
+                h['DisRNN'], kls['DisRNN'] = DisRNN.step(h['DisRNN'], x['DisRNN'])
+                logits['DisRNN'] = DisRNN.out(h['DisRNN'])
+                critic_inputs['DisRNN'] = h['DisRNN'].detach()
+            if 'DisLRU' in active_models:
+                h['DisLRU'], kls['DisLRU'] = DisLRU.step(h['DisLRU'], x['DisLRU'])
+                logits['DisLRU'] = DisLRU.out(h['DisLRU'])
+                critic_inputs['DisLRU'] = h['DisLRU'].detach()
+            if 'LSTM' in active_models:
+                out, (h['LSTM'], c['LSTM']) = LSTM(x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
+                logits['LSTM'] = LSTM_readout(out.squeeze(0))
+                critic_inputs['LSTM'] = out.squeeze(0)
 
-                DisRNN_log_probs.append(DisRNN_pi.log_prob(DisRNN_a))
-                DisRNN_rewards.append(DisRNN_r)
-                DisRNN_expected_returns.append(DisRNN_critic(DisRNN_h.detach()).squeeze(-1))
-                DisRNN_entropies.append(DisRNN_pi.entropy())
-                for key, val in DisRNN_kls.items():
-                    DisRNN_bottleneck_losses[key].append(val)
-                DisRNN_regrets.append(probs.max(dim= -1).values - probs[batch_idx, DisRNN_a])
+            # sample
+            optimal = probs.max(dim= -1).values
 
-            # LSTM step
-            if train_LSTM:
-                LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
-                LSTM_logits = LSTM_readout(LSTM_out.squeeze(0))
+            a = {model: None for model in active_models}
+            r = {model: None for model in active_models}
+            for model in active_models:
+                pi = torch.distributions.Categorical(logits= logits[model])
+                a[model] = pi.sample()
+                r[model] = (torch.rand(batch_size, device= device) < probs[batch_idx, a[model]]).float()
 
-                LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
-                LSTM_a = LSTM_pi.sample()
-                LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
-                LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
-                
-                LSTM_log_probs.append(LSTM_pi.log_prob(LSTM_a))
-                LSTM_rewards.append(LSTM_r)
-                LSTM_expected_returns.append(LSTM_critic(LSTM_out.squeeze(0)).squeeze(-1))
-                LSTM_entropies.append(LSTM_pi.entropy())
-                LSTM_regrets.append(probs.max(dim= -1).values - probs[batch_idx, LSTM_a])
+                log_probs[model].append(pi.log_prob(a[model]))
+                rewards[model].append(r[model])
+                entropies[model].append(pi.entropy())
+                expected_returns[model].append(models[model]['critic'](critic_inputs[model]).squeeze(-1))
+                regrets[model].append(optimal - probs[batch_idx, a[model]])
+                if model in bottleneck_losses:
+                    for key, val in kls[model].items():
+                        bottleneck_losses[model][key].append(val)
+
+            # update obs
+            if 'DisRNN' in active_models:
+                x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
+            if 'DisLRU' in active_models:
+                x['DisLRU'] = torch.zeros(batch_size, config['input_size']['DisLRU'], device= device)
+                x['DisLRU'][torch.arange(batch_size, device= device), a['DisLRU']] = 2*r['DisLRU'] - 1
+            if 'LSTM' in active_models:
+                x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
 
             # restless bandits
             if restless:
@@ -198,110 +245,60 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 if dependent_arms:
                     probs[:, 1] = 1 - probs[:, 0]
 
-        if train_DisRNN:
-            DisRNN_log_probs = torch.stack(DisRNN_log_probs)
-            DisRNN_rewards = torch.stack(DisRNN_rewards)
-            DisRNN_expected_returns = torch.stack(DisRNN_expected_returns)
-            DisRNN_entropies = torch.stack(DisRNN_entropies)
-            DisRNN_bottleneck_losses = {key: torch.stack(vals) for key, vals in DisRNN_bottleneck_losses.items()}
-            DisRNN_regrets = torch.stack(DisRNN_regrets)
-            
-            DisRNN_regret = DisRNN_regrets.mean().item()
-            DisRNN_total_reward = DisRNN_rewards.sum(dim= 0).mean().item()
-        else:
-            DisRNN_regret = float('NaN')
-            DisRNN_total_reward = float('NaN')
-
-        if train_LSTM:
-            LSTM_log_probs = torch.stack(LSTM_log_probs)
-            LSTM_rewards = torch.stack(LSTM_rewards)
-            LSTM_expected_returns = torch.stack(LSTM_expected_returns)
-            LSTM_entropies = torch.stack(LSTM_entropies)
-            LSTM_regrets = torch.stack(LSTM_regrets)
-
-            LSTM_regret = LSTM_regrets.mean().item()
-            LSTM_total_reward = LSTM_rewards.sum(dim= 0).mean().item()
-        else:
-            LSTM_regret = float('NaN')
-            LSTM_total_reward = float('NaN')
+        log_probs = {model: torch.stack(vals) for model, vals in log_probs.items()}
+        rewards = {model: torch.stack(vals) for model, vals in rewards.items()}
+        expected_returns = {model: torch.stack(vals) for model, vals in expected_returns.items()}
+        entropies = {model: torch.stack(vals) for model, vals in entropies.items()}
+        regrets = {model: torch.stack(vals) for model, vals in regrets.items()}
+        bottleneck_losses = {
+            model: {key: torch.stack(vals) for key, vals in bottleneck_losses[model].items()}
+            for model in bottleneck_losses
+        }
 
         
         # --- advantage actor-critic ------
 
-        # update betas
         if beta_e_annealed:
             beta_e = beta_e_floor + (1.0 - beta_e_floor) * max(0.0, 1.0 - ep / anneal_end)
-        if ep < warmup_start or phase == 2:
-            beta = beta_floor
-        else:
-            beta = beta_floor + (beta_ceil - beta_floor) * min((ep - warmup_start) / (warmup_end - warmup_start), 1.0)
 
-        # DisRNN update
-        if train_DisRNN:
-            DisRNN_returns = DisRNN_rewards.clone()
+        for model in active_models:
+            returns = rewards[model].clone()
             for t in reversed(range(num_trials - 1)):
-                DisRNN_returns[t] = DisRNN_rewards[t] + DisRNN_gamma * DisRNN_returns[t+1]
-            DisRNN_returns = (DisRNN_returns - DisRNN_returns.mean(dim= 1, keepdim= True)) / (DisRNN_returns.std(dim= 1, keepdim= True) + 1e-8)
-            DisRNN_advantage = DisRNN_returns - DisRNN_expected_returns
-            
-            DisRNN_loss_actor = -(DisRNN_log_probs * DisRNN_advantage.detach()).mean()
-            DisRNN_loss_critic = torch.nn.functional.mse_loss(DisRNN_expected_returns, DisRNN_returns)
-            DisRNN_loss_entropy = DisRNN_entropies.mean()
-            DisRNN_loss_bottlenecks = sum(loss.mean() for loss in DisRNN_bottleneck_losses.values())
-            DisRNN_loss = (
-                DisRNN_loss_actor 
-                + beta_v * DisRNN_loss_critic
-                - beta_e * DisRNN_loss_entropy 
-                + beta * DisRNN_loss_bottlenecks
-            )
-            
-            DisRNN_loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                list(DisRNN.parameters()) + list(DisRNN_critic.parameters()),
-                max_norm= 1.0
-            )
-            DisRNN_optimizer.step()
-            with torch.no_grad():
-                DisRNN.logit_M_h.clamp_(min= m_min)
-                DisRNN.log_sigma_h.clamp_(min= sigma_min, max= 0.0)
-                DisRNN.logit_M_x.clamp_(min= m_min)
-                DisRNN.log_sigma_x.clamp_(min= sigma_min, max= 0.0)
-                DisRNN.logit_M_z.clamp_(min= m_min)
-                DisRNN.log_sigma_z.clamp_(min= sigma_min, max= 0.0)
+                returns[t] = rewards[model][t] + config['gamma'][model] * returns[t+1]
+            returns = (returns - returns.mean(dim= 1, keepdim= True)) / (returns.std(dim= 1, keepdim= True) + 1e-8)
+            advantage = returns - expected_returns[model]
 
-        # LSTM update
-        if train_LSTM:
-            LSTM_returns = LSTM_rewards.clone()
-            for t in reversed(range(num_trials - 1)):
-                LSTM_returns[t] = LSTM_rewards[t] + LSTM_gamma * LSTM_returns[t+1]
-            LSTM_returns = (LSTM_returns - LSTM_returns.mean(dim= 1, keepdim= True)) / (LSTM_returns.std(dim= 1, keepdim= True) + 1e-8)
-            LSTM_advantage = LSTM_returns - LSTM_expected_returns
+            if model in config['beta']:
+                floor = models[model]['beta']['floor']
+                ceil = models[model]['beta']['ceil']
+                warmup_start = models[model]['beta']['warmup']['start']
+                warmup_end = models[model]['beta']['warmup']['end']
+                if ep < warmup_start or phase == 2:
+                    beta = floor
+                else:
+                    beta = floor + (ceil - floor) * min((ep - warmup_start) / (warmup_end - warmup_start), 1.0)
+            else:
+                beta = 0.0
 
-            LSTM_loss_actor = -(LSTM_log_probs * LSTM_advantage.detach()).mean()
-            LSTM_loss_critic = torch.nn.functional.mse_loss(LSTM_expected_returns, LSTM_returns)
-            LSTM_loss_entropy = LSTM_entropies.mean()
-            LSTM_loss = (
-                LSTM_loss_actor
-                + beta_v * LSTM_loss_critic
-                - beta_e * LSTM_loss_entropy
-            )
+            loss_actor = -(log_probs[model] * advantage.detach()).mean()
+            loss_critic = torch.nn.functional.mse_loss(expected_returns[model], returns)
+            loss_entropy = entropies[model].mean()
+            loss_bottlenecks = sum(loss.mean() for loss in bottleneck_losses[model].values()) if model in bottleneck_losses else 0.0
+            loss = loss_actor + beta_v * loss_critic - beta_e * loss_entropy + beta * loss_bottlenecks
 
-            LSTM_loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters()),
-                max_norm= 1.0
-            )
-            LSTM_optimizer.step()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(models[model]['parameters'], max_norm= 1.0)
+            models[model]['optimizer'].step()
+
+            if model in bottleneck_losses:
+                with torch.no_grad():
+                    for bottleneck in models[model]['bottlenecks']:
+                        getattr(models[model]['model'], f'logit_M_{bottleneck}').clamp_(min= m_min)
+                        getattr(models[model]['model'], f'log_sigma_{bottleneck}').clamp_(min= sigma_min, max= 0.0)
 
         return {
-            'regret': {
-                'DisRNN': DisRNN_regret,
-                'LSTM': LSTM_regret
-            },
-            'reward': {
-                'DisRNN': DisRNN_total_reward,
-                'LSTM': LSTM_total_reward
-            }
+            'regret': {model: regrets[model].mean().item() for model in active_models},
+            'reward': {model: rewards[model].sum(dim= 0).mean().item() for model in active_models}
         }
 
 
@@ -310,61 +307,60 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             # sample task
             probs = D(batch_size, num_arms, device)
 
-            # reset DisRNN state
-            DisRNN.eval()
-            DisRNN_h = torch.zeros(batch_size, DisRNN_hidden_size, device= device)
-            DisRNN_x = torch.zeros(batch_size, input_size, device= device)
+            for model in models:
+                models[model]['model'].eval()
 
-            # reset LSTM state
-            LSTM.eval()
-            LSTM_h = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
-            LSTM_c = torch.zeros(1, batch_size, LSTM_hidden_size, device= device)
-            LSTM_x = torch.zeros(batch_size, input_size, device= device)
+            h, c, x = {}, {}, {}
+            if 'DisRNN' in models:
+                h['DisRNN'] = torch.zeros(batch_size, config['hidden_size']['DisRNN'], device= device)
+                x['DisRNN'] = torch.zeros(batch_size, config['input_size']['DisRNN'], device= device)
+            if 'DisLRU' in models:
+                h['DisLRU'] = torch.zeros(batch_size, config['hidden_size']['DisLRU'], device= device)
+                x['DisLRU'] = torch.zeros(batch_size, config['input_size']['DisLRU'], device= device)
+            if 'LSTM' in models:
+                h['LSTM'] = torch.zeros(1, batch_size, config['hidden_size']['LSTM'], device= device)
+                c['LSTM'] = torch.zeros(1, batch_size, config['hidden_size']['LSTM'], device= device)
+                x['LSTM'] = torch.zeros(batch_size, config['input_size']['LSTM'], device= device)
 
-            DisRNN_regrets = []
-            LSTM_regrets = []
+            regrets = {model: [] for model in models}
             for t in range(num_trials):
+                # step
+                logits = {model: None for model in models}
+                if 'DisRNN' in models:
+                    h['DisRNN'], _ = DisRNN.step(h['DisRNN'], x['DisRNN'])
+                    logits['DisRNN'] = DisRNN.out(h['DisRNN'])
+                if 'DisLRU' in models:
+                    h['DisLRU'], _ = DisLRU.step(h['DisLRU'], x['DisLRU'])
+                    logits['DisLRU'] = DisLRU.out(h['DisLRU'])
+                if 'LSTM' in models:
+                    out, (h['LSTM'], c['LSTM']) = LSTM(x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
+                    logits['LSTM'] = LSTM_readout(out.squeeze(0))
+
+                # sample
                 optimal = probs.max(dim= -1).values
 
-                # DisRNN step
-                DisRNN_h, _ = DisRNN.step(DisRNN_h, DisRNN_x)
-                DisRNN_logits = DisRNN.out(DisRNN_h)
+                a = {model: None for model in models}
+                r = {model: None for model in models}
+                for model in models:
+                    pi = torch.distributions.Categorical(logits= logits[model])
+                    a[model] = pi.sample()
+                    r[model] = (torch.rand(batch_size, device= device) < probs[batch_idx, a[model]]).float()
+                    regrets[model].append(optimal - probs[batch_idx, a[model]])
 
-                DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
-                DisRNN_a = DisRNN_pi.sample()
-                DisRNN_r = (torch.rand(batch_size, device= device) < probs[batch_idx, DisRNN_a]).float()
-                DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
-                DisRNN_regrets.append((optimal - probs[batch_idx, DisRNN_a]).cpu())
+        regrets = {model: torch.stack(vals) for model, vals in regrets.items()}
 
-                # LSTM step
-                LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
-                LSTM_logits = LSTM_readout(LSTM_out.squeeze(0))
-
-                LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
-                LSTM_a = LSTM_pi.sample()
-                LSTM_r = (torch.rand(batch_size, device= device) < probs[batch_idx, LSTM_a]).float()
-                LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
-                LSTM_regrets.append((optimal - probs[batch_idx, LSTM_a]).cpu())
-
-        return {
-            'regret': {
-                'DisRNN': np.mean(DisRNN_regrets),
-                'LSTM': np.mean(LSTM_regrets)
-            }
-        }
+        return {'regret': {model: regrets[model].mean().item() for model in models}}
 
 
 
 
     # --- Phase 1: train until disentanglement ------
-    DisRNN_regret_history = []
-    LSTM_regret_history = []
+    regret_histories = {model: [] for model in models}
+    prev_state_dicts = {model: copy.deepcopy(models[model]['model'].state_dict()) for model in models}
+    training = {model: True for model in models}
+    was_training = {model: True for model in models}
 
     ep = 0
-
-    prev_state_dict = copy.deepcopy(DisRNN.state_dict())
-    DisRNN_converged = False
-    DisRNN_disentanglement_ep = 0
 
     # load checkpoint
     if checkpoint_path:
@@ -374,138 +370,105 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
         DisRNN_critic.load_state_dict(checkpoint['DisRNN_critic_state_dict'])
         DisRNN_optimizer.load_state_dict(checkpoint['DisRNN_optimizer_state_dict'])
-        DisRNN_regret_history = checkpoint['DisRNN_regret_history']
+        regret_histories['DisRNN'] = checkpoint['DisRNN_regret_history']
 
-        prev_state_dict = checkpoint['prev_state_dict']
-        DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
-        DisRNN_disentanglement_ep = len(DisRNN_regret_history)
+        prev_state_dicts['DisRNN'] = checkpoint['prev_state_dicts']['DisRNN']
+        models['DisRNN']['converged'] = bottlenecks_converged('DisRNN', prev_state_dicts)
+        models['DisRNN']['disentanglement_ep'] = len(regret_histories['DisRNN'])
+
+        DisLRU.load_state_dict(checkpoint['DisLRU_state_dict'])
+        DisLRU_critic.load_state_dict(checkpoint['DisLRU_critic_state_dict'])
+        DisLRU_optimizer.load_state_dict(checkpoint['DisLRU_optimizer_state_dict'])
+        regret_histories['DisLRU'] = checkpoint['DisLRU_regret_history']
+
+        prev_state_dicts['DisLRU'] = checkpoint['prev_state_dicts']['DisLRU']
+        models['DisLRU']['converged'] = bottlenecks_converged('DisLRU', prev_state_dicts)
+        models['DisLRU']['disentanglement_ep'] = len(regret_histories['DisLRU'])
 
         LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
         LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
         LSTM_critic.load_state_dict(checkpoint['LSTM_critic_state_dict'])
         LSTM_optimizer.load_state_dict(checkpoint['LSTM_optimizer_state_dict'])
-        LSTM_regret_history = checkpoint['LSTM_regret_history']
+        regret_histories['LSTM'] = checkpoint['LSTM_regret_history']
 
-    train_DisRNN = ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)
-    train_LSTM = ep < train_LSTM_until_ep
-    while train_DisRNN or train_LSTM:
-        training_ep_res = run_training_episode(train_DisRNN, train_LSTM, phase= 1)
-        if train_DisRNN:
-            DisRNN_regret_history.append(training_ep_res['regret']['DisRNN'])
-        if train_LSTM:
-            LSTM_regret_history.append(training_ep_res['regret']['LSTM'])
+    for model in models: 
+        if 'bottlenecks' in models[model]: 
+            training[model] = ep < models[model]['beta']['warmup']['end'] or (not disentangled(model) and not models[model]['converged'])
+        else:
+            training[model] = ep < models[model]['train_until_ep']
+
+    while any(training[model] for model in training):
+        active_models = {model for model in training if training[model]}
+        training_ep_res = run_training_episode(active_models, phase= 1)
+        for model in active_models:
+            regret_histories[model].append(training_ep_res['regret'][model])
         
-        if ep > 0 and ep % 500 == 0:
+        if ep % 500 == 0:
             print(f'ep {ep:6d}')
-            print(
-                f"DisRNN total reward: {training_ep_res['reward']['DisRNN']:5.2f} | "
-                f"LSTM total reward: {training_ep_res['reward']['LSTM']:5.2f}"
-            )
-            print_bottleneck_parameters(DisRNN)
+            print(" | ".join(f"{model} total reward: {training_ep_res['reward'][model]:5.2f}" for model in active_models))
+            for model in active_models:
+                if 'bottlenecks' in models[model]: 
+                    print_bottleneck_parameters(model)
 
         if ep > 0 and ep % 10_000 == 0:
             plot_regret_history(
-                smooth(np.array(DisRNN_regret_history)), 
-                smooth(np.array(LSTM_regret_history)), 
-                plot_name= 'training_regret_phase1'
+                {model: smooth(np.array(regret_histories[model])) for model in models}, 
+                plot_name= 'training_regret'
             )
-            torch.save({
-                'ep': ep,
-                'DisRNN_state_dict': DisRNN.state_dict(),
-                'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
-                'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
-                'DisRNN_regret_history': DisRNN_regret_history,
-                'prev_state_dict': prev_state_dict,
-                'LSTM_state_dict': LSTM.state_dict(),
-                'LSTM_readout_state_dict': LSTM_readout.state_dict(),
-                'LSTM_critic_state_dict': LSTM_critic.state_dict(),
-                'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
-                'LSTM_regret_history': LSTM_regret_history
-            }, checkpoints_dir + f'checkpoint_ep{ep}.pt')
+            torch.save(build_checkpoint(ep), checkpoints_dir + f'checkpoint_ep{ep}.pt')
 
-            DisRNN_converged = bottlenecks_converged(DisRNN, prev_state_dict)
-            prev_state_dict = copy.deepcopy(DisRNN.state_dict())
+            for model in models: 
+                if 'bottlenecks' in models[model]: 
+                    models[model]['converged'] = bottlenecks_converged(model, prev_state_dicts)
+                    prev_state_dicts[model] = copy.deepcopy(models[model]['model'].state_dict())
 
         ep += 1
-
-        if train_DisRNN and not (ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)):
-            DisRNN_disentanglement_ep = ep
-            torch.save({
-                'ep': ep,
-                'DisRNN_state_dict': DisRNN.state_dict(),
-                'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
-                'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
-                'DisRNN_regret_history': DisRNN_regret_history,
-                'prev_state_dict': prev_state_dict,
-                'LSTM_state_dict': LSTM.state_dict(),
-                'LSTM_readout_state_dict': LSTM_readout.state_dict(),
-                'LSTM_critic_state_dict': LSTM_critic.state_dict(),
-                'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
-                'LSTM_regret_history': LSTM_regret_history
-            }, checkpoints_dir + f'DisRNN_disentanglement_at_ep{ep}.pt')
+        for model in models: 
+            if 'bottlenecks' in models[model]:
+                was_training[model] = training[model]
+                training[model] = ep < models[model]['beta']['warmup']['end'] or (not disentangled(model) and not models[model]['converged'])
+                if was_training[model] and not training[model]:
+                    models[model]['disentanglement_ep'] = ep
+                    torch.save(build_checkpoint(ep), checkpoints_dir + f'{model}_disentanglement_at_ep{ep}.pt')
+            else:
+                training[model] = ep < models[model]['train_until_ep']
             
-        train_DisRNN = ep < warmup_end or (not disentangled(DisRNN) and not DisRNN_converged)
-        train_LSTM = ep < train_LSTM_until_ep
-
-
     # display bottleneck parameters and plot regret histories after phase 1
-    print_bottleneck_parameters(DisRNN)
+    for model in models:
+        if 'bottlenecks' in models[model]: 
+            print_bottleneck_parameters(model)
     plot_regret_history(
-        smooth(np.array(DisRNN_regret_history)), 
-        smooth(np.array(LSTM_regret_history)), 
-        plot_name= 'training_regret_phase1'
+        {model: smooth(np.array(regret_histories[model])) for model in models}, 
+        plot_name= 'training_regret'
     )
 
 
-
-
     # --- Phase 2: search for best post-disentanglement model ------
-    DisRNN_best_regret = np.inf
-    LSTM_best_regret = np.inf
+    best_regrets = {model: np.inf for model in models}
+    cur_regrets = {model: None for model in models}
 
     eval_interval = config['eval_interval']
     eval_episodes = config['eval_episodes']
     search_episodes = config['search_episodes']
     for search_ep in range(search_episodes):
-        training_ep_res = run_training_episode(train_DisRNN= True, train_LSTM= True, phase= 2)
-        DisRNN_regret_history.append(training_ep_res['regret']['DisRNN'])
-        LSTM_regret_history.append(training_ep_res['regret']['LSTM'])
+        training_ep_res = run_training_episode(models, phase= 2)
+        for model in models:
+            regret_histories[model].append(training_ep_res['regret'][model])
 
         if search_ep % eval_interval == 0:
-            DisRNN_eval_regrets = []
-            LSTM_eval_regrets = []
+            eval_regrets = {model: [] for model in models}
             for _ in range(eval_episodes):
                 eval_ep_res = run_eval_episode()
-                DisRNN_eval_regrets.append(eval_ep_res['regret']['DisRNN'])
-                LSTM_eval_regrets.append(eval_ep_res['regret']['LSTM'])
+                for model in models:
+                    eval_regrets[model].append(eval_ep_res['regret'][model])
 
-            DisRNN_cur_regret = np.mean(DisRNN_eval_regrets)
-            if DisRNN_cur_regret < DisRNN_best_regret:
-                DisRNN_best_regret = DisRNN_cur_regret
-                torch.save({
-                    'DisRNN_state_dict': DisRNN.state_dict()
-                }, checkpoints_dir + 'best_DisRNN.pt')
-                print_bottleneck_parameters(DisRNN)
-                
-            LSTM_cur_regret = np.mean(LSTM_eval_regrets)
-            if LSTM_cur_regret < LSTM_best_regret:
-                LSTM_best_regret = LSTM_cur_regret
-                torch.save({
-                    'LSTM_state_dict': LSTM.state_dict(),
-                    'LSTM_readout_state_dict': LSTM_readout.state_dict()
-                }, checkpoints_dir + 'best_LSTM.pt')
-
-            print(f'ep {ep:6d}')
-            print(
-                f"DisRNN total reward: {training_ep_res['reward']['DisRNN']:5.2f} | "
-                f"LSTM total reward: {training_ep_res['reward']['LSTM']:5.2f}"
-            )
-            print()
-            plot_regret_history(
-                smooth(np.array(DisRNN_regret_history[DisRNN_disentanglement_ep:])), 
-                smooth(np.array(LSTM_regret_history[train_LSTM_until_ep:])), 
-                plot_name= 'training_regret_phase2'
-            )
+            for model in models:
+                cur_regrets[model] = np.mean(eval_regrets[model])
+                if cur_regrets[model] < best_regrets[model]:
+                    best_regrets[model] = cur_regrets[model]
+                    torch.save({
+                        f'{model}_state_dict': models[model]['model'].state_dict()
+                    }, checkpoints_dir + f'best_{model}.pt')
 
         ep += 1
 

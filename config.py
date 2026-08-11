@@ -54,10 +54,14 @@ exps = {
         'restless': False,
         'drift': 0.0,
         'dependent_arms': False,
-        'input_size': 2,
+        'input_size': {
+            'DisRNN': 2,
+            'DisLRU': num_arms,
+            'LSTM': 2
+        },
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 12,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
@@ -68,7 +72,7 @@ exps = {
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
+            'DisLRU': 5e-3,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -76,9 +80,25 @@ exps = {
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
-        'beta_floor': 1e-8,
-        'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 200_000,
+        'beta': {
+            'DisRNN': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            },
+            'DisLRU': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            }
+        },
+        'train_until_ep': {'LSTM': 200_000},
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
@@ -90,10 +110,14 @@ exps = {
         'restless': True,
         'drift': 0.02,
         'dependent_arms': False,
-        'input_size': 2,
+        'input_size': {
+            'DisRNN': 2,
+            'DisLRU': num_arms,
+            'LSTM': 2
+        },
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 12,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
@@ -104,7 +128,7 @@ exps = {
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
+            'DisLRU': 5e-3,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -112,9 +136,25 @@ exps = {
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
-        'beta_floor': 1e-8,
-        'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 200_000,
+        'beta': {
+            'DisRNN': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            },
+            'DisLRU': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            }
+        },
+        'train_until_ep': {'LSTM': 200_000},
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
@@ -126,10 +166,14 @@ exps = {
         'restless': False,
         'drift': 0.0,
         'dependent_arms': True,
-        'input_size': 2,
+        'input_size': {
+            'DisRNN': 2,
+            'DisLRU': num_arms,
+            'LSTM': 2
+        },
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 12,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
@@ -140,7 +184,7 @@ exps = {
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
+            'DisLRU': 5e-3,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -148,9 +192,25 @@ exps = {
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
-        'beta_floor': 1e-8,
-        'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 100_000,
+        'beta': {
+            'DisRNN': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            },
+            'DisLRU': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            }
+        },
+        'train_until_ep': {'LSTM': 100_000},
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
@@ -162,10 +222,14 @@ exps = {
         'restless': False,
         'drift': 0.0,
         'dependent_arms': True,
-        'input_size': 2,
+        'input_size': {
+            'DisRNN': 2,
+            'DisLRU': num_arms,
+            'LSTM': 2
+        },
         'hidden_size': {
             'DisRNN': 5,
-            'DisLRU': 12,
+            'DisLRU': 5,
             'LSTM': 48
         },
         'gamma': {
@@ -176,7 +240,7 @@ exps = {
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-4,
+            'DisLRU': 5e-3,
             'LSTM': 5e-3
         },
         'batch_size': 32,
@@ -184,9 +248,25 @@ exps = {
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
-        'beta_floor': 1e-8,
-        'beta_ceil': 1e-4,
-        'train_LSTM_until_ep': 100_000,
+        'beta': {
+            'DisRNN': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            },
+            'DisLRU': {
+                'floor': 1e-8,
+                'ceil': 1e-4,
+                'warmup': {
+                    'start': 5000,
+                    'end': 10_000
+                }
+            }
+        },
+        'train_until_ep': {'LSTM': 100_000},
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
