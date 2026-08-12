@@ -12,57 +12,65 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
 
     # initialize training models and optimizers
-    DisRNN = MyDisRNN(config['hidden_size']['DisRNN'], config['input_size']['DisRNN'], num_arms).to(device)
-    DisRNN_critic = torch.nn.Linear(config['hidden_size']['DisRNN'], 1).to(device)
-    DisRNN_parameters = list(DisRNN.parameters()) + list(DisRNN_critic.parameters())
-    DisRNN_optimizer = torch.optim.Adam(DisRNN_parameters, lr= config['lr']['DisRNN'])
-
-    DisLRU = MyDisLRU(config['hidden_size']['DisLRU'], config['input_size']['DisLRU'], num_arms).to(device)
-    DisLRU_critic = torch.nn.Linear(config['hidden_size']['DisLRU'], 1).to(device)
-    DisLRU_parameters = list(DisLRU.parameters()) + list(DisLRU_critic.parameters())
-    DisLRU_optimizer = torch.optim.Adam(DisLRU_parameters, lr= config['lr']['DisLRU'])
-
-    LSTM = torch.nn.LSTM(config['input_size']['LSTM'], config['hidden_size']['LSTM']).to(device)
-    LSTM_readout = torch.nn.Linear(config['hidden_size']['LSTM'], num_arms).to(device)
-    LSTM_critic = torch.nn.Linear(config['hidden_size']['LSTM'], 1).to(device)
-    LSTM_parameters = list(LSTM.parameters()) + list(LSTM_readout.parameters()) + list(LSTM_critic.parameters())
-    LSTM_optimizer = torch.optim.Adam(LSTM_parameters, lr= config['lr']['LSTM'])
-
-    models = {
-        'DisRNN': {
-            'model': DisRNN,
-            'critic': DisRNN_critic,
-            'parameters': DisRNN_parameters,
-            'optimizer': DisRNN_optimizer,
+    def DisRNN_constructor():
+        model = MyDisRNN(config['hidden_size']['DisRNN'], config['input_size']['DisRNN'], num_arms).to(device)
+        critic = torch.nn.Linear(config['hidden_size']['DisRNN'], 1).to(device)
+        parameters = list(model.parameters()) + list(critic.parameters())
+        optimizer = torch.optim.Adam(parameters, lr= config['lr']['DisRNN'])
+        return {
+            'model': model,
+            'critic': critic,
+            'parameters': parameters,
+            'optimizer': optimizer,
             'bottlenecks': ['h', 'x', 'z'],
             'beta': config['beta']['DisRNN'],
             'converged': False,
             'disentangled': False,
             'disentanglement_ep': 0
-        },
-        'DisLRU': {
-            'model': DisLRU,
-            'critic': DisLRU_critic,
-            'parameters': DisLRU_parameters,
-            'optimizer': DisLRU_optimizer,
+        }
+
+    def DisLRU_constructor():
+        model = MyDisLRU(config['hidden_size']['DisLRU'], config['input_size']['DisLRU'], num_arms).to(device)
+        critic = torch.nn.Linear(config['hidden_size']['DisLRU'], 1).to(device)
+        parameters = list(model.parameters()) + list(critic.parameters())
+        optimizer = torch.optim.Adam(parameters, lr= config['lr']['DisLRU'])
+        return {
+            'model': model,
+            'critic': critic,
+            'parameters': parameters,
+            'optimizer': optimizer,
             'bottlenecks': ['x', 'z'],
             'beta': config['beta']['DisLRU'],
             'converged': False,
             'disentangled': False,
             'disentanglement_ep': 0
-        },
-        'LSTM': {
-            'model': LSTM,
-            'readout': LSTM_readout,
-            'critic': LSTM_critic,
-            'parameters': LSTM_parameters,
-            'optimizer': LSTM_optimizer,
+        }
+
+    def LSTM_constructor():
+        model = torch.nn.LSTM(config['input_size']['LSTM'], config['hidden_size']['LSTM']).to(device)
+        readout = torch.nn.Linear(config['hidden_size']['LSTM'], num_arms).to(device)
+        critic = torch.nn.Linear(config['hidden_size']['LSTM'], 1).to(device)
+        parameters = list(model.parameters()) + list(readout.parameters()) + list(critic.parameters())
+        optimizer = torch.optim.Adam(parameters, lr= config['lr']['LSTM'])
+        return {
+            'model': model,
+            'readout': readout,
+            'critic': critic,
+            'parameters': parameters,
+            'optimizer': optimizer,
             'train_until_ep': config['train_until_ep']['LSTM']
         }
+
+    model_constructors = {
+        'DisRNN': DisRNN_constructor,
+        'DisLRU': DisLRU_constructor,
+        'LSTM': LSTM_constructor
     }
+    models = {model: model_constructors[model]() for model in ['DisLRU']}
 
     m_min = torch.logit(torch.tensor(0.01)).item()
     sigma_min = torch.log(torch.tensor(0.01)).item()
+
 
     # training hyperparameters
     batch_size = config['batch_size']
@@ -75,6 +83,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     else:
         beta_e = config['beta_e']
     beta_v = config['beta_v']
+
 
     # training helpers
     def plot_regret_history(regret_histories, plot_name, colors= None):
@@ -108,23 +117,16 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
 
     def build_checkpoint(ep):
-        return {
-            'ep': ep,
-            'DisRNN_state_dict': DisRNN.state_dict(),
-            'DisRNN_critic_state_dict': DisRNN_critic.state_dict(),
-            'DisRNN_optimizer_state_dict': DisRNN_optimizer.state_dict(),
-            'DisRNN_regret_history': regret_histories['DisRNN'],
-            'DisLRU_state_dict': DisLRU.state_dict(),
-            'DisLRU_critic_state_dict': DisLRU_critic.state_dict(),
-            'DisLRU_optimizer_state_dict': DisLRU_optimizer.state_dict(),
-            'DisLRU_regret_history': regret_histories['DisLRU'],
-            'LSTM_state_dict': LSTM.state_dict(),
-            'LSTM_readout_state_dict': LSTM_readout.state_dict(),
-            'LSTM_critic_state_dict': LSTM_critic.state_dict(),
-            'LSTM_optimizer_state_dict': LSTM_optimizer.state_dict(),
-            'LSTM_regret_history': regret_histories['LSTM'],
-            'prev_state_dicts': prev_state_dicts
-        }
+        checkpoint = {'ep': ep, 'prev_state_dicts': prev_state_dicts}
+        for model in models:
+            checkpoint[f'{model}_state_dict'] = models[model]['model'].state_dict()
+            checkpoint[f'{model}_critic_state_dict'] = models[model]['critic'].state_dict()
+            checkpoint[f'{model}_optimizer_state_dict'] = models[model]['optimizer'].state_dict()
+            checkpoint[f'{model}_regret_history'] = regret_histories[model]
+            if 'readout' in models[model]:
+                checkpoint[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
+        
+        return checkpoint
 
 
     def disentangled(model, low= 0.1, high= 0.9):
@@ -155,11 +157,12 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         # sample task
         probs = D(batch_size, num_arms, device)
 
-        # reset models state
+        # activate training mode and reset gradients
         for model in active_models:
             models[model]['model'].train()
             models[model]['optimizer'].zero_grad()
-        
+
+        # reset model states
         h, c, x = {}, {}, {}
         if 'DisRNN' in active_models:
             h['DisRNN'] = torch.zeros(batch_size, config['hidden_size']['DisRNN'], device= device)
@@ -183,6 +186,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         }
 
         for t in range(num_trials):
+            optimal = probs.max(dim= -1).values
+
+            # detach gradients
             if t % steps_unrolled == 0:
                 for model in h: 
                     h[model] = h[model].detach() 
@@ -198,21 +204,19 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             critic_inputs = {model: None for model in active_models}
 
             if 'DisRNN' in active_models:
-                h['DisRNN'], kls['DisRNN'] = DisRNN.step(h['DisRNN'], x['DisRNN'])
-                logits['DisRNN'] = DisRNN.out(h['DisRNN'])
+                h['DisRNN'], kls['DisRNN'] = models['DisRNN']['model'].step(h['DisRNN'], x['DisRNN'])
+                logits['DisRNN'] = models['DisRNN']['model'].out(h['DisRNN'])
                 critic_inputs['DisRNN'] = h['DisRNN'].detach()
             if 'DisLRU' in active_models:
-                h['DisLRU'], kls['DisLRU'] = DisLRU.step(h['DisLRU'], x['DisLRU'])
-                logits['DisLRU'] = DisLRU.out(h['DisLRU'])
+                h['DisLRU'], kls['DisLRU'] = models['DisLRU']['model'].step(h['DisLRU'], x['DisLRU'])
+                logits['DisLRU'] = models['DisLRU']['model'].out(h['DisLRU'])
                 critic_inputs['DisLRU'] = h['DisLRU'].detach()
             if 'LSTM' in active_models:
-                out, (h['LSTM'], c['LSTM']) = LSTM(x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
-                logits['LSTM'] = LSTM_readout(out.squeeze(0))
+                out, (h['LSTM'], c['LSTM']) = models['LSTM']['model'](x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
+                logits['LSTM'] = models['LSTM']['readout'](out.squeeze(0))
                 critic_inputs['LSTM'] = out.squeeze(0)
 
             # sample
-            optimal = probs.max(dim= -1).values
-
             a = {model: None for model in active_models}
             r = {model: None for model in active_models}
             for model in active_models:
@@ -258,9 +262,11 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         
         # --- advantage actor-critic ------
 
+        # update exploration parameter
         if beta_e_annealed:
             beta_e = beta_e_floor + (1.0 - beta_e_floor) * max(0.0, 1.0 - ep / anneal_end)
 
+        # gradient descent
         for model in active_models:
             returns = rewards[model].clone()
             for t in reversed(range(num_trials - 1)):
@@ -268,6 +274,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             returns = (returns - returns.mean(dim= 1, keepdim= True)) / (returns.std(dim= 1, keepdim= True) + 1e-8)
             advantage = returns - expected_returns[model]
 
+            # update bottleneck pressure
             if model in config['beta']:
                 floor = models[model]['beta']['floor']
                 ceil = models[model]['beta']['ceil']
@@ -280,16 +287,19 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             else:
                 beta = 0.0
 
+            # calculate loss
             loss_actor = -(log_probs[model] * advantage.detach()).mean()
             loss_critic = torch.nn.functional.mse_loss(expected_returns[model], returns)
             loss_entropy = entropies[model].mean()
             loss_bottlenecks = sum(loss.mean() for loss in bottleneck_losses[model].values()) if model in bottleneck_losses else 0.0
             loss = loss_actor + beta_v * loss_critic - beta_e * loss_entropy + beta * loss_bottlenecks
 
+            # take gradient step
             loss.backward()
             torch.nn.utils.clip_grad_norm_(models[model]['parameters'], max_norm= 1.0)
             models[model]['optimizer'].step()
 
+            # maintain bottleneck parameters
             if model in bottleneck_losses:
                 with torch.no_grad():
                     for bottleneck in models[model]['bottlenecks']:
@@ -307,9 +317,11 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             # sample task
             probs = D(batch_size, num_arms, device)
 
+            # activate eval mode
             for model in models:
                 models[model]['model'].eval()
 
+            # reset model states
             h, c, x = {}, {}, {}
             if 'DisRNN' in models:
                 h['DisRNN'] = torch.zeros(batch_size, config['hidden_size']['DisRNN'], device= device)
@@ -324,21 +336,21 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
             regrets = {model: [] for model in models}
             for t in range(num_trials):
+                optimal = probs.max(dim= -1).values
+
                 # step
                 logits = {model: None for model in models}
                 if 'DisRNN' in models:
-                    h['DisRNN'], _ = DisRNN.step(h['DisRNN'], x['DisRNN'])
-                    logits['DisRNN'] = DisRNN.out(h['DisRNN'])
+                    h['DisRNN'], _ = models['DisRNN']['model'].step(h['DisRNN'], x['DisRNN'])
+                    logits['DisRNN'] = models['DisRNN']['model'].out(h['DisRNN'])
                 if 'DisLRU' in models:
-                    h['DisLRU'], _ = DisLRU.step(h['DisLRU'], x['DisLRU'])
-                    logits['DisLRU'] = DisLRU.out(h['DisLRU'])
+                    h['DisLRU'], _ = models['DisLRU']['model'].step(h['DisLRU'], x['DisLRU'])
+                    logits['DisLRU'] = models['DisLRU']['model'].out(h['DisLRU'])
                 if 'LSTM' in models:
-                    out, (h['LSTM'], c['LSTM']) = LSTM(x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
-                    logits['LSTM'] = LSTM_readout(out.squeeze(0))
+                    out, (h['LSTM'], c['LSTM']) = models['LSTM']['model'](x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
+                    logits['LSTM'] = models['LSTM']['readout'](out.squeeze(0))
 
                 # sample
-                optimal = probs.max(dim= -1).values
-
                 a = {model: None for model in models}
                 r = {model: None for model in models}
                 for model in models:
@@ -346,10 +358,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                     a[model] = pi.sample()
                     r[model] = (torch.rand(batch_size, device= device) < probs[batch_idx, a[model]]).float()
                     regrets[model].append(optimal - probs[batch_idx, a[model]])
+            regrets = {model: torch.stack(vals) for model, vals in regrets.items()}
 
-        regrets = {model: torch.stack(vals) for model, vals in regrets.items()}
-
-        return {'regret': {model: regrets[model].mean().item() for model in models}}
+            return {'regret': {model: regrets[model].mean().item() for model in models}}
 
 
 
@@ -366,43 +377,34 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path, map_location= device)
         ep = checkpoint['ep']
+        prev_state_dicts = checkpoint['prev_state_dicts']
+        for model in models:
+            models[model]['model'].load_state_dict(checkpoint[f'{model}_state_dict'])
+            models[model]['critic'].load_state_dict(checkpoint[f'{model}_critic_state_dict'])
+            models[model]['optimizer'].load_state_dict(checkpoint[f'{model}_optimizer_state_dict'])
+            regret_histories[model] = checkpoint[f'{model}_regret_history']
+            if 'readout' in models[model]:
+                models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
+            if 'bottlenecks' in models[model]:
+                models[model]['converged'] = bottlenecks_converged(model, prev_state_dicts)
+                models[model]['disentanglement_ep'] = len(regret_histories[model])
 
-        DisRNN.load_state_dict(checkpoint['DisRNN_state_dict'])
-        DisRNN_critic.load_state_dict(checkpoint['DisRNN_critic_state_dict'])
-        DisRNN_optimizer.load_state_dict(checkpoint['DisRNN_optimizer_state_dict'])
-        regret_histories['DisRNN'] = checkpoint['DisRNN_regret_history']
-
-        prev_state_dicts['DisRNN'] = checkpoint['prev_state_dicts']['DisRNN']
-        models['DisRNN']['converged'] = bottlenecks_converged('DisRNN', prev_state_dicts)
-        models['DisRNN']['disentanglement_ep'] = len(regret_histories['DisRNN'])
-
-        DisLRU.load_state_dict(checkpoint['DisLRU_state_dict'])
-        DisLRU_critic.load_state_dict(checkpoint['DisLRU_critic_state_dict'])
-        DisLRU_optimizer.load_state_dict(checkpoint['DisLRU_optimizer_state_dict'])
-        regret_histories['DisLRU'] = checkpoint['DisLRU_regret_history']
-
-        prev_state_dicts['DisLRU'] = checkpoint['prev_state_dicts']['DisLRU']
-        models['DisLRU']['converged'] = bottlenecks_converged('DisLRU', prev_state_dicts)
-        models['DisLRU']['disentanglement_ep'] = len(regret_histories['DisLRU'])
-
-        LSTM.load_state_dict(checkpoint['LSTM_state_dict'])
-        LSTM_readout.load_state_dict(checkpoint['LSTM_readout_state_dict'])
-        LSTM_critic.load_state_dict(checkpoint['LSTM_critic_state_dict'])
-        LSTM_optimizer.load_state_dict(checkpoint['LSTM_optimizer_state_dict'])
-        regret_histories['LSTM'] = checkpoint['LSTM_regret_history']
-
+    # get training status
     for model in models: 
         if 'bottlenecks' in models[model]: 
             training[model] = ep < models[model]['beta']['warmup']['end'] or (not disentangled(model) and not models[model]['converged'])
         else:
             training[model] = ep < models[model]['train_until_ep']
 
+    # phase 1 training
     while any(training[model] for model in training):
+        # run training episode for models still training
         active_models = {model for model in training if training[model]}
         training_ep_res = run_training_episode(active_models, phase= 1)
         for model in active_models:
             regret_histories[model].append(training_ep_res['regret'][model])
-        
+
+        # print episode rewards and model bottleneck parameters
         if ep % 500 == 0:
             print(f'ep {ep:6d}')
             print(" | ".join(f"{model} total reward: {training_ep_res['reward'][model]:5.2f}" for model in active_models))
@@ -410,36 +412,44 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 if 'bottlenecks' in models[model]: 
                     print_bottleneck_parameters(model)
 
+        # update phase 1 regret history plot and save checkpoint
         if ep > 0 and ep % 10_000 == 0:
             plot_regret_history(
                 {model: smooth(np.array(regret_histories[model])) for model in models}, 
-                plot_name= 'training_regret'
+                plot_name= 'training_regret_phase1'
             )
             torch.save(build_checkpoint(ep), checkpoints_dir + f'checkpoint_ep{ep}.pt')
 
+            # check for bottleneck parameter convergence
             for model in models: 
                 if 'bottlenecks' in models[model]: 
                     models[model]['converged'] = bottlenecks_converged(model, prev_state_dicts)
                     prev_state_dicts[model] = copy.deepcopy(models[model]['model'].state_dict())
 
+        # update training status
         ep += 1
         for model in models: 
             if 'bottlenecks' in models[model]:
                 was_training[model] = training[model]
                 training[model] = ep < models[model]['beta']['warmup']['end'] or (not disentangled(model) and not models[model]['converged'])
+                # save disentanglement checkpoint if model disentangled or bottleneck parameters converged (after beta warmup)
                 if was_training[model] and not training[model]:
                     models[model]['disentanglement_ep'] = ep
                     torch.save(build_checkpoint(ep), checkpoints_dir + f'{model}_disentanglement_at_ep{ep}.pt')
             else:
                 training[model] = ep < models[model]['train_until_ep']
-            
-    # display bottleneck parameters and plot regret histories after phase 1
+
+    # print final bottleneck parameters and finalize phase 1 regret history plot
+    phase_2_start_eps = {model: None for model in models}
     for model in models:
         if 'bottlenecks' in models[model]: 
             print_bottleneck_parameters(model)
+            phase_2_start_eps[model] = models[model]['disentanglement_ep']
+        else:
+            phase_2_start_eps[model] = models[model]['train_until_ep']
     plot_regret_history(
         {model: smooth(np.array(regret_histories[model])) for model in models}, 
-        plot_name= 'training_regret'
+        plot_name= 'training_regret_phase1'
     )
 
 
@@ -451,17 +461,21 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     eval_episodes = config['eval_episodes']
     search_episodes = config['search_episodes']
     for search_ep in range(search_episodes):
+        # run training episode for all models (min bottleneck pressure)
         training_ep_res = run_training_episode(models, phase= 2)
         for model in models:
             regret_histories[model].append(training_ep_res['regret'][model])
 
+        # evaluate models at interval
         if search_ep % eval_interval == 0:
+            # get regret data for model evaluation
             eval_regrets = {model: [] for model in models}
             for _ in range(eval_episodes):
                 eval_ep_res = run_eval_episode()
                 for model in models:
                     eval_regrets[model].append(eval_ep_res['regret'][model])
 
+            # save best model if current average regret is better than previous best regret
             for model in models:
                 cur_regrets[model] = np.mean(eval_regrets[model])
                 if cur_regrets[model] < best_regrets[model]:
@@ -469,6 +483,12 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                     torch.save({
                         f'{model}_state_dict': models[model]['model'].state_dict()
                     }, checkpoints_dir + f'best_{model}.pt')
+
+            # update phase 2 regret history plot
+            plot_regret_history(
+                {model: smooth(np.array(regret_histories[model][phase_2_start_eps[model]:])) for model in models}, 
+                plot_name= 'training_regret_phase2'
+            )
 
         ep += 1
 

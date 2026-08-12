@@ -66,7 +66,7 @@ exps = {
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
+            'DisLRU': 0.99,
             'LSTM': 0.95,
             'gittins': 0.99
         },
@@ -91,7 +91,7 @@ exps = {
             },
             'DisLRU': {
                 'floor': 1e-8,
-                'ceil': 1e-4,
+                'ceil': 1e-5,
                 'warmup': {
                     'start': 5000,
                     'end': 10_000
@@ -122,7 +122,7 @@ exps = {
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
+            'DisLRU': 0.99,
             'LSTM': 0.95,
             'gittins': 0.99
         },
@@ -178,7 +178,7 @@ exps = {
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
+            'DisLRU': 0.99,
             'LSTM': 0.95,
             'gittins': 0.98
         },
@@ -234,7 +234,7 @@ exps = {
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.98,
+            'DisLRU': 0.99,
             'LSTM': 0.95,
             'gittins': 0.99
         },
