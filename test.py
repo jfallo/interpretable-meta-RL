@@ -14,113 +14,124 @@ def test(config, checkpoints_path, figs_path):
     dependent_arms = config['dependent_arms']
 
 
-    # initialize models and model parameters
-    input_size = config['input_size']
-
-    DisRNN_hidden_size = config['hidden_size']['DisRNN']
-    DisRNN = MyDisRNN(DisRNN_hidden_size, input_size, num_arms).to(device)
-
-    LSTM_hidden_size = config['hidden_size']['LSTM']
-    LSTM = torch.nn.LSTM(input_size, LSTM_hidden_size).to(device)
-    LSTM_readout = torch.nn.Linear(LSTM_hidden_size, num_arms).to(device)
-
-    c = config['c']  # exploration parameter for UCB
-    gamma = config['gamma']['gittins']  # discount factor for Gittins
+    # build Gittins index table
+    gittins_table = compute_gittins_table(max_total= num_trials+1, gamma= config['gamma']['Gittins'], N= 200, tol= 1e-4)
+    
+    # initialize models
+    def DisRNN_constructor():
+        model = MyDisRNN(config['hidden_size']['DisRNN'], config['input_size']['DisRNN'], num_arms).to(device)
+        return {'model': model, 'color': config['colors']['DisRNN'], 'linestyle': config['linestyles']['DisRNN']}
+    
+    def DisLRU_constructor():
+        model = MyDisLRU(config['hidden_size']['DisLRU'], config['input_size']['DisLRU'], num_arms).to(device)
+        return {'model': model, 'color': config['colors']['DisLRU'], 'linestyle': config['linestyles']['DisLRU']}
+    
+    def LSTM_constructor():
+        model = torch.nn.LSTM(config['input_size']['LSTM'], config['hidden_size']['LSTM']).to(device)
+        readout = torch.nn.Linear(config['hidden_size']['LSTM'], num_arms).to(device)
+        return {'model': model, 'readout': readout, 'color': config['colors']['LSTM'], 'linestyle': config['linestyles']['LSTM']}
+    
+    model_constructors = {
+        'DisRNN': DisRNN_constructor,
+        'DisLRU': DisLRU_constructor,
+        'LSTM': LSTM_constructor
+    }
+    trained_models = {
+        model: model_constructors[model]() 
+        for model in ['DisLRU']
+    }
+    classical_models = {
+        'Thompson': {'model': None, 'color': config['colors']['Thompson'], 'linestyle': config['linestyles']['Thompson']},
+        'UCB': {'model': None, 'color': config['colors']['UCB'], 'linestyle': config['linestyles']['UCB']},
+        'Gittins': {'model': None, 'color': config['colors']['Gittins'], 'linestyle': config['linestyles']['Gittins']}
+    }
+    models = {**trained_models, **classical_models}
 
 
     # testing helpers
     def plot_agent(data, color, linestyle, label, plot_std= False):
         mean = np.stack(data).mean(axis= 0)
         plt.plot(mean, color= color, linestyle= linestyle, label= label)
-        print(mean[-1])
-        
         if plot_std:
             std = np.stack(data).std(axis= 0, ddof= 1)
             plt.fill_between(range(num_trials), mean - std, mean + std, alpha= 0.1, color= color, linestyle= linestyle)
 
 
+    def optimal_arm_rate(raw_regrets):
+        regrets = np.stack(raw_regrets)
+        return (regrets == 0).mean(axis= 0)
+
+
     def run_tests(num_tests):
-        DisRNN_raw_regrets = []
-        LSTM_raw_regrets = []
-        thompson_raw_regrets = []
-        ucb_raw_regrets = []
-        gittins_raw_regrets = []
+        with torch.no_grad():
+            raw_regrets = {model: [] for model in models}
+            cumulative_regrets = {model: [] for model in models}
+            for _ in range(num_tests):
+                # sample task
+                probs = D(1, num_arms, device)
+                
+                # activate eval mode
+                for model in trained_models:
+                    trained_models[model]['model'].eval()
+                
+                # reset model states
+                h, c, x = {}, {}, {}
+                if 'DisRNN' in models:
+                    h['DisRNN'] = torch.zeros(1, config['hidden_size']['DisRNN'], device= device)
+                    x['DisRNN'] = torch.zeros(1, config['input_size']['DisRNN'], device= device)
+                if 'DisLRU' in models:
+                    h['DisLRU'] = torch.zeros(1, config['hidden_size']['DisLRU'], device= device)
+                    x['DisLRU'] = torch.zeros(1, config['input_size']['DisLRU'], device= device)
+                if 'LSTM' in models:
+                    h['LSTM'] = torch.zeros(1, 1, config['hidden_size']['LSTM'], device= device)
+                    c['LSTM'] = torch.zeros(1, 1, config['hidden_size']['LSTM'], device= device)
+                    x['LSTM'] = torch.zeros(1, config['input_size']['LSTM'], device= device)
 
-        DisRNN_cumulative_regrets = []
-        LSTM_cumulative_regrets = []
-        thompson_cumulative_regrets = []
-        ucb_cumulative_regrets = []
-        gittins_cumulative_regrets = []
-        for _ in range(num_tests):
-            probs = D(1, num_arms, device)
-            
-            # reset DisRNN state
-            DisRNN.eval()
-            DisRNN_h = torch.zeros(1, DisRNN_hidden_size, device= device)
-            DisRNN_x = torch.zeros(1, input_size, device= device)
+                classical_models['Thompson']['model'] = Thompson(num_arms)
+                classical_models['UCB']['model'] = UCB(num_arms, config['c'])
+                classical_models['Gittins']['model'] = Gittins(num_arms, gittins_table)
 
-            # reset LSTM state
-            LSTM.eval()
-            LSTM_h = torch.zeros(1, 1, LSTM_hidden_size, device= device)
-            LSTM_c = torch.zeros(1, 1, LSTM_hidden_size, device= device)
-            LSTM_x = torch.zeros(1, input_size, device= device)
-
-            # test models
-            thompson = Thompson(num_arms)
-            ucb = UCB(num_arms, c)
-            gittins = Gittins(num_arms, gittins_table)
-
-
-            DisRNN_regrets = []
-            LSTM_regrets = []
-            thompson_regrets = []
-            ucb_regrets = []
-            gittins_regrets = []
-            with torch.no_grad():
+                regrets = {model: [] for model in models}
+                
                 for t in range(num_trials):
                     optimal = probs.max(dim= -1).values
-
-                    # a single reward outcome for all agents for fair evaluation
+                    # a single reward outcome for fair evaluation
                     arm_rewards = torch.bernoulli(probs).squeeze(0)
 
-                    # DisRNN step
-                    DisRNN_h, _ = DisRNN.step(DisRNN_h, DisRNN_x)
-                    DisRNN_logits = DisRNN.out(DisRNN_h)
+                    # step
+                    logits = {model: None for model in trained_models}
+                    if 'DisRNN' in models:
+                        h['DisRNN'], _ = models['DisRNN']['model'].step(h['DisRNN'], x['DisRNN'])
+                        logits['DisRNN'] = models['DisRNN']['model'].out(h['DisRNN'])
+                    if 'DisLRU' in models:
+                        h['DisLRU'], _ = models['DisLRU']['model'].step(h['DisLRU'], x['DisLRU'])
+                        logits['DisLRU'] = models['DisLRU']['model'].out(h['DisLRU'])
+                    if 'LSTM' in models:
+                        out, (h['LSTM'], c['LSTM']) = models['LSTM']['model'](x['LSTM'].unsqueeze(0), (h['LSTM'], c['LSTM']))
+                        logits['LSTM'] = models['LSTM']['readout'](out.squeeze(0))
 
-                    DisRNN_pi = torch.distributions.Categorical(logits= DisRNN_logits)
-                    DisRNN_a = DisRNN_pi.sample()
-                    DisRNN_r = arm_rewards[DisRNN_a.item()].unsqueeze(0)
-                    DisRNN_x = torch.stack([2*DisRNN_a.float() - 1, 2*DisRNN_r - 1], dim= -1)
-                    DisRNN_regrets.append((optimal - probs[0, DisRNN_a]).cpu())
+                    # sample
+                    a = {model: None for model in models}
+                    r = {model: None for model in models}            
+                    for model in models:
+                        if model in trained_models:
+                            pi = torch.distributions.Categorical(logits= logits[model])
+                            a[model] = pi.sample()
+                            r[model] = arm_rewards[a[model].item()].unsqueeze(0)
+                        if model in classical_models:
+                            a[model] = models[model]['model'].choice()
+                            r[model] = arm_rewards[a[model]].item()
+                            models[model]['model'].getReward(a[model], r[model])
+                        regrets[model].append(optimal.item() - probs[0, a[model]].item())
 
-                    # LSTM step
-                    LSTM_out, (LSTM_h, LSTM_c) = LSTM(LSTM_x.unsqueeze(0), (LSTM_h, LSTM_c))
-                    LSTM_logits = LSTM_readout(LSTM_out.squeeze(0))
-
-                    LSTM_pi = torch.distributions.Categorical(logits= LSTM_logits)
-                    LSTM_a = LSTM_pi.sample()
-                    LSTM_r = arm_rewards[LSTM_a.item()].unsqueeze(0)
-                    LSTM_x = torch.stack([2*LSTM_a.float() - 1, 2*LSTM_r - 1], dim= -1)
-                    LSTM_regrets.append((optimal - probs[0, LSTM_a]).cpu())
-
-                    # Thompson step
-                    thompson_a = thompson.choice()
-                    thompson_r = arm_rewards[thompson_a].item()
-                    thompson.getReward(thompson_a, thompson_r)
-                    thompson_regrets.append(optimal.item() - probs[0, thompson_a].item())
-
-                    # UCB step
-                    ucb_a = ucb.choice()
-                    ucb_r = arm_rewards[ucb_a].item()
-                    ucb.getReward(ucb_a, ucb_r)
-                    ucb_regrets.append(optimal.item() - probs[0, ucb_a].item())
-
-                    # Gittins step
-                    gittins_a = gittins.choice()
-                    gittins_r = arm_rewards[gittins_a].item()
-                    gittins.getReward(gittins_a, gittins_r)
-                    gittins_regrets.append(optimal.item() - probs[0, gittins_a].item())
-
+                    # update obs
+                    if 'DisRNN' in models:
+                        x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
+                    if 'DisLRU' in models:
+                        x['DisLRU'] = torch.zeros(1, config['input_size']['DisLRU'], device= device)
+                        x['DisLRU'][torch.arange(1, device= device), a['DisLRU']] = 2*r['DisLRU'] - 1
+                    if 'LSTM' in models:
+                        x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
 
                     # restless bandits
                     if restless:
@@ -129,74 +140,30 @@ def test(config, checkpoints_path, figs_path):
                         if dependent_arms:
                             probs[:, 1] = 1 - probs[:, 0]
 
-                    
-            DisRNN_raw_regrets.append(np.array(DisRNN_regrets))
-            LSTM_raw_regrets.append(np.array(LSTM_regrets))
-            thompson_raw_regrets.append(np.array(thompson_regrets))
-            ucb_raw_regrets.append(np.array(ucb_regrets))
-            gittins_raw_regrets.append(np.array(gittins_regrets))
+                for model in models:
+                    raw_regrets[model].append(np.array(regrets[model]))
+                    cumulative_regrets[model].append(np.array(regrets[model]).cumsum())
 
-            DisRNN_cumulative_regrets.append(np.array(DisRNN_regrets).cumsum())
-            LSTM_cumulative_regrets.append(np.array(LSTM_regrets).cumsum())
-            thompson_cumulative_regrets.append(np.array(thompson_regrets).cumsum())
-            ucb_cumulative_regrets.append(np.array(ucb_regrets).cumsum())
-            gittins_cumulative_regrets.append(np.array(gittins_regrets).cumsum())
-
-
-        return {
-            'DisRNN': {
-                'raw_regrets': DisRNN_raw_regrets,
-                'cumulative_regrets': DisRNN_cumulative_regrets,
-            },
-            'LSTM': {
-                'raw_regrets': LSTM_raw_regrets,
-                'cumulative_regrets': LSTM_cumulative_regrets,
-            },
-            'Thompson': {
-                'raw_regrets': thompson_raw_regrets,
-                'cumulative_regrets': thompson_cumulative_regrets,
-            },
-            'UCB': {
-                'raw_regrets': ucb_raw_regrets,
-                'cumulative_regrets': ucb_cumulative_regrets,
-            },
-            'Gittins': {
-                'raw_regrets': gittins_raw_regrets,
-                'cumulative_regrets': gittins_cumulative_regrets,
-            },
-        }
-
-            
-    def optimal_arm_rate(raw_regrets):
-        regrets = np.stack(raw_regrets)
-
-        return (regrets == 0).mean(axis= 0)
+            return raw_regrets, cumulative_regrets
 
 
 
-
-    # build Gittins index table
-    gittins_table = compute_gittins_table(max_total= num_trials+1, gamma= gamma, N= 200, tol= 1e-4)
 
     # load best models
-    best_DisRNN = torch.load(checkpoints_path + 'best_DisRNN.pt')
-    DisRNN.load_state_dict(best_DisRNN['DisRNN_state_dict'])
-
-    best_LSTM = torch.load(checkpoints_path + 'best_LSTM.pt')
-    LSTM.load_state_dict(best_LSTM['LSTM_state_dict'])
-    LSTM_readout.load_state_dict(best_LSTM['LSTM_readout_state_dict'])
+    for model in trained_models:
+        checkpoint = torch.load(checkpoints_path + f'best_{model}.pt')
+        models[model]['model'].load_state_dict(checkpoint[f'{model}_state_dict'])
+        if 'readout' in models[model]:
+            models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
 
     # testing
-    results = run_tests(10_000)
+    raw_regrets, cumulative_regrets = run_tests(10_000)
 
     # plot cumulative regrets
     plt.figure(figsize= (8,5))
     plt.ylim(0, 4.0)
-    plot_agent(results['DisRNN']['cumulative_regrets'], 'blue', '-', 'DisRNN')
-    plot_agent(results['LSTM']['cumulative_regrets'], 'green', '-', 'LSTM')
-    plot_agent(results['Thompson']['cumulative_regrets'], 'gray', '--', 'Thompson')
-    plot_agent(results['UCB']['cumulative_regrets'], 'lightgray', '--', 'UCB')
-    plot_agent(results['Gittins']['cumulative_regrets'], 'black', '--', 'Gittins')
+    for model in models:
+        plot_agent(cumulative_regrets[model], models[model]['color'], models[model]['linestyle'], model)
     plt.xlabel('Trial')
     plt.ylabel('Cumulative Regret')
     plt.title('Model Cumulative Regret')
@@ -207,11 +174,8 @@ def test(config, checkpoints_path, figs_path):
 
     # plot optimal arm rates
     plt.figure(figsize= (8,5))
-    plt.plot(optimal_arm_rate(results['DisRNN']['raw_regrets']), color= 'blue', linestyle= '-', label= 'DisRNN')
-    plt.plot(optimal_arm_rate(results['LSTM']['raw_regrets']), color= 'green', linestyle= '-', label= 'LSTM')
-    plt.plot(optimal_arm_rate(results['Thompson']['raw_regrets']), color= 'gray', linestyle= '--', label= 'Thompson')
-    plt.plot(optimal_arm_rate(results['UCB']['raw_regrets']), color= 'lightgray', linestyle= '--', label= 'UCB')
-    plt.plot(optimal_arm_rate(results['Gittins']['raw_regrets']), color= 'black', linestyle= '--', label= 'Gittins')
+    for model in models:
+        plt.plot(optimal_arm_rate(raw_regrets[model]), color= models[model]['color'], linestyle= models[model]['linestyle'], label= model)
     plt.xlabel('Trial')
     plt.ylabel('P(optimal arm chosen)')
     plt.title('Model Optimal Arm Rate')

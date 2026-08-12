@@ -46,6 +46,24 @@ def sample_dependent_easy(batch_size, num_arms, device):
     p2 = 1 - p1
     return torch.stack([p1,p2], dim= 1)
 
+
+colors = {
+    'DisRNN': 'blue',
+    'DisLRU': 'orange',
+    'LSTM': 'green',
+    'Thompson': 'gray',
+    'UCB': 'lightgray',
+    'Gittins': 'black'
+}
+linestyles = {
+    'DisRNN': '-',
+    'DisLRU': '-',
+    'LSTM': '-',
+    'Thompson': '--',
+    'UCB': '--',
+    'Gittins': '--'
+}
+
 num_arms = 2
 exps = {
     'independent/standard': {
@@ -68,7 +86,7 @@ exps = {
             'DisRNN': 0.98,
             'DisLRU': 0.99,
             'LSTM': 0.95,
-            'gittins': 0.99
+            'Gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
@@ -102,7 +120,9 @@ exps = {
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
-        'c': 0.15
+        'c': 0.15,
+        'colors': colors,
+        'linestyles': linestyles
     },
     'independent/restless': {
         'D': sample_independent,
@@ -124,7 +144,7 @@ exps = {
             'DisRNN': 0.98,
             'DisLRU': 0.99,
             'LSTM': 0.95,
-            'gittins': 0.99
+            'Gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
@@ -158,7 +178,9 @@ exps = {
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
-        'c': 0.15
+        'c': 0.15,
+        'colors': colors,
+        'linestyles': linestyles
     },
     'dependent/standard': {
         'D': sample_dependent,
@@ -180,7 +202,7 @@ exps = {
             'DisRNN': 0.98,
             'DisLRU': 0.99,
             'LSTM': 0.95,
-            'gittins': 0.98
+            'Gittins': 0.98
         },
         'lr': {
             'DisRNN': 5e-4,
@@ -214,7 +236,9 @@ exps = {
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
-        'c': 0.15
+        'c': 0.15,
+        'colors': colors,
+        'linestyles': linestyles
     },
     'dependent/hard': {
         'D': sample_dependent_hard,
@@ -236,7 +260,7 @@ exps = {
             'DisRNN': 0.98,
             'DisLRU': 0.99,
             'LSTM': 0.95,
-            'gittins': 0.99
+            'Gittins': 0.99
         },
         'lr': {
             'DisRNN': 5e-4,
@@ -270,6 +294,8 @@ exps = {
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,
-        'c': 0.15
+        'c': 0.15,
+        'colors': colors,
+        'linestyles': linestyles
     }
 }

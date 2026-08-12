@@ -26,7 +26,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'beta': config['beta']['DisRNN'],
             'converged': False,
             'disentangled': False,
-            'disentanglement_ep': 0
+            'disentanglement_ep': 0,
+            'color': config['colors']['DisRNN'],
+            'linestyle': config['linestyles']['DisRNN']
         }
 
     def DisLRU_constructor():
@@ -43,7 +45,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'beta': config['beta']['DisLRU'],
             'converged': False,
             'disentangled': False,
-            'disentanglement_ep': 0
+            'disentanglement_ep': 0,
+            'color': config['colors']['DisLRU'],
+            'linestyle': config['linestyles']['DisLRU']
         }
 
     def LSTM_constructor():
@@ -58,7 +62,9 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'critic': critic,
             'parameters': parameters,
             'optimizer': optimizer,
-            'train_until_ep': config['train_until_ep']['LSTM']
+            'train_until_ep': config['train_until_ep']['LSTM'],
+            'color': config['colors']['LSTM'],
+            'linestyle': config['linestyles']['LSTM']
         }
 
     model_constructors = {
@@ -66,7 +72,10 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         'DisLRU': DisLRU_constructor,
         'LSTM': LSTM_constructor
     }
-    models = {model: model_constructors[model]() for model in ['DisLRU']}
+    models = {
+        model: model_constructors[model]() 
+        for model in ['DisLRU', 'LSTM']
+    }
 
     m_min = torch.logit(torch.tensor(0.01)).item()
     sigma_min = torch.log(torch.tensor(0.01)).item()
@@ -86,15 +95,10 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
 
     # training helpers
-    def plot_regret_history(regret_histories, plot_name, colors= None):
-        if colors is None:
-            colors = {}
-        default_colors = ['blue', 'green', 'orange', 'purple', 'red', 'brown']
-
+    def plot_regret_history(regret_histories, plot_name):
         plt.figure(figsize= (8,5))
-        for i, (model, history) in enumerate(regret_histories.items()):
-            color = colors.get(model, default_colors[i % len(default_colors)])
-            plt.plot(history, label= model, color= color)
+        for model, history in regret_histories.items():
+            plt.plot(history, label= model, color= models[model]['color'])
         plt.xlabel('Episode')
         plt.ylabel('Regret')
         plt.title('Model Regret Over Time')
@@ -335,6 +339,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 x['LSTM'] = torch.zeros(batch_size, config['input_size']['LSTM'], device= device)
 
             regrets = {model: [] for model in models}
+
             for t in range(num_trials):
                 optimal = probs.max(dim= -1).values
 
@@ -358,6 +363,23 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                     a[model] = pi.sample()
                     r[model] = (torch.rand(batch_size, device= device) < probs[batch_idx, a[model]]).float()
                     regrets[model].append(optimal - probs[batch_idx, a[model]])
+
+                # update obs
+                if 'DisRNN' in models:
+                    x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
+                if 'DisLRU' in models:
+                    x['DisLRU'] = torch.zeros(batch_size, config['input_size']['DisLRU'], device= device)
+                    x['DisLRU'][torch.arange(batch_size, device= device), a['DisLRU']] = 2*r['DisLRU'] - 1
+                if 'LSTM' in models:
+                    x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
+
+                # restless bandits
+                if restless:
+                    probs += drift * torch.randn(batch_size, num_arms, device= device)
+                    probs = torch.clamp(probs, 0, 1)
+                    if dependent_arms:
+                        probs[:, 1] = 1 - probs[:, 0]
+
             regrets = {model: torch.stack(vals) for model, vals in regrets.items()}
 
             return {'regret': {model: regrets[model].mean().item() for model in models}}
@@ -480,9 +502,11 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 cur_regrets[model] = np.mean(eval_regrets[model])
                 if cur_regrets[model] < best_regrets[model]:
                     best_regrets[model] = cur_regrets[model]
-                    torch.save({
-                        f'{model}_state_dict': models[model]['model'].state_dict()
-                    }, checkpoints_dir + f'best_{model}.pt')
+
+                    save_dict = {f'{model}_state_dict': models[model]['model'].state_dict()}
+                    if 'readout' in models[model]:
+                        save_dict[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
+                    torch.save(save_dict, checkpoints_dir + f'best_{model}.pt')
 
             # update phase 2 regret history plot
             plot_regret_history(
