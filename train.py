@@ -74,7 +74,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     }
     models = {
         model: model_constructors[model]() 
-        for model in ['DisLRU', 'LSTM']
+        for model in ['DisRNN', 'DisLRU', 'LSTM']  # --- list of models to train ---
     }
 
     m_min = torch.logit(torch.tensor(0.01)).item()
@@ -412,7 +412,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                 models[model]['disentanglement_ep'] = len(regret_histories[model])
 
     # get training status
-    for model in models: 
+    for model in models:
         if 'bottlenecks' in models[model]: 
             training[model] = ep < models[model]['beta']['warmup']['end'] or (not disentangled(model) and not models[model]['converged'])
         else:

@@ -109,7 +109,7 @@ exps = {
             },
             'DisLRU': {
                 'floor': 1e-8,
-                'ceil': 1e-5,
+                'ceil': 1e-6,
                 'warmup': {
                     'start': 5000,
                     'end': 10_000
@@ -159,7 +159,7 @@ exps = {
         'beta': {
             'DisRNN': {
                 'floor': 1e-8,
-                'ceil': 1e-4,
+                'ceil': 1e-6,
                 'warmup': {
                     'start': 5000,
                     'end': 10_000
@@ -225,7 +225,7 @@ exps = {
             },
             'DisLRU': {
                 'floor': 1e-8,
-                'ceil': 1e-4,
+                'ceil': 1e-6,
                 'warmup': {
                     'start': 5000,
                     'end': 10_000
@@ -283,7 +283,7 @@ exps = {
             },
             'DisLRU': {
                 'floor': 1e-8,
-                'ceil': 1e-4,
+                'ceil': 1e-6,
                 'warmup': {
                     'start': 5000,
                     'end': 10_000

@@ -38,7 +38,7 @@ def test(config, checkpoints_path, figs_path):
     }
     trained_models = {
         model: model_constructors[model]() 
-        for model in ['DisLRU']
+        for model in ['DisRNN', 'DisLRU', 'LSTM']  # --- list of models to test ---
     }
     classical_models = {
         'Thompson': {'model': None, 'color': config['colors']['Thompson'], 'linestyle': config['linestyles']['Thompson']},
