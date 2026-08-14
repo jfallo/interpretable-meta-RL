@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 
 def format_matrix(M, name, row_prefix= 'rule', col_prefix= 'dim'):
@@ -15,20 +16,118 @@ def format_matrix(M, name, row_prefix= 'rule', col_prefix= 'dim'):
     return '\n'.join(lines)
 
 
+# training helpers
 def smooth(x, window= 200):
     return np.convolve(x, np.ones(window)/window, mode= 'valid')
 
 
-def print_bottleneck_parameters(model):
-    M_h = torch.sigmoid(model.logit_M_h)
-    M_x = torch.sigmoid(model.logit_M_x)
-    M_z = torch.sigmoid(model.logit_M_z)
+def plot_regret_histories(regret_histories, figs_dir, colors):
+    phase1 = {model: smooth(np.array(regret_histories['phase1'][model])) for model in regret_histories['phase1']}
+    plt.figure(figsize= (8,5))
+    for model, history in phase1.items():
+        plt.plot(history, label= model, color= colors[model])
+    plt.xlabel('Episode')
+    plt.ylabel('Regret')
+    plt.title('Phase 1 Model Regret')
+    plt.legend()
+    plt.grid()
+    plt.savefig(figs_dir + 'training_regret_phase1.png')
+    plt.close()
 
-    print()
-    print(format_matrix(M_h, 'M_h', row_prefix= 'rule', col_prefix= 'lat'))
-    print()
-    print(format_matrix(M_x, 'M_x', row_prefix= 'rule', col_prefix= 'obs'))
-    print()
-    print(format_matrix(M_z.reshape(1,-1), 'M_z', row_prefix= 'lat', col_prefix= 'lat'))
-    print()
-    print()
+    phase2 = {model: smooth(np.array(regret_histories['phase2'][model])) for model in regret_histories['phase2']}
+    if phase2:
+        plt.figure(figsize= (8,5))
+        for model, history in phase2.items():
+            plt.plot(history, label= model, color= colors[model])
+        plt.xlabel('Episode')
+        plt.ylabel('Regret')
+        plt.title('Phase 2 Model Regret')
+        plt.legend()
+        plt.grid()
+        plt.savefig(figs_dir + 'training_regret_phase2.png')
+        plt.close()
+
+
+def print_bottleneck_parameters(model):
+    with torch.no_grad():
+        print()
+        print(model['name'])
+        print()
+        for bottleneck in model['bottlenecks']:
+            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+            print(format_matrix(m, f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
+            print()
+        print()
+
+
+def disentangled(model, low= 0.1, high= 0.9):
+    with torch.no_grad():
+        checks = []
+        for bottleneck in model['bottlenecks']:
+            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+            sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
+            checks.append(((m <= low) | (m >= high)).all() and ((sigma <= low) | (sigma >= high)).all())
+
+        return bool(all(checks))
+
+
+def bottlenecks_converged(model, prev_state_dict, tol= 0.02):
+    with torch.no_grad():
+        checks = []
+        for bottleneck in model['bottlenecks']:
+            prev_m = torch.sigmoid(prev_state_dict[f'logit_M_{bottleneck}'])
+            prev_sigma = torch.exp(prev_state_dict[f'log_sigma_{bottleneck}'])
+            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+            sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
+            checks.append((torch.abs(m - prev_m) < tol).all() and (torch.abs(sigma - prev_sigma) < tol).all())
+
+        return bool(all(checks))
+
+
+def load_checkpoint(checkpoint, models):
+    ep = checkpoint['ep']
+    prev_state_dicts = checkpoint['prev_state_dicts']
+    training_phase = checkpoint['training_phase']
+    regret_histories = checkpoint['regret_histories']
+    for model in models:
+        models[model]['model'].load_state_dict(checkpoint[f'{model}_state_dict'])
+        models[model]['critic'].load_state_dict(checkpoint[f'{model}_critic_state_dict'])
+        models[model]['optimizer'].load_state_dict(checkpoint[f'{model}_optimizer_state_dict'])
+        if 'readout' in models[model]:
+            models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
+        if 'bottlenecks' in models[model]:
+            models[model]['converged'] = checkpoint[f'{model}_converged']
+
+    return ep, prev_state_dicts, training_phase, regret_histories, models
+
+
+def build_checkpoint(ep, prev_state_dicts, training_phase, regret_histories, models):
+    checkpoint = {
+        'ep': ep, 
+        'prev_state_dicts': prev_state_dicts,
+        'training_phase': training_phase,
+        'regret_histories': regret_histories
+    }
+    for model in models:
+        checkpoint[f'{model}_state_dict'] = models[model]['model'].state_dict()
+        checkpoint[f'{model}_critic_state_dict'] = models[model]['critic'].state_dict()
+        checkpoint[f'{model}_optimizer_state_dict'] = models[model]['optimizer'].state_dict()
+        if 'readout' in models[model]:
+            checkpoint[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
+        if 'bottlenecks' in models[model]:
+            checkpoint[f'{model}_converged'] = models[model]['converged']
+    
+    return checkpoint
+
+
+# testing helpers
+def plot_agent(data, T, color, linestyle, label, plot_std= False):
+    mean = np.stack(data).mean(axis= 0)
+    plt.plot(mean, color= color, linestyle= linestyle, label= label)
+    if plot_std:
+        std = np.stack(data).std(axis= 0, ddof= 1)
+        plt.fill_between(range(T), mean - std, mean + std, alpha= 0.1, color= color, linestyle= linestyle)
+
+
+def optimal_arm_rate(regrets):
+    return (regrets == 0).mean(axis= 0)

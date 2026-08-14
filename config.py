@@ -1,17 +1,13 @@
 import numpy as np
 import torch
-import random
 import matplotlib.pyplot as plt
-import os, copy
+import os, random, copy
+
+from envs import *
+from helpers import *
 
 from agents.DisRNN import MyDisRNN
 from agents.DisLRU import MyDisLRU
-
-
-seed = 40
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -64,23 +60,39 @@ linestyles = {
     'Gittins': '--'
 }
 
-num_arms = 2
+
 exps = {
-    'independent/standard': {
-        'D': sample_independent,
-        'num_trials': 100,
-        'restless': False,
-        'drift': 0.0,
-        'dependent_arms': False,
+    'bandits/independent/standard': {
+        'name': 'standard independent bandits',
+        'env': BanditsEnv(
+            config= {
+                'D': sample_independent,
+                'num_arms': 2,
+                'dependent_arms': False,
+                'restless': False,
+                'drift': 0.0,
+                'num_trials': 100
+            },
+            device= device
+        ),
+        'models': {'DisLRU'},
         'input_size': {
             'DisRNN': 2,
-            'DisLRU': num_arms,
-            'LSTM': 2
+            'DisLRU': 2,
+            'LSTM': 2,
+            'Thompson': 2,
+            'UCB': 2,
+            'Gittins': 2
         },
         'hidden_size': {
             'DisRNN': 5,
             'DisLRU': 5,
             'LSTM': 48
+        },
+        'output_size': {
+            'DisRNN': 2,
+            'DisLRU': 2,
+            'LSTM': 2
         },
         'gamma': {
             'DisRNN': 0.98,
@@ -121,181 +133,7 @@ exps = {
         'eval_episodes': 1000,
         'search_episodes': 20_000,
         'c': 0.15,
-        'colors': colors,
-        'linestyles': linestyles
-    },
-    'independent/restless': {
-        'D': sample_independent,
-        'num_trials': 100,
-        'restless': True,
-        'drift': 0.02,
-        'dependent_arms': False,
-        'input_size': {
-            'DisRNN': 2,
-            'DisLRU': num_arms,
-            'LSTM': 2
-        },
-        'hidden_size': {
-            'DisRNN': 5,
-            'DisLRU': 5,
-            'LSTM': 48
-        },
-        'gamma': {
-            'DisRNN': 0.98,
-            'DisLRU': 0.99,
-            'LSTM': 0.95,
-            'Gittins': 0.99
-        },
-        'lr': {
-            'DisRNN': 5e-4,
-            'DisLRU': 5e-3,
-            'LSTM': 5e-3
-        },
-        'batch_size': 32,
-        'steps_unrolled': 100,
-        'beta_e_annealed': True,
-        'beta_e': 0.005,
-        'beta_v': 0.05,
-        'beta': {
-            'DisRNN': {
-                'floor': 1e-8,
-                'ceil': 1e-6,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            },
-            'DisLRU': {
-                'floor': 1e-8,
-                'ceil': 1e-4,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            }
-        },
-        'train_until_ep': {'LSTM': 200_000},
-        'eval_interval': 500,
-        'eval_episodes': 1000,
-        'search_episodes': 20_000,
-        'c': 0.15,
-        'colors': colors,
-        'linestyles': linestyles
-    },
-    'dependent/standard': {
-        'D': sample_dependent,
-        'num_trials': 100,
-        'restless': False,
-        'drift': 0.0,
-        'dependent_arms': True,
-        'input_size': {
-            'DisRNN': 2,
-            'DisLRU': num_arms,
-            'LSTM': 2
-        },
-        'hidden_size': {
-            'DisRNN': 5,
-            'DisLRU': 5,
-            'LSTM': 48
-        },
-        'gamma': {
-            'DisRNN': 0.98,
-            'DisLRU': 0.99,
-            'LSTM': 0.95,
-            'Gittins': 0.98
-        },
-        'lr': {
-            'DisRNN': 5e-4,
-            'DisLRU': 5e-3,
-            'LSTM': 5e-3
-        },
-        'batch_size': 32,
-        'steps_unrolled': 100,
-        'beta_e_annealed': True,
-        'beta_e': 0.005,
-        'beta_v': 0.05,
-        'beta': {
-            'DisRNN': {
-                'floor': 1e-8,
-                'ceil': 1e-4,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            },
-            'DisLRU': {
-                'floor': 1e-8,
-                'ceil': 1e-6,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            }
-        },
-        'train_until_ep': {'LSTM': 100_000},
-        'eval_interval': 500,
-        'eval_episodes': 1000,
-        'search_episodes': 20_000,
-        'c': 0.15,
-        'colors': colors,
-        'linestyles': linestyles
-    },
-    'dependent/hard': {
-        'D': sample_dependent_hard,
-        'num_trials': 100,
-        'restless': False,
-        'drift': 0.0,
-        'dependent_arms': True,
-        'input_size': {
-            'DisRNN': 2,
-            'DisLRU': num_arms,
-            'LSTM': 2
-        },
-        'hidden_size': {
-            'DisRNN': 5,
-            'DisLRU': 5,
-            'LSTM': 48
-        },
-        'gamma': {
-            'DisRNN': 0.98,
-            'DisLRU': 0.99,
-            'LSTM': 0.95,
-            'Gittins': 0.99
-        },
-        'lr': {
-            'DisRNN': 5e-4,
-            'DisLRU': 5e-3,
-            'LSTM': 5e-3
-        },
-        'batch_size': 32,
-        'steps_unrolled': 100,
-        'beta_e_annealed': True,
-        'beta_e': 0.005,
-        'beta_v': 0.05,
-        'beta': {
-            'DisRNN': {
-                'floor': 1e-8,
-                'ceil': 1e-4,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            },
-            'DisLRU': {
-                'floor': 1e-8,
-                'ceil': 1e-6,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
-            }
-        },
-        'train_until_ep': {'LSTM': 100_000},
-        'eval_interval': 500,
-        'eval_episodes': 1000,
-        'search_episodes': 20_000,
-        'c': 0.15,
-        'colors': colors,
-        'linestyles': linestyles
+        'color': colors,
+        'linestyle': linestyles
     }
 }
