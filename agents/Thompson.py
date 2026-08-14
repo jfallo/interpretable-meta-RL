@@ -5,6 +5,10 @@ class Thompson:
     def __init__(self, num_arms):
         self.alpha = np.ones(num_arms)
         self.beta = np.ones(num_arms)
+
+    def reset(self):
+        self.alpha = np.ones_like(self.alpha)
+        self.beta = np.ones_like(self.beta)
     
     def choice(self):
         samples = np.random.beta(self.alpha, self.beta)

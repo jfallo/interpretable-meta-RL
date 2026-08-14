@@ -8,6 +8,11 @@ class UCB:
         self.rewards = np.zeros(num_arms)
         self.c = c
         self.total = 0
+
+    def reset(self):
+        self.counts = np.zeros_like(self.counts)
+        self.rewards = np.zeros_like(self.rewards)
+        self.total = 0
     
     def choice(self):
         self.total += 1

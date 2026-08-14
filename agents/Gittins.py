@@ -82,6 +82,10 @@ class Gittins:
         self.table = table
         self.alpha = np.ones(num_arms, dtype= int)
         self.beta = np.ones(num_arms, dtype= int)
+
+    def reset(self):
+        self.alpha = np.ones_like(self.alpha)
+        self.beta = np.ones_like(self.beta)
     
     def choice(self):
         indices = [self.table[self.alpha[i], self.beta[i]] for i in range(self.num_arms)]
