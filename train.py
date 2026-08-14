@@ -43,6 +43,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'name': 'DisRNN',
             'input_size': input_size,
             'hidden_size': hidden_size,
+            'output_size': output_size,
             'model': model,
             'critic': critic,
             'parameters': parameters,
@@ -64,6 +65,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'name': 'DisLRU',
             'input_size': input_size,
             'hidden_size': hidden_size,
+            'output_size': output_size,
             'model': model,
             'critic': critic,
             'parameters': parameters,
@@ -86,6 +88,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
             'name': 'LSTM',
             'input_size': input_size,
             'hidden_size': hidden_size,
+            'output_size': output_size,
             'model': model,
             'readout': readout,
             'critic': critic,
@@ -213,7 +216,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
 
         # print episode rewards and bottleneck parameters, convergence check
-        if ep % 500 == 0:
+        if ep % 2500 == 0:
             print(f'ep {ep}')
             print(" | ".join(f"{model} total reward: {total_rewards[model]:5.2f}" for model in active_models))
             for model in active_models:
