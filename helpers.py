@@ -16,6 +16,37 @@ def format_matrix(M, name, row_prefix= 'rule', col_prefix= 'dim'):
     return '\n'.join(lines)
 
 
+# experiment helpers
+def sample_independent(batch_size, num_arms, device):
+    return torch.rand(batch_size, num_arms, device= device)
+
+def sample_dependent(batch_size, num_arms, device):
+    p1 = torch.rand(batch_size, device= device)
+    p2 = 1 - p1
+    return torch.stack([p1,p2], dim= 1)
+
+def sample_dependent_hard(batch_size, num_arms, device):
+    p1 = torch.where(torch.rand(batch_size, device= device) < 0.5,
+                     torch.full((batch_size,), 0.4, device= device),
+                     torch.full((batch_size,), 0.6, device= device))
+    p2 = 1 - p1
+    return torch.stack([p1,p2], dim= 1)
+
+def sample_dependent_medium(batch_size, num_arms, device):
+    p1 = torch.where(torch.rand(batch_size, device= device) < 0.5,
+                     torch.full((batch_size,), 0.25, device= device),
+                     torch.full((batch_size,), 0.75, device= device))
+    p2 = 1 - p1
+    return torch.stack([p1,p2], dim= 1)
+
+def sample_dependent_easy(batch_size, num_arms, device):
+    p1 = torch.where(torch.rand(batch_size, device= device) < 0.5,
+                     torch.full((batch_size,), 0.1, device= device),
+                     torch.full((batch_size,), 0.9, device= device))
+    p2 = 1 - p1
+    return torch.stack([p1,p2], dim= 1)
+
+
 # training helpers
 def smooth(x, window= 200):
     return np.convolve(x, np.ones(window)/window, mode= 'valid')
