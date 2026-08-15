@@ -1,24 +1,15 @@
 import torch
 
 
-class BanditsEnv:
-    def __init__(self, config, device):
-        self.D = config['D']
-        self.num_arms = config['num_arms']
-        self.dependent_arms = config['dependent_arms']
-        self.restless = config['restless']
-        self.drift = config['drift']
-        self.T = config['num_trials']
-
+class Env:
+    def __init__(self, device):
         self.device = device
-
         self.set_batch_size()
-        self.reset(active_models= {})
 
 
     def set_batch_size(self, batch_size= 1):
-        self.batch_size = batch_size
-        self.batch_idx = torch.arange(self.batch_size, device= self.device)
+            self.batch_size = batch_size
+            self.batch_idx = torch.arange(self.batch_size, device= self.device)
 
 
     def build_models(self, models):
@@ -26,10 +17,7 @@ class BanditsEnv:
 
 
     def reset(self, active_models, testing= False):
-        # reset task
-        self.probs = self.D(self.batch_size, self.num_arms, device= self.device)
-
-        # reset states
+        # reset trained model states
         self.h, self.c, self.x = {}, {}, {}
         if 'DisRNN' in active_models:
             self.h['DisRNN'] = torch.zeros(self.batch_size, self.models['DisRNN']['hidden_size'], device= self.device)
@@ -42,6 +30,7 @@ class BanditsEnv:
             self.c['LSTM'] = torch.zeros(1, self.batch_size, self.models['LSTM']['hidden_size'], device= self.device)
             self.x['LSTM'] = torch.zeros(self.batch_size, self.models['LSTM']['input_size'], device= self.device)
 
+        # reset classical models if testing
         if testing:
             self.models['Thompson']['model'].reset()
             self.models['UCB']['model'].reset()
@@ -71,44 +60,24 @@ class BanditsEnv:
         return logits, kls, critic_inputs
 
 
-    def sample(self, active_models, logits, classical_models= {'Thompson', 'UCB', 'Gittins'}):
-        arm_rewards = torch.bernoulli(self.probs)
-
+    def sample(self, active_models, logits, rewards, classical_models= {'Thompson', 'UCB', 'Gittins'}):
         pi = {model: None for model in active_models}
         a = {model: None for model in active_models}
         r = {model: None for model in active_models}
         for model in active_models:
             if model in classical_models:
                 a[model] = self.models[model]['model'].choice()
-                r[model] = arm_rewards[0, a[model]].item()
+                r[model] = rewards[0, a[model]].item()
                 self.models[model]['model'].getReward(a[model], r[model])
             else:
                 pi[model] = torch.distributions.Categorical(logits= logits[model])
                 a[model] = pi[model].sample()
-                r[model] = arm_rewards[self.batch_idx, a[model]]
+                r[model] = rewards[self.batch_idx, a[model]]
 
         return pi, a, r
 
 
-    def update(self, active_models, a, r):
-        # restless bandits
-        if self.restless:
-            self.probs += self.drift * torch.randn(self.batch_size, self.num_arms, device= self.device)
-            self.probs = torch.clamp(self.probs, 0, 1)
-            if self.dependent_arms:
-                self.probs[:, 1] = 1 - self.probs[:, 0]
-
-        # obs
-        if 'DisRNN' in active_models:
-            self.x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
-        if 'DisLRU' in active_models:
-            self.x['DisLRU'] = torch.zeros(self.batch_size, self.models['DisLRU']['input_size'], device= self.device)
-            self.x['DisLRU'][torch.arange(self.batch_size, device= self.device), a['DisLRU']] = 2*r['DisLRU'] - 1
-        if 'LSTM' in active_models:
-            self.x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
-
-
-    def training_episode(self, active_models, steps_unrolled):
+    def training_episode(self, active_models, steps_unrolled, get_regret, update):
         log_probs = {model: [] for model in active_models}
         rewards = {model: [] for model in active_models}
         expected_returns = {model: [] for model in active_models}
@@ -129,22 +98,21 @@ class BanditsEnv:
 
             # step
             logits, kls, critic_inputs = self.step(active_models)
+
             # sample
             pi, a, r = self.sample(active_models, logits)
-
-            optimal = self.probs.max(dim= -1).values
             for model in active_models:
                 log_probs[model].append(pi[model].log_prob(a[model]))
                 rewards[model].append(r[model])
                 entropies[model].append(pi[model].entropy())
                 expected_returns[model].append(self.models[model]['critic'](critic_inputs[model]).squeeze(-1))
-                regrets[model].append(optimal - self.probs[self.batch_idx, a[model]])
+                regrets[model].append(get_regret(a, model))
                 if model in bottleneck_losses:
                     for key, val in kls[model].items():
                         bottleneck_losses[model][key].append(val)
 
             # update
-            self.update(active_models, a, r)
+            update(active_models, a, r)
 
         return (
             {model: torch.stack(vals) for model, vals in rewards.items()},
@@ -159,20 +127,78 @@ class BanditsEnv:
         )
 
 
-    def eval_episode(self, active_models):
+    def eval_episode(self, active_models, get_regret, update):
         regrets = {model: [] for model in active_models}
 
         for _ in range(self.T):
             # step
             logits, _, _ = self.step(active_models)
+
             # sample
             _, a, r = self.sample(active_models, logits)
-
-            optimal = self.probs.max(dim= -1).values
             for model in active_models:
-                regrets[model].append(optimal - self.probs[self.batch_idx, a[model]])
+                regrets[model].append(get_regret(a, model))
 
             # update
-            self.update(active_models, a, r)
+            update(active_models, a, r)
 
         return {model: torch.stack(vals) for model, vals in regrets.items()}
+
+
+
+
+class BanditsEnv(Env):
+    def __init__(self, config, device):
+        super().__init__(device= device)
+
+        self.D = config['D']
+        self.num_arms = config['num_arms']
+        self.dependent_arms = config['dependent_arms']
+        self.restless = config['restless']
+        self.drift = config['drift']
+        self.T = config['num_trials']
+
+        self.reset(active_models= {})
+
+
+    def reset(self, active_models, testing= False):
+        # reset task
+        self.probs = self.D(self.batch_size, self.num_arms, device= self.device)
+        # reset models
+        super().reset(active_models, testing)
+
+
+    def sample(self, active_models, logits, classical_models= {'Thompson', 'UCB', 'Gittins'}):
+        arm_rewards = torch.bernoulli(self.probs)
+
+        return super().sample(active_models, logits, arm_rewards, classical_models)
+
+
+    def update(self, active_models, a, r):
+        # restless bandits
+        if self.restless:
+            self.probs += self.drift * torch.randn(self.batch_size, self.num_arms, device= self.device)
+            self.probs = torch.clamp(self.probs, 0, 1)
+            if self.dependent_arms:
+                self.probs[:, 1] = 1 - self.probs[:, 0]
+
+        # obs
+        if 'DisRNN' in active_models:
+            self.x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
+        if 'DisLRU' in active_models:
+            self.x['DisLRU'] = torch.zeros(self.batch_size, self.models['DisLRU']['input_size'], device= self.device)
+            self.x['DisLRU'][torch.arange(self.batch_size, device= self.device), a['DisLRU']] = 2*r['DisLRU'] - 1
+        if 'LSTM' in active_models:
+            self.x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
+
+
+    def _get_regret(self, a, model):
+        return self.probs.max(dim= -1).values - self.probs[self.batch_idx, a[model]]
+
+
+    def training_episode(self, active_models, steps_unrolled):
+        return super().training_episode(active_models, steps_unrolled, self._get_regret, self.update)
+
+
+    def eval_episode(self, active_models):
+        return super().eval_episode(active_models, self._get_regret, self.update)
