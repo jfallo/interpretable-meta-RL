@@ -1,7 +1,7 @@
 from config import *
 
 
-def train(config, figs_dir, checkpoints_dir, checkpoint_path):
+def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     # build env
     env = config['env']
     env.set_batch_size(config['batch_size'])
@@ -62,7 +62,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path):
                 'critic': critic,
                 'parameters': parameters,
                 'optimizer': optimizer,
-                'bottlenecks': ['x', 'z'],
+                'bottlenecks': ['h', 'x', 'z'],
                 'beta': betas['DisLRU'],
                 'converged': False}
     def LSTM_constructor():
@@ -195,7 +195,8 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path):
             if model in bottleneck_losses:
                 with torch.no_grad():
                     for bottleneck in models[model]['bottlenecks']:
-                        getattr(models[model]['model'], f'logit_M_{bottleneck}').clamp_(min= m_min)
+                        if hasattr(models[model]['model'], f'logit_M_{bottleneck}'):
+                            getattr(models[model]['model'], f'logit_M_{bottleneck}').clamp_(min= m_min)
                         getattr(models[model]['model'], f'log_sigma_{bottleneck}').clamp_(min= sigma_min, max= 0.0)
 
 

@@ -85,9 +85,10 @@ def print_bottleneck_parameters(model):
         print(model['name'])
         print()
         for bottleneck in model['bottlenecks']:
-            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
-            print(format_matrix(m, f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
-            print()
+            if hasattr(model['model'], f'logit_M_{bottleneck}'):
+                m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+                print(format_matrix(m, f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
+                print()
         print()
 
 
@@ -95,9 +96,11 @@ def disentangled(model, low= 0.1, high= 0.9):
     with torch.no_grad():
         checks = []
         for bottleneck in model['bottlenecks']:
-            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+            if hasattr(model['model'], f'logit_M_{bottleneck}'):
+                m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+                checks.append(((m <= low) | (m >= high)).all())
             sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
-            checks.append(((m <= low) | (m >= high)).all() and ((sigma <= low) | (sigma >= high)).all())
+            checks.append(((sigma <= low) | (sigma >= high)).all())
 
         return bool(all(checks))
 
@@ -106,11 +109,13 @@ def bottlenecks_converged(model, prev_state_dict, tol= 0.02):
     with torch.no_grad():
         checks = []
         for bottleneck in model['bottlenecks']:
-            prev_m = torch.sigmoid(prev_state_dict[f'logit_M_{bottleneck}'])
+            if hasattr(model['model'], f'logit_M_{bottleneck}'):
+                prev_m = torch.sigmoid(prev_state_dict[f'logit_M_{bottleneck}'])
+                m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
+                checks.append((torch.abs(m - prev_m) < tol).all())
             prev_sigma = torch.exp(prev_state_dict[f'log_sigma_{bottleneck}'])
-            m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
             sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
-            checks.append((torch.abs(m - prev_m) < tol).all() and (torch.abs(sigma - prev_sigma) < tol).all())
+            checks.append((torch.abs(sigma - prev_sigma) < tol).all())
 
         return bool(all(checks))
 

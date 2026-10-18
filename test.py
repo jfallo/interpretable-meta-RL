@@ -45,7 +45,7 @@ def test(config, checkpoints_path, figs_path):
         output_size = config['output_size']['LSTM']
         model = torch.nn.LSTM(input_size, hidden_size).to(device)
         readout = torch.nn.Linear(hidden_size, output_size).to(device)
-        return {'name': 'DisRNN',
+        return {'name': 'LSTM',
                 'input_size': input_size,
                 'hidden_size': hidden_size,
                 'output_size': output_size,
@@ -72,7 +72,7 @@ def test(config, checkpoints_path, figs_path):
     
     with torch.no_grad():
         for model in trained_models:
-            checkpoint = torch.load(checkpoints_path + f'best_{model}.pt')
+            checkpoint = torch.load(checkpoints_path + f'best_{model}.pt', map_location= device)
             models[model]['model'].load_state_dict(checkpoint[f'{model}_state_dict'])
             if 'readout' in models[model]:
                 models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
@@ -86,8 +86,9 @@ def test(config, checkpoints_path, figs_path):
 
             regrets = env.eval_episode(all_models)
             for model in all_models:
-                raw_regrets[model].append(np.array(regrets[model]))
-                cumulative_regrets[model].append(np.array(regrets[model]).cumsum())
+                r = regrets[model].detach().cpu().numpy()
+                raw_regrets[model].append(r)
+                cumulative_regrets[model].append(r.cumsum())
 
 
     # plot cumulative regrets
