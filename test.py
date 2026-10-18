@@ -24,55 +24,43 @@ def test(config, checkpoints_path, figs_path):
         hidden_size = config['hidden_size']['DisRNN']
         output_size = config['output_size']['DisRNN']
         model = MyDisRNN(hidden_size, input_size, output_size).to(device)
-        return {
-            'name': 'DisRNN',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model
-        }
-
+        return {'name': 'DisRNN',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model}
     def DisLRU_constructor():
         input_size = config['input_size']['DisLRU']
         hidden_size = config['hidden_size']['DisLRU']
         output_size = config['output_size']['DisLRU']
         model = MyDisLRU(hidden_size, input_size, output_size).to(device)
-        return {
-            'name': 'DisLRU',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model
-        }
-
+        return {'name': 'DisLRU',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model}
     def LSTM_constructor():
         input_size = config['input_size']['LSTM']
         hidden_size = config['hidden_size']['LSTM']
         output_size = config['output_size']['LSTM']
         model = torch.nn.LSTM(input_size, hidden_size).to(device)
         readout = torch.nn.Linear(hidden_size, output_size).to(device)
-        return {
-            'name': 'DisRNN',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model,
-            'readout': readout
-        }
+        return {'name': 'DisRNN',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model,
+                'readout': readout}
 
     trained_models = config['models']
     classical_models = {'Thompson', 'UCB', 'Gittins'}
     all_models = trained_models | classical_models
 
-    model_constructors = {
-        'DisRNN': DisRNN_constructor,
-        'DisLRU': DisLRU_constructor,
-        'LSTM': LSTM_constructor
-    }
-    models = {
-        model: model_constructors[model]()
-        for model in trained_models
-    }
+    model_constructors = {'DisRNN': DisRNN_constructor,
+                          'DisLRU': DisLRU_constructor,
+                          'LSTM': LSTM_constructor}
+    models = {model: model_constructors[model]()
+              for model in trained_models}
     models['Thompson'] = {'model': Thompson(config['input_size']['Thompson'])}
     models['UCB'] = {'model': UCB(config['input_size']['UCB'], config['c'])}
     models['Gittins'] = {'model': Gittins(config['input_size']['Gittins'], gittins_table)}

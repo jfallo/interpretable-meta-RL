@@ -1,11 +1,10 @@
 from config import *
 
 
-def train(config, checkpoint_path, checkpoints_dir, figs_dir):
+def train(config, figs_dir, checkpoints_dir, checkpoint_path):
     # build env
     env = config['env']
     env.set_batch_size(config['batch_size'])
-
 
     # training hyperparameters
     lrs = config['lr']
@@ -27,10 +26,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
     eval_episodes = config['eval_episodes']
     search_episodes = config['search_episodes']
 
-
     # initialize training models and optimizers
-    colors = config['color']
-
     def DisRNN_constructor():
         input_size = config['input_size']['DisRNN']
         hidden_size = config['hidden_size']['DisRNN']
@@ -39,20 +35,17 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         critic = torch.nn.Linear(hidden_size, 1).to(device)
         parameters = list(model.parameters()) + list(critic.parameters())
         optimizer = torch.optim.Adam(parameters, lr= lrs['DisRNN'])
-        return {
-            'name': 'DisRNN',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model,
-            'critic': critic,
-            'parameters': parameters,
-            'optimizer': optimizer,
-            'bottlenecks': ['h', 'x', 'z'],
-            'beta': betas['DisRNN'],
-            'converged': False
-        }
-
+        return {'name': 'DisRNN',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model,
+                'critic': critic,
+                'parameters': parameters,
+                'optimizer': optimizer,
+                'bottlenecks': ['h', 'x', 'z'],
+                'beta': betas['DisRNN'],
+                'converged': False}
     def DisLRU_constructor():
         input_size = config['input_size']['DisLRU']
         hidden_size = config['hidden_size']['DisLRU']
@@ -61,20 +54,17 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         critic = torch.nn.Linear(hidden_size, 1).to(device)
         parameters = list(model.parameters()) + list(critic.parameters())
         optimizer = torch.optim.Adam(parameters, lr= lrs['DisLRU'])
-        return {
-            'name': 'DisLRU',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model,
-            'critic': critic,
-            'parameters': parameters,
-            'optimizer': optimizer,
-            'bottlenecks': ['x', 'z'],
-            'beta': betas['DisLRU'],
-            'converged': False
-        }
-
+        return {'name': 'DisLRU',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model,
+                'critic': critic,
+                'parameters': parameters,
+                'optimizer': optimizer,
+                'bottlenecks': ['x', 'z'],
+                'beta': betas['DisLRU'],
+                'converged': False}
     def LSTM_constructor():
         input_size = config['input_size']['LSTM']
         hidden_size = config['hidden_size']['LSTM']
@@ -84,28 +74,22 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
         critic = torch.nn.Linear(hidden_size, 1).to(device)
         parameters = list(model.parameters()) + list(readout.parameters()) + list(critic.parameters())
         optimizer = torch.optim.Adam(parameters, lr= lrs['LSTM'])
-        return {
-            'name': 'LSTM',
-            'input_size': input_size,
-            'hidden_size': hidden_size,
-            'output_size': output_size,
-            'model': model,
-            'readout': readout,
-            'critic': critic,
-            'parameters': parameters,
-            'optimizer': optimizer,
-            'train_until_ep': config['train_until_ep']['LSTM']
-        }
+        return {'name': 'LSTM',
+                'input_size': input_size,
+                'hidden_size': hidden_size,
+                'output_size': output_size,
+                'model': model,
+                'readout': readout,
+                'critic': critic,
+                'parameters': parameters,
+                'optimizer': optimizer,
+                'train_until_ep': config['train_until_ep']['LSTM']}
 
-    model_constructors = {
-        'DisRNN': DisRNN_constructor,
-        'DisLRU': DisLRU_constructor,
-        'LSTM': LSTM_constructor
-    }
-    models = {
-        model: model_constructors[model]() 
-        for model in config['models']
-    }
+    model_constructors = {'DisRNN': DisRNN_constructor,
+                          'DisLRU': DisLRU_constructor,
+                          'LSTM': LSTM_constructor}
+    models = {model: model_constructors[model]() 
+              for model in config['models']}
 
     env.build_models(models)
 
@@ -168,7 +152,7 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                             torch.save(save_dict, checkpoints_dir + f'best_{model}.pt')
         
         
-        # --- advantage actor-critic ------
+        # --- advantage actor-critic ----
 
         # update exploration parameter
         if beta_e_annealed:
@@ -232,13 +216,15 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
                     if ep >= models[model]['beta']['warmup']['end'] and (disentangled(models[model]) or models[model]['converged']):
                         training_phase[model] = 2
                         regret_histories['phase2'][model] = []
-                        torch.save(build_checkpoint(
-                            ep, 
-                            prev_state_dicts, 
-                            training_phase, 
-                            regret_histories, 
-                            models
-                        ), checkpoints_dir + f'{model}_disentanglement_at_ep{ep}.pt')  # save disentanglement checkpoint
+                        # save disentanglement checkpoint
+                        torch.save(
+                            build_checkpoint(ep, 
+                                             prev_state_dicts, 
+                                             training_phase, 
+                                             regret_histories, 
+                                             models), 
+                            checkpoints_dir + f'{model}_disentanglement_at_ep{ep}.pt'
+                        )  
                 else:
                     if ep >= models[model]['train_until_ep']:
                         training_phase[model] = 2
@@ -246,14 +232,15 @@ def train(config, checkpoint_path, checkpoints_dir, figs_dir):
 
         # plot regret histories, save checkpoint
         if ep > 0 and ep % 10_000 == 0:
-            plot_regret_histories(regret_histories, figs_dir, colors)
-            torch.save(build_checkpoint(
-                ep, 
-                prev_state_dicts, 
-                training_phase, 
-                regret_histories, 
-                models
-            ), checkpoints_dir + f'checkpoint_ep{ep}.pt')
+            plot_regret_histories(regret_histories, figs_dir, config['color'])
+            torch.save(
+                build_checkpoint(ep, 
+                                 prev_state_dicts, 
+                                 training_phase, 
+                                 regret_histories, 
+                                 models), 
+                checkpoints_dir + f'checkpoint_ep{ep}.pt'
+            )
 
         ep += 1
         active_models = {model for model in models if training_phase[model] != 0}

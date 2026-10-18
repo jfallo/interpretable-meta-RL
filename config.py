@@ -12,36 +12,31 @@ from agents.DisLRU import MyDisLRU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-colors = {
-    'DisRNN': 'blue',
-    'DisLRU': 'orange',
-    'LSTM': 'green',
-    'Thompson': 'gray',
-    'UCB': 'lightgray',
-    'Gittins': 'black'
-}
-linestyles = {
-    'DisRNN': '-',
-    'DisLRU': '-',
-    'LSTM': '-',
-    'Thompson': '--',
-    'UCB': '--',
-    'Gittins': '--'
-}
+colors = {'DisRNN': 'blue',
+          'DisLRU': 'orange',
+          'LSTM': 'green',
+          'Thompson': 'gray',
+          'UCB': 'lightgray',
+          'Gittins': 'black'}
+
+linestyles = {'DisRNN': '-',
+              'DisLRU': '-',
+              'LSTM': '-',
+              'Thompson': '--',
+              'UCB': '--',
+              'Gittins': '--'}
 
 
 exps = {
     'bandits/independent/standard': {
         'name': 'standard independent bandits',
         'env': BanditsEnv(
-            config= {
-                'D': sample_independent,
-                'num_arms': 2,
-                'dependent_arms': False,
-                'restless': False,
-                'drift': 0.0,
-                'num_trials': 100
-            },
+            config= {'D': sample_independent,
+                     'num_arms': 2,
+                     'dependent_arms': False,
+                     'restless': False,
+                     'drift': 0.0,
+                     'num_trials': 100},
             device= device
         ),
         'models': {'DisLRU'},
@@ -83,18 +78,14 @@ exps = {
             'DisRNN': {
                 'floor': 1e-8,
                 'ceil': 1e-4,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
+                'warmup': {'start': 5000,
+                           'end': 10_000}
             },
             'DisLRU': {
                 'floor': 1e-8,
                 'ceil': 1e-4,
-                'warmup': {
-                    'start': 5000,
-                    'end': 10_000
-                }
+                'warmup': {'start': 5000,
+                           'end': 10_000}
             }
         },
         'train_until_ep': {'LSTM': 200_000},
