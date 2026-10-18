@@ -2,6 +2,17 @@ import torch
 import torch.nn as nn
 
 
+def build_update_MLP(input_size, output_size= 1, hidden_size= 5):
+    return nn.Sequential(
+        nn.Linear(input_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, output_size)
+    )
+
 def build_choice_MLP(input_size, output_size, hidden_size= 2):
     return nn.Sequential(
         nn.Linear(input_size, hidden_size),
@@ -21,21 +32,22 @@ class MyDisLRU(nn.Module):
         self.q = q
 
         # build update MLPs and choice MLP
-        self.logit_A_chosen = nn.Parameter(2 * torch.ones(m))  # represent diagonal matrix A of size m x m with vector size m
-        self.logit_A_unchosen = nn.Parameter(2 * torch.ones(m))
-        self.gates = nn.ModuleList(
-            [nn.Linear(n, 1, bias= False) for _ in range(m)]  # learn conditioning rules per latent
+        self.gateMLPs = nn.ModuleList(
+            [build_update_MLP(1+n) for _ in range(m)]
         )
-        self.updateMLPs = nn.ModuleList(
-            [nn.Linear(n, 1, bias= False) for _ in range(m)]
+        self.driveMLPs = nn.ModuleList(
+            [build_update_MLP(1+n) for _ in range(m)]
         )
         self.choiceMLP = build_choice_MLP(m,q)
             
         # initialize bottleneck parameters
+        self.logit_M_h = nn.Parameter(2 * torch.ones(m))
+        self.log_sigma_h = nn.Parameter(-2 * torch.ones(m))
+
         self.logit_M_x = nn.Parameter(2 * torch.ones((m,n)))
         self.log_sigma_x = nn.Parameter(-2 * torch.ones((m,n)))
 
-        self.logit_M_z = nn.Parameter(2 *torch.ones(m))
+        self.register_buffer('M_z', torch.ones(m))
         self.log_sigma_z = nn.Parameter(-2 * torch.ones(m))
 
 
@@ -60,32 +72,34 @@ class MyDisLRU(nn.Module):
         return z, kl
 
     def step(self, h, x):
+        h_prev = h
+
         # bottlenecks for disentangled update rules
+        M_h = torch.sigmoid(self.logit_M_h)
+        sigma_h = torch.exp(self.log_sigma_h)
+        h, kl_h = self.bottleneck(h, M_h, sigma_h)
+
         M_x = torch.sigmoid(self.logit_M_x)
         sigma_x = torch.exp(self.log_sigma_x)
         x, kl_x = self.bottleneck(x, M_x, sigma_x)
 
-        # apply update MLPs
+        # apply update from gate and drive MLPs
         z_outs = []
-        for i, MLP in enumerate(self.updateMLPs):
-            gate = self.gates[i]
-            theta = torch.sigmoid(gate(x[i]).squeeze(-1))
-
-            a_i_chosen = torch.sigmoid(self.logit_A_chosen[i])  # |a_i| < 1
-            a_i_unchosen = torch.sigmoid(self.logit_A_unchosen[i])
-            a_i = theta * a_i_chosen + (1 - theta) * a_i_unchosen
-            b_i = MLP(x[i]).squeeze(-1)
-            
-            z_out = a_i * h[:, i] + b_i
+        for i in range(self.m):
+            z_i = torch.cat([h[:, i:i+1], x[i]], dim= -1)
+            logit_w = self.gateMLPs[i](z_i).squeeze(-1)
+            w = torch.sigmoid(logit_w)
+            u = self.driveMLPs[i](z_i).squeeze(-1)
+            z_out = w * h_prev[:, i] + u
             z_outs.append(z_out)
         z = torch.stack(z_outs, dim= -1)
 
         # bottlenecks for disentangled latents
-        M_z = torch.sigmoid(self.logit_M_z)
         sigma_z = torch.exp(self.log_sigma_z)
-        z, kl_z = self.bottleneck(z, M_z, sigma_z)
+        z, kl_z = self.bottleneck(z, self.M_z, sigma_z)
 
         kls = {
+            'h': kl_h,
             'x': kl_x.sum(dim= 0),
             'z': kl_z
         }
@@ -102,7 +116,7 @@ class MyDisLRU(nn.Module):
         assert n == self.n
 
         latents = []
-        bottleneck_losses = {'x': [], 'z': []}
+        bottleneck_losses = {'h': [], 'x': [], 'z': []}
         outputs = []
         
         h = torch.zeros(B, self.m, device= X.device)
