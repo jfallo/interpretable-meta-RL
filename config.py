@@ -60,7 +60,7 @@ exps = {
         },
         'gamma': {
             'DisRNN': 0.98,
-            'DisLRU': 0.99,
+            'DisLRU': 0.98,
             'LSTM': 0.95,
             'Gittins': 0.99
         },
@@ -69,26 +69,30 @@ exps = {
             'DisLRU': 5e-3,
             'LSTM': 5e-3
         },
-        'batch_size': 32,
+        'batch_size': 16,
         'steps_unrolled': 100,
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
         'beta': {
             'DisRNN': {
-                'floor': 1e-8,
+                'floor': 0.0,
                 'ceil': 1e-4,
                 'warmup': {'start': 5000,
                            'end': 10_000}
             },
             'DisLRU': {
-                'floor': 1e-8,
+                'floor': 0.0,
                 'ceil': 1e-4,
-                'warmup': {'start': 5000,
-                           'end': 10_000}
+                'warmup': {'start': 100_000,
+                           'end': 100_001}
             }
         },
-        'train_until_ep': {'LSTM': 200_000},
+        'phase1_end': {
+            'DisRNN': 400_000,
+            'DisLRU': 400_000,
+            'LSTM': 200_000,
+        },
         'eval_interval': 500,
         'eval_episodes': 1000,
         'search_episodes': 20_000,

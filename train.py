@@ -45,7 +45,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'optimizer': optimizer,
                 'bottlenecks': ['h', 'x', 'z'],
                 'beta': betas['DisRNN'],
-                'converged': False}
+                'phase1_end': config['phase1_end']['DisRNN']}
     def DisLRU_constructor():
         input_size = config['input_size']['DisLRU']
         hidden_size = config['hidden_size']['DisLRU']
@@ -64,7 +64,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'optimizer': optimizer,
                 'bottlenecks': ['h', 'x', 'z'],
                 'beta': betas['DisLRU'],
-                'converged': False}
+                'phase1_end': config['phase1_end']['DisLRU']}
     def LSTM_constructor():
         input_size = config['input_size']['LSTM']
         hidden_size = config['hidden_size']['LSTM']
@@ -83,7 +83,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'critic': critic,
                 'parameters': parameters,
                 'optimizer': optimizer,
-                'train_until_ep': config['train_until_ep']['LSTM']}
+                'phase1_end': config['phase1_end']['LSTM']}
 
     model_constructors = {'DisRNN': DisRNN_constructor,
                           'DisLRU': DisLRU_constructor,
@@ -94,7 +94,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     env.build_models(models)
 
 
-    # --- training ---
+    # --- training --- #
 
     prev_state_dicts = {model: copy.deepcopy(models[model]['model'].state_dict()) for model in models}
     training_phase = {model: 1 for model in models}
@@ -107,6 +107,9 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path, map_location= device)
         ep, prev_state_dicts, training_phase, regret_histories, models = load_checkpoint(checkpoint, models)
+        for model in models:
+            if training_phase[model] != 1:
+                freeze_bottleneck_parameters(models[model])
         ep += 1
  
     active_models = {model for model in models if training_phase[model] != 0}
@@ -207,29 +210,14 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
             for model in active_models:
                 if 'bottlenecks' in models[model]: 
                     print_bottleneck_parameters(models[model])
-                    models[model]['converged'] = bottlenecks_converged(models[model], prev_state_dicts[model])
                     prev_state_dicts[model] = copy.deepcopy(models[model]['model'].state_dict())
 
         # update training status
         for model in active_models:
-            if training_phase[model] == 1:
-                if 'bottlenecks' in models[model]:
-                    if ep >= models[model]['beta']['warmup']['end'] and (disentangled(models[model]) or models[model]['converged']):
-                        training_phase[model] = 2
-                        regret_histories['phase2'][model] = []
-                        # save disentanglement checkpoint
-                        torch.save(
-                            build_checkpoint(ep, 
-                                             prev_state_dicts, 
-                                             training_phase, 
-                                             regret_histories, 
-                                             models), 
-                            checkpoints_dir + f'{model}_disentanglement_at_ep{ep}.pt'
-                        )  
-                else:
-                    if ep >= models[model]['train_until_ep']:
-                        training_phase[model] = 2
-                        regret_histories['phase2'][model] = []
+            if training_phase[model] == 1 and models[model]['phase1_end'] <= ep:
+                training_phase[model] = 2
+                regret_histories['phase2'][model] = []
+                freeze_bottleneck_parameters(models[model])
 
         # plot regret histories, save checkpoint
         if ep > 0 and ep % 10_000 == 0:

@@ -65,7 +65,9 @@ def plot_regret_histories(regret_histories, figs_dir, colors):
     plt.savefig(figs_dir + 'training_regret_phase1.png')
     plt.close()
 
-    phase2 = {model: smooth(np.array(regret_histories['phase2'][model])) for model in regret_histories['phase2']}
+    phase2 = {model: smooth(np.array(regret_histories['phase2'][model])) 
+              for model in regret_histories['phase2']
+              if len(regret_histories['phase2']) > 0}
     if phase2:
         plt.figure(figsize= (8,5))
         for model, history in phase2.items():
@@ -92,32 +94,11 @@ def print_bottleneck_parameters(model):
         print()
 
 
-def disentangled(model, low= 0.1, high= 0.9):
-    with torch.no_grad():
-        checks = []
-        for bottleneck in model['bottlenecks']:
-            if hasattr(model['model'], f'logit_M_{bottleneck}'):
-                m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
-                checks.append(((m <= low) | (m >= high)).all())
-            sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
-            checks.append(((sigma <= low) | (sigma >= high)).all())
-
-        return bool(all(checks))
-
-
-def bottlenecks_converged(model, prev_state_dict, tol= 0.02):
-    with torch.no_grad():
-        checks = []
-        for bottleneck in model['bottlenecks']:
-            if hasattr(model['model'], f'logit_M_{bottleneck}'):
-                prev_m = torch.sigmoid(prev_state_dict[f'logit_M_{bottleneck}'])
-                m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
-                checks.append((torch.abs(m - prev_m) < tol).all())
-            prev_sigma = torch.exp(prev_state_dict[f'log_sigma_{bottleneck}'])
-            sigma = torch.exp(getattr(model['model'], f'log_sigma_{bottleneck}'))
-            checks.append((torch.abs(sigma - prev_sigma) < tol).all())
-
-        return bool(all(checks))
+def freeze_bottleneck_parameters(model):
+    for bottleneck in model['bottlenecks']:
+        for name in (f'logit_M_{bottleneck}', f'log_sigma_{bottleneck}'):
+            if hasattr(model['model'], name):
+                getattr(model['model'], name).requires_grad_(False)
 
 
 def load_checkpoint(checkpoint, models):
@@ -131,8 +112,6 @@ def load_checkpoint(checkpoint, models):
         models[model]['optimizer'].load_state_dict(checkpoint[f'{model}_optimizer_state_dict'])
         if 'readout' in models[model]:
             models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
-        if 'bottlenecks' in models[model]:
-            models[model]['converged'] = checkpoint[f'{model}_converged']
 
     return ep, prev_state_dicts, training_phase, regret_histories, models
 
@@ -150,8 +129,6 @@ def build_checkpoint(ep, prev_state_dicts, training_phase, regret_histories, mod
         checkpoint[f'{model}_optimizer_state_dict'] = models[model]['optimizer'].state_dict()
         if 'readout' in models[model]:
             checkpoint[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
-        if 'bottlenecks' in models[model]:
-            checkpoint[f'{model}_converged'] = models[model]['converged']
     
     return checkpoint
 
