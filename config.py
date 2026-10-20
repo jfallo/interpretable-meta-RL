@@ -39,7 +39,7 @@ exps = {
                      'num_trials': 100},
             device= device
         ),
-        'models': {'DisLRU'},
+        'models': ['DisRNN', 'DisLRU'],
         'input_size': {
             'DisRNN': 2,
             'DisLRU': 2,
@@ -66,26 +66,24 @@ exps = {
         },
         'lr': {
             'DisRNN': 5e-4,
-            'DisLRU': 5e-3,
+            'DisLRU': 5e-4,
             'LSTM': 5e-3
         },
-        'batch_size': 16,
+        'batch_size': 256,
         'steps_unrolled': 100,
         'beta_e_annealed': True,
         'beta_e': 0.005,
         'beta_v': 0.05,
         'beta': {
             'DisRNN': {
-                'floor': 0.0,
                 'ceil': 1e-4,
-                'warmup': {'start': 5000,
-                           'end': 10_000}
+                'warmup': {'start': 20_000,
+                           'end': 30_000}
             },
             'DisLRU': {
-                'floor': 0.0,
                 'ceil': 1e-4,
-                'warmup': {'start': 100_000,
-                           'end': 100_001}
+                'warmup': {'start': 20_000,
+                           'end': 30_000}
             }
         },
         'phase1_end': {

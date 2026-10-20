@@ -67,7 +67,7 @@ def plot_regret_histories(regret_histories, figs_dir, colors):
 
     phase2 = {model: smooth(np.array(regret_histories['phase2'][model])) 
               for model in regret_histories['phase2']
-              if len(regret_histories['phase2']) > 0}
+              if len(regret_histories['phase2'][model]) > 0}
     if phase2:
         plt.figure(figsize= (8,5))
         for model, history in phase2.items():
@@ -89,7 +89,7 @@ def print_bottleneck_parameters(model):
         for bottleneck in model['bottlenecks']:
             if hasattr(model['model'], f'logit_M_{bottleneck}'):
                 m = torch.sigmoid(getattr(model['model'], f'logit_M_{bottleneck}'))
-                print(format_matrix(m, f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
+                print(format_matrix(m.detach().cpu().numpy(), f'M_{bottleneck}', row_prefix= 'lat', col_prefix= 'lat'))
                 print()
         print()
 
@@ -103,9 +103,9 @@ def freeze_bottleneck_parameters(model):
 
 def load_checkpoint(checkpoint, models):
     ep = checkpoint['ep']
-    prev_state_dicts = checkpoint['prev_state_dicts']
     training_phase = checkpoint['training_phase']
     regret_histories = checkpoint['regret_histories']
+    best_regret = checkpoint['best_regret']
     for model in models:
         models[model]['model'].load_state_dict(checkpoint[f'{model}_state_dict'])
         models[model]['critic'].load_state_dict(checkpoint[f'{model}_critic_state_dict'])
@@ -113,15 +113,15 @@ def load_checkpoint(checkpoint, models):
         if 'readout' in models[model]:
             models[model]['readout'].load_state_dict(checkpoint[f'{model}_readout_state_dict'])
 
-    return ep, prev_state_dicts, training_phase, regret_histories, models
+    return ep, training_phase, regret_histories, best_regret, models
 
 
-def build_checkpoint(ep, prev_state_dicts, training_phase, regret_histories, models):
+def build_checkpoint(ep, training_phase, regret_histories, best_regret, models):
     checkpoint = {
         'ep': ep, 
-        'prev_state_dicts': prev_state_dicts,
         'training_phase': training_phase,
-        'regret_histories': regret_histories
+        'regret_histories': regret_histories,
+        'best_regret': best_regret
     }
     for model in models:
         checkpoint[f'{model}_state_dict'] = models[model]['model'].state_dict()

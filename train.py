@@ -32,8 +32,14 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
         hidden_size = config['hidden_size']['DisRNN']
         output_size = config['output_size']['DisRNN']
         model = MyDisRNN(hidden_size, input_size, output_size).to(device)
-        critic = torch.nn.Linear(hidden_size, 1).to(device)
-        parameters = list(model.parameters()) + list(critic.parameters())
+        critic = torch.nn.Sequential(
+            torch.nn.Linear(hidden_size + 1, 16),
+            torch.nn.ReLU(),
+            torch.nn.Linear(16, 1)
+        ) .to(device)
+        actor_parameters = list(model.parameters())
+        critic_parameters = list(critic.parameters())
+        parameters = actor_parameters + critic_parameters
         optimizer = torch.optim.Adam(parameters, lr= lrs['DisRNN'])
         return {'name': 'DisRNN',
                 'input_size': input_size,
@@ -41,6 +47,8 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'output_size': output_size,
                 'model': model,
                 'critic': critic,
+                'actor_parameters': actor_parameters,
+                'critic_parameters': critic_parameters,
                 'parameters': parameters,
                 'optimizer': optimizer,
                 'bottlenecks': ['h', 'x', 'z'],
@@ -51,8 +59,14 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
         hidden_size = config['hidden_size']['DisLRU']
         output_size = config['output_size']['DisLRU']
         model = MyDisLRU(hidden_size, input_size, output_size).to(device)
-        critic = torch.nn.Linear(hidden_size, 1).to(device)
-        parameters = list(model.parameters()) + list(critic.parameters())
+        critic = torch.nn.Sequential(
+            torch.nn.Linear(hidden_size + 1, 16),
+            torch.nn.ReLU(),
+            torch.nn.Linear(16, 1)
+        ) .to(device)
+        actor_parameters = list(model.parameters())
+        critic_parameters = list(critic.parameters())
+        parameters = actor_parameters + critic_parameters
         optimizer = torch.optim.Adam(parameters, lr= lrs['DisLRU'])
         return {'name': 'DisLRU',
                 'input_size': input_size,
@@ -60,6 +74,8 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'output_size': output_size,
                 'model': model,
                 'critic': critic,
+                'actor_parameters': actor_parameters,
+                'critic_parameters': critic_parameters,
                 'parameters': parameters,
                 'optimizer': optimizer,
                 'bottlenecks': ['h', 'x', 'z'],
@@ -71,8 +87,14 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
         output_size = config['output_size']['LSTM']
         model = torch.nn.LSTM(input_size, hidden_size).to(device)
         readout = torch.nn.Linear(hidden_size, output_size).to(device)
-        critic = torch.nn.Linear(hidden_size, 1).to(device)
-        parameters = list(model.parameters()) + list(readout.parameters()) + list(critic.parameters())
+        critic = torch.nn.Sequential(
+            torch.nn.Linear(hidden_size + 1, 16),
+            torch.nn.ReLU(),
+            torch.nn.Linear(16, 1)
+        ) .to(device)
+        actor_parameters = list(model.parameters()) + list(readout.parameters())
+        critic_parameters = list(critic.parameters())
+        parameters = actor_parameters + critic_parameters
         optimizer = torch.optim.Adam(parameters, lr= lrs['LSTM'])
         return {'name': 'LSTM',
                 'input_size': input_size,
@@ -81,6 +103,8 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                 'model': model,
                 'readout': readout,
                 'critic': critic,
+                'actor_parameters': actor_parameters,
+                'critic_parameters': critic_parameters,
                 'parameters': parameters,
                 'optimizer': optimizer,
                 'phase1_end': config['phase1_end']['LSTM']}
@@ -96,7 +120,6 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
 
     # --- training --- #
 
-    prev_state_dicts = {model: copy.deepcopy(models[model]['model'].state_dict()) for model in models}
     training_phase = {model: 1 for model in models}
     regret_histories = {'phase1': {model: [] for model in models}, 'phase2': {}}
     best_regret = {model: np.inf for model in models}
@@ -106,13 +129,13 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     # load checkpoint
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path, map_location= device)
-        ep, prev_state_dicts, training_phase, regret_histories, models = load_checkpoint(checkpoint, models)
+        ep, training_phase, regret_histories, best_regret, models = load_checkpoint(checkpoint, models)
         for model in models:
-            if training_phase[model] != 1:
+            if training_phase[model] != 1 and 'bottlenecks' in models[model]:
                 freeze_bottleneck_parameters(models[model])
         ep += 1
  
-    active_models = {model for model in models if training_phase[model] != 0}
+    active_models = sorted(model for model in models if training_phase[model] != 0)
     while active_models:
         # reset active models
         for model in active_models:
@@ -128,12 +151,10 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
             regret_histories[f'phase{training_phase[model]}'][model].append(avg_regrets[model])
 
         # evaluate models in phase 2
-        phase2_models = {model for model in models if training_phase[model] == 2}
+        phase2_models = sorted(model for model in models if training_phase[model] == 2)
         for model in phase2_models:
             search_ep = len(regret_histories['phase2'][model])
-            if search_ep >= search_episodes:
-                training_phase[model] = 0  # end training
-            else:
+            if search_ep <= search_episodes:
                 if search_ep % eval_interval == 0:
                     with torch.no_grad():
                         models[model]['model'].eval()
@@ -146,14 +167,18 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                             eval_regrets.append(eval_regret)
             
                         # save best model if current average regret is better than previous best regret
-                        cur_regret[model] = np.mean(eval_regrets)
+                        cur_regret[model] = float(np.mean(eval_regrets))
                         if cur_regret[model] < best_regret[model]:
                             best_regret[model] = cur_regret[model]
                             save_dict = {f'{model}_state_dict': models[model]['model'].state_dict()}
                             if 'readout' in models[model]:
                                 save_dict[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
                             torch.save(save_dict, checkpoints_dir + f'best_{model}.pt')
-        
+            else:
+                # end training
+                training_phase[model] = 0  
+                active_models.remove(model)
+                
         
         # --- advantage actor-critic ----
 
@@ -166,21 +191,17 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
             returns = rewards[model].clone()
             for t in reversed(range(len(returns) - 1)):
                 returns[t] = rewards[model][t] + gammas[model] * returns[t+1]
-            returns = (returns - returns.mean(dim= 1, keepdim= True)) / (returns.std(dim= 1, keepdim= True) + 1e-8)
+            returns = (returns - returns.mean()) / (returns.std() + 1e-8)
             advantage = returns - expected_returns[model]
 
             # update bottleneck pressure
+            beta = 0.0
             if 'beta' in models[model]:
-                floor = models[model]['beta']['floor']
-                ceil = models[model]['beta']['ceil']
+                beta_ceil = models[model]['beta']['ceil']
                 warmup_start = models[model]['beta']['warmup']['start']
                 warmup_end = models[model]['beta']['warmup']['end']
-                if ep < warmup_start or training_phase[model] == 2:
-                    beta = floor
-                else:
-                    beta = floor + (ceil - floor) * min((ep - warmup_start) / (warmup_end - warmup_start), 1.0)
-            else:
-                beta = 0.0
+                if ep >= warmup_start:
+                    beta = beta_ceil * min((ep - warmup_start) / (warmup_end - warmup_start), 1.0)
 
             # calculate loss
             loss_actor = -(log_probs[model] * advantage.detach()).mean()
@@ -191,7 +212,8 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
 
             # take gradient step
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(models[model]['parameters'], max_norm= 1.0)
+            torch.nn.utils.clip_grad_norm_(models[model]['actor_parameters'], max_norm= 1.0)
+            torch.nn.utils.clip_grad_norm_(models[model]['critic_parameters'], max_norm= 1.0)
             models[model]['optimizer'].step()
 
             # maintain bottleneck parameters
@@ -203,39 +225,48 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                         getattr(models[model]['model'], f'log_sigma_{bottleneck}').clamp_(min= sigma_min, max= 0.0)
 
 
-        # print episode rewards and bottleneck parameters, convergence check
+        # print episode rewards and bottleneck parameters, plot regret histories
         if ep % 2500 == 0:
             print(f'ep {ep}')
             print(" | ".join(f"{model} total reward: {total_rewards[model]:5.2f}" for model in active_models))
             for model in active_models:
                 if 'bottlenecks' in models[model]: 
                     print_bottleneck_parameters(models[model])
-                    prev_state_dicts[model] = copy.deepcopy(models[model]['model'].state_dict())
+            plot_regret_histories(regret_histories, figs_dir, config['color'])
 
         # update training status
         for model in active_models:
             if training_phase[model] == 1 and models[model]['phase1_end'] <= ep:
                 training_phase[model] = 2
                 regret_histories['phase2'][model] = []
-                freeze_bottleneck_parameters(models[model])
+                if 'bottlenecks' in models[model]:
+                    freeze_bottleneck_parameters(models[model])
 
-        # plot regret histories, save checkpoint
+        # save checkpoint
         if ep > 0 and ep % 10_000 == 0:
-            plot_regret_histories(regret_histories, figs_dir, config['color'])
             torch.save(
                 build_checkpoint(ep, 
-                                 prev_state_dicts, 
                                  training_phase, 
                                  regret_histories, 
+                                 best_regret,
                                  models), 
                 checkpoints_dir + f'checkpoint_ep{ep}.pt'
             )
 
         ep += 1
-        active_models = {model for model in models if training_phase[model] != 0}
         
 
     # print final bottleneck parameters
     for model in models:
         if 'bottlenecks' in models[model]: 
             print_bottleneck_parameters(models[model])
+
+    plot_regret_histories(regret_histories, figs_dir, config['color'])
+    torch.save(
+        build_checkpoint(ep - 1, 
+                         training_phase, 
+                         regret_histories, 
+                         best_regret,
+                         models), 
+        checkpoints_dir + f'checkpoint_ep{ep-1}.pt'
+    )
