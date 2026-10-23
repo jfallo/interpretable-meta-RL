@@ -1,30 +1,48 @@
 from config import *
 
 from train import train
-from test import test
+from eval import test
 
+torch.set_num_threads(1)
 
-seed = 40
+parser = argparse.ArgumentParser()
+parser.add_argument('--seed', type= int, default= 40)
+parser.add_argument('--models', nargs= '+', default= None)
+parser.add_argument('--lr', type= float, default= None)
+parser.add_argument('--gamma', type= float, default= None)
+parser.add_argument('--training_eps', type= int, default= None)
+parser.add_argument('--resume', default= None)
+args = parser.parse_args()
+
+seed = args.seed
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
 
 
-# hyperparameter grid points
-lrs = [5e-4, 1e-4, 5e-3, 1e-3]
-gammas = [0.9, 0.933, 0.95, 0.98, 0.99]
-
-
 # experiment setup
 exp = 'bandits/independent/standard'
 config = exps[exp]
+if args.models:
+    config['models'] = args.models
+if args.lr:
+    for model in config['models']:
+        config['lr'][model] = args.lr
+if args.gamma:
+    for model in config['models']:
+        config['gamma'][model] = args.gamma
+if args.training_eps:
+    for model in config['models']:
+        config['training_eps'][model] = args.training_eps
 
-checkpoints_dir = f'checkpoints/{exp}/seed{seed}/'
+tag = os.path.join('_'.join(config['models']), f'lr{args.lr}_gamma{args.gamma}')
+checkpoints_dir = f'checkpoints/{exp}/{tag}/seed{seed}/'
+figs_dir = f'figs/{exp}/{tag}/seed{seed}/'
 os.makedirs(checkpoints_dir, exist_ok= True)
-figs_dir = f'figs/{exp}/seed{seed}/'
 os.makedirs(figs_dir, exist_ok= True)
 
 
 # run training
-print(f"Beginning training for {config['name']} experiment, seed {seed}.")
-train(config, figs_dir, checkpoints_dir)
+print(f'Device: {device}')
+print(f"Beginning training for {config['name']} experiment, seed {seed}, models {config['models']}.")
+train(config, figs_dir, checkpoints_dir, checkpoint_path= args.resume)
