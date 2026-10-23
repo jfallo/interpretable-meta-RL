@@ -89,7 +89,7 @@ class BanditsEnv(Env):
         if 'LSTM' in active_models:
             out, (self.h['LSTM'], self.c['LSTM']) = self.models['LSTM']['model'](self.x['LSTM'].unsqueeze(0), (self.h['LSTM'], self.c['LSTM']))
             logits['LSTM'] = self.models['LSTM']['readout'](out.squeeze(0))
-            critic_inputs['LSTM'] = out.squeeze(0).detach()
+            critic_inputs['LSTM'] = out.squeeze(0)
 
         return logits, kls, critic_inputs
 
@@ -113,7 +113,7 @@ class BanditsEnv(Env):
         return pi, a, r
 
 
-    def update(self, active_models, a, r):
+    def update(self, active_models, a, r, t):
         # restless bandits
         if self.restless:
             self.probs += self.drift * torch.randn(self.batch_size, self.num_arms, device= self.device)
@@ -122,12 +122,13 @@ class BanditsEnv(Env):
                 self.probs[:, 1] = 1 - self.probs[:, 0]
 
         # obs
+        t_feat = torch.full((self.batch_size,), (t+1)/self.T, device= self.device)
         if 'DisRNN' in active_models:
-            self.x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1], dim= -1)
+            self.x['DisRNN'] = torch.stack([2*a['DisRNN'].float() - 1, 2*r['DisRNN'] - 1, t_feat], dim= -1)
         if 'DisLRU' in active_models:
-            self.x['DisLRU'] = torch.stack([2*a['DisLRU'].float() - 1, 2*r['DisLRU'] - 1], dim= -1)
+            self.x['DisLRU'] = torch.stack([2*a['DisLRU'].float() - 1, 2*r['DisLRU'] - 1, t_feat], dim= -1)
         if 'LSTM' in active_models:
-            self.x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1], dim= -1)
+            self.x['LSTM'] = torch.stack([2*a['LSTM'].float() - 1, 2*r['LSTM'] - 1, t_feat], dim= -1)
 
 
     def _get_regret(self, a, model):
@@ -143,8 +144,10 @@ class BanditsEnv(Env):
         bottleneck_losses = {model: {bottleneck: [] for bottleneck in self.models[model]['bottlenecks']} 
                              for model in active_models if 'bottlenecks' in self.models[model]}
 
+        t_feats = (torch.arange(self.T, device= self.device, dtype= torch.float32) / self.T) \
+                  .view(-1, 1, 1).expand(-1, self.batch_size, 1)
         for t in range(self.T):
-            t_feat = torch.full((self.batch_size, 1), t/self.T, device= self.device)
+            t_feat = t_feats[t]
 
             # detach gradients
             if t % steps_unrolled == 0:
@@ -170,7 +173,7 @@ class BanditsEnv(Env):
                         bottleneck_losses[model][key].append(val)
 
             # update
-            self.update(active_models, a, r)
+            self.update(active_models, a, r, t)
 
         return ({model: torch.stack(vals) for model, vals in rewards.items()},
                 {model: torch.stack(vals) for model, vals in expected_returns.items()},
@@ -184,7 +187,7 @@ class BanditsEnv(Env):
     def eval_episode(self, active_models):
         regrets = {model: [] for model in active_models}
 
-        for _ in range(self.T):
+        for t in range(self.T):
             # step
             logits, _, _ = self.step(active_models)
 
@@ -194,6 +197,6 @@ class BanditsEnv(Env):
                 regrets[model].append(self._get_regret(a, model))
 
             # update
-            self.update(active_models, a, r)
+            self.update(active_models, a, r, t)
 
         return {model: torch.stack(vals) for model, vals in regrets.items()}
