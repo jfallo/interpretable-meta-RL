@@ -1,26 +1,7 @@
 import torch
 import torch.nn as nn
 
-
-def build_update_MLP(input_size, output_size= 2, hidden_size= 5):
-    return nn.Sequential(
-        nn.Linear(input_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, output_size)
-    )
-
-def build_choice_MLP(input_size, output_size, hidden_size= 2):
-    return nn.Sequential(
-        nn.Linear(input_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, output_size)
-    )
+from agents.helpers import build_update_MLPs, build_choice_MLP
 
 
 class MyDisRNN(nn.Module):
@@ -32,13 +13,11 @@ class MyDisRNN(nn.Module):
         self.q = q
 
         # build update MLPs and choice MLP
-        self.updateMLPs = nn.ModuleList(
-            [build_update_MLP(m+n) for _ in range(m)]
-        )
+        self.updateMLPs = build_update_MLPs(m, m+n, 2)
         self.choiceMLP = build_choice_MLP(m,q)
             
         # initialize bottleneck parameters
-        self.logit_M_h = nn.Parameter(2 * torch.ones((m,m)))  # M(i,j) -> update rule i's dependence on latent j
+        self.logit_M_h = nn.Parameter(2 * torch.ones((m,m)))
         self.log_sigma_h = nn.Parameter(-2 * torch.ones((m,m)))
 
         self.logit_M_x = nn.Parameter(2 * torch.ones((m,n)))
@@ -81,14 +60,9 @@ class MyDisRNN(nn.Module):
         x, kl_x = self.bottleneck(x, M_x, sigma_x)
 
         # apply update MLPs
-        z_outs = []
-        for i, MLP in enumerate(self.updateMLPs):
-            z_i = torch.cat([h[i], x[i]], dim= -1)
-            logit_w, u = MLP(z_i).unbind(dim= -1)
-            w = torch.sigmoid(logit_w)
-            z_out = (1 - w) * h_prev[:, i] + w * u
-            z_outs.append(z_out)
-        z = torch.stack(z_outs, dim= -1)
+        logit_w, u = self.updateMLPs(torch.cat([h, x], dim= -1)).unbind(dim= -1)
+        w = torch.sigmoid(logit_w)
+        z = ((1 - w) * h_prev.T + w * u).T
 
         # bottlenecks for disentangled latents
         M_z = torch.sigmoid(self.logit_M_z)

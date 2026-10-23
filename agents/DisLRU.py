@@ -1,26 +1,7 @@
 import torch
 import torch.nn as nn
 
-
-def build_update_MLP(input_size, output_size= 1, hidden_size= 5):
-    return nn.Sequential(
-        nn.Linear(input_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, output_size)
-    )
-
-def build_choice_MLP(input_size, output_size, hidden_size= 2):
-    return nn.Sequential(
-        nn.Linear(input_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.ReLU(),
-        nn.Linear(hidden_size, output_size)
-    )
+from agents.helpers import build_update_MLPs, build_choice_MLP
 
 
 class MyDisLRU(nn.Module):
@@ -32,12 +13,8 @@ class MyDisLRU(nn.Module):
         self.q = q
 
         # build update MLPs and choice MLP
-        self.gateMLPs = nn.ModuleList(
-            [build_update_MLP(1+n) for _ in range(m)]
-        )
-        self.driveMLPs = nn.ModuleList(
-            [build_update_MLP(1+n) for _ in range(m)]
-        )
+        self.gateMLPs = build_update_MLPs(m, 1+n, 1)
+        self.driveMLPs = build_update_MLPs(m, 1+n, 1)
         self.choiceMLP = build_choice_MLP(m,q)
             
         # initialize bottleneck parameters
@@ -83,16 +60,11 @@ class MyDisLRU(nn.Module):
         sigma_x = torch.exp(self.log_sigma_x)
         x, kl_x = self.bottleneck(x, M_x, sigma_x)
 
-        # apply update from gate and drive MLPs
-        z_outs = []
-        for i in range(self.m):
-            z_i = torch.cat([h[:, i:i+1], x[i]], dim= -1)
-            logit_w = self.gateMLPs[i](z_i).squeeze(-1)
-            w = torch.sigmoid(logit_w)
-            u = self.driveMLPs[i](z_i).squeeze(-1)
-            z_out = w * h_prev[:, i] + u
-            z_outs.append(z_out)
-        z = torch.stack(z_outs, dim= -1)
+        # apply update MLPs
+        logit_w = self.gateMLPs(torch.cat([h.T.unsqueeze(-1), x], dim= -1)).squeeze(-1)
+        w = torch.sigmoid(logit_w)
+        u = self.driveMLPs(torch.cat([h.T.unsqueeze(-1), x], dim= -1)).squeeze(-1)
+        z = (w * h_prev.T + u).T
 
         # bottlenecks for disentangled latents
         sigma_z = torch.exp(self.log_sigma_z)
