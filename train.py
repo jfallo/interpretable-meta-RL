@@ -3,139 +3,42 @@ from config import *
 
 def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     # build env
-    env = config['env']
+    env = config['env']['env'](config= config['env']['config'], 
+                               device= config['env']['device'])
     env.set_batch_size(config['batch_size'])
 
     # training hyperparameters
     lrs = config['lr']
     gammas = config['gamma']
     steps_unrolled = config['steps_unrolled']
-    beta_e_annealed = config['beta_e_annealed']
-    if beta_e_annealed:
-        beta_e_floor = config['beta_e']
-        anneal_end = 5000
-    else:
-        beta_e = config['beta_e']
     beta_v = config['beta_v']
-    betas = config['beta']
+    beta_e_ceil = config['beta_e']['ceil']
+    beta_e_floor = config['beta_e']['floor']
+    anneal_start = config['beta_e']['anneal']['start']
+    anneal_end = config['beta_e']['anneal']['end']
+    tau = config['beta_e']['tau']
 
     m_min = torch.logit(torch.tensor(0.01)).item()
     sigma_min = torch.log(torch.tensor(0.01)).item()
 
-    eval_interval = config['eval_interval']
-    eval_episodes = config['eval_episodes']
-    search_episodes = config['search_episodes']
-
     # initialize training models and optimizers
-    def DisRNN_constructor():
-        input_size = config['input_size']['DisRNN']
-        hidden_size = config['hidden_size']['DisRNN']
-        output_size = config['output_size']['DisRNN']
-        model = MyDisRNN(hidden_size, input_size, output_size).to(device)
-        critic = torch.nn.Sequential(
-            torch.nn.Linear(hidden_size + 1, 16),
-            torch.nn.ReLU(),
-            torch.nn.Linear(16, 1)
-        ) .to(device)
-        actor_parameters = list(model.parameters())
-        critic_parameters = list(critic.parameters())
-        parameters = actor_parameters + critic_parameters
-        optimizer = torch.optim.Adam(parameters, lr= lrs['DisRNN'])
-        return {'name': 'DisRNN',
-                'input_size': input_size,
-                'hidden_size': hidden_size,
-                'output_size': output_size,
-                'model': model,
-                'critic': critic,
-                'actor_parameters': actor_parameters,
-                'critic_parameters': critic_parameters,
-                'parameters': parameters,
-                'optimizer': optimizer,
-                'bottlenecks': ['h', 'x', 'z'],
-                'beta': betas['DisRNN'],
-                'phase1_end': config['phase1_end']['DisRNN']}
-    def DisLRU_constructor():
-        input_size = config['input_size']['DisLRU']
-        hidden_size = config['hidden_size']['DisLRU']
-        output_size = config['output_size']['DisLRU']
-        model = MyDisLRU(hidden_size, input_size, output_size).to(device)
-        critic = torch.nn.Sequential(
-            torch.nn.Linear(hidden_size + 1, 16),
-            torch.nn.ReLU(),
-            torch.nn.Linear(16, 1)
-        ) .to(device)
-        actor_parameters = list(model.parameters())
-        critic_parameters = list(critic.parameters())
-        parameters = actor_parameters + critic_parameters
-        optimizer = torch.optim.Adam(parameters, lr= lrs['DisLRU'])
-        return {'name': 'DisLRU',
-                'input_size': input_size,
-                'hidden_size': hidden_size,
-                'output_size': output_size,
-                'model': model,
-                'critic': critic,
-                'actor_parameters': actor_parameters,
-                'critic_parameters': critic_parameters,
-                'parameters': parameters,
-                'optimizer': optimizer,
-                'bottlenecks': ['h', 'x', 'z'],
-                'beta': betas['DisLRU'],
-                'phase1_end': config['phase1_end']['DisLRU']}
-    def LSTM_constructor():
-        input_size = config['input_size']['LSTM']
-        hidden_size = config['hidden_size']['LSTM']
-        output_size = config['output_size']['LSTM']
-        model = torch.nn.LSTM(input_size, hidden_size).to(device)
-        readout = torch.nn.Linear(hidden_size, output_size).to(device)
-        critic = torch.nn.Sequential(
-            torch.nn.Linear(hidden_size + 1, 16),
-            torch.nn.ReLU(),
-            torch.nn.Linear(16, 1)
-        ) .to(device)
-        actor_parameters = list(model.parameters()) + list(readout.parameters())
-        critic_parameters = list(critic.parameters())
-        parameters = actor_parameters + critic_parameters
-        optimizer = torch.optim.Adam(parameters, lr= lrs['LSTM'])
-        return {'name': 'LSTM',
-                'input_size': input_size,
-                'hidden_size': hidden_size,
-                'output_size': output_size,
-                'model': model,
-                'readout': readout,
-                'critic': critic,
-                'actor_parameters': actor_parameters,
-                'critic_parameters': critic_parameters,
-                'parameters': parameters,
-                'optimizer': optimizer,
-                'phase1_end': config['phase1_end']['LSTM']}
-
-    model_constructors = {'DisRNN': DisRNN_constructor,
-                          'DisLRU': DisLRU_constructor,
-                          'LSTM': LSTM_constructor}
-    models = {model: model_constructors[model]() 
+    models = {model: model_constructor(model, lrs[model], config, device) 
               for model in config['models']}
-
     env.build_models(models)
 
 
     # --- training --- #
 
-    training_phase = {model: 1 for model in models}
-    regret_histories = {'phase1': {model: [] for model in models}, 'phase2': {}}
-    best_regret = {model: np.inf for model in models}
-    cur_regret = {model: None for model in models}
+    regret_histories = {model: [] for model in models}
     ep = 0
 
     # load checkpoint
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path, map_location= device)
-        ep, training_phase, regret_histories, best_regret, models = load_checkpoint(checkpoint, models)
-        for model in models:
-            if training_phase[model] != 1 and 'bottlenecks' in models[model]:
-                freeze_bottleneck_parameters(models[model])
+        ep, regret_histories, models = load_checkpoint(checkpoint, models)
         ep += 1
  
-    active_models = sorted(model for model in models if training_phase[model] != 0)
+    active_models = sorted(model for model in models if ep <= models[model]['training_eps'])
     while active_models:
         # reset active models
         for model in active_models:
@@ -148,43 +51,18 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
         total_rewards = {model: rewards[model].sum(dim= 0).mean().item() for model in active_models}
         avg_regrets = {model: regrets[model].mean().item() for model in active_models}
         for model in active_models:
-            regret_histories[f'phase{training_phase[model]}'][model].append(avg_regrets[model])
-
-        # evaluate models in phase 2
-        phase2_models = sorted(model for model in models if training_phase[model] == 2)
-        for model in phase2_models:
-            search_ep = len(regret_histories['phase2'][model])
-            if search_ep <= search_episodes:
-                if search_ep % eval_interval == 0:
-                    with torch.no_grad():
-                        models[model]['model'].eval()
-                        
-                        eval_regrets = []
-                        for _ in range(eval_episodes):
-                            env.reset({model})
-
-                            eval_regret = env.eval_episode({model})[model].mean().item()
-                            eval_regrets.append(eval_regret)
-            
-                        # save best model if current average regret is better than previous best regret
-                        cur_regret[model] = float(np.mean(eval_regrets))
-                        if cur_regret[model] < best_regret[model]:
-                            best_regret[model] = cur_regret[model]
-                            save_dict = {f'{model}_state_dict': models[model]['model'].state_dict()}
-                            if 'readout' in models[model]:
-                                save_dict[f'{model}_readout_state_dict'] = models[model]['readout'].state_dict()
-                            torch.save(save_dict, checkpoints_dir + f'best_{model}.pt')
-            else:
-                # end training
-                training_phase[model] = 0  
-                active_models.remove(model)
+            regret_histories[model].append(avg_regrets[model])
                 
         
         # --- advantage actor-critic ----
 
         # update exploration parameter
-        if beta_e_annealed:
-            beta_e = beta_e_floor + (1.0 - beta_e_floor) * max(0.0, 1.0 - ep / anneal_end)
+        if ep < anneal_start:
+            beta_e = beta_e_ceil
+        elif ep < anneal_end:
+            beta_e = beta_e_floor + (beta_e_ceil - beta_e_floor) * np.exp(-(ep - anneal_start) / tau)
+        else:
+            beta_e = beta_e_floor
 
         # gradient descent
         for model in active_models:
@@ -234,39 +112,17 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                     print_bottleneck_parameters(models[model])
             plot_regret_histories(regret_histories, figs_dir, config['color'])
 
-        # update training status
-        for model in active_models:
-            if training_phase[model] == 1 and models[model]['phase1_end'] <= ep:
-                training_phase[model] = 2
-                regret_histories['phase2'][model] = []
-                if 'bottlenecks' in models[model]:
-                    freeze_bottleneck_parameters(models[model])
-
         # save checkpoint
         if ep > 0 and ep % 10_000 == 0:
-            torch.save(
-                build_checkpoint(ep, 
-                                 training_phase, 
-                                 regret_histories, 
-                                 best_regret,
-                                 models), 
-                checkpoints_dir + f'checkpoint_ep{ep}.pt'
-            )
+            torch.save(build_checkpoint(ep, regret_histories, models), 
+                       checkpoints_dir + f'checkpoint_ep{ep}.pt')
 
+        # update training status
+        active_models = sorted(model for model in models if ep < models[model]['training_eps'])
         ep += 1
-        
 
-    # print final bottleneck parameters
     for model in models:
-        if 'bottlenecks' in models[model]: 
+        if 'bottlenecks' in models[model]:
             print_bottleneck_parameters(models[model])
-
     plot_regret_histories(regret_histories, figs_dir, config['color'])
-    torch.save(
-        build_checkpoint(ep - 1, 
-                         training_phase, 
-                         regret_histories, 
-                         best_regret,
-                         models), 
-        checkpoints_dir + f'checkpoint_ep{ep-1}.pt'
-    )
+    
