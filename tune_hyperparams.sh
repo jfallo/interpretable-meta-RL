@@ -5,5 +5,5 @@ for model in 'DisRNN' 'DisLRU'; do
       echo "$model $lr $g"
     done
   done
-done | xargs -P 4 -L 1 sh -c \
-  'python3 main.py --seed 40 --models $0 --lr $1 --gamma $2 --training_eps 5000 > logs/$0_lr$1_gamma$2.txt 2>&1'
+done | xargs -P 12 -L 1 sh -c \
+  'python3 main.py --seed 40 --models $0 --lr $1 --gamma $2 --training_eps 100000 > logs/$0_lr$1_gamma$2.txt 2>&1'
