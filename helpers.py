@@ -51,12 +51,10 @@ def sample_dependent_easy(batch_size, num_arms, device):
     return torch.stack([p1,p2], dim= 1)
 
 
-def model_constructor(model_name, lr, config, device):
+def model_constructor(model_name, config, device, training= False, lr= None):
     input_size = config['input_size'][model_name]
     hidden_size = config['hidden_size'][model_name]
     output_size = config['output_size'][model_name]
-    training_eps = config['training_eps'][model_name]
-
     if model_name == 'DisRNN':
         model = MyDisRNN(hidden_size, input_size, output_size).to(device)
         actor_parameters = list(model.parameters())
@@ -67,32 +65,36 @@ def model_constructor(model_name, lr, config, device):
         model = nn.LSTM(input_size, hidden_size).to(device)
         readout = nn.Linear(hidden_size, output_size).to(device)
         actor_parameters = list(model.parameters()) + list(readout.parameters())
-    critic = nn.Sequential(
-        nn.Linear(hidden_size + 1, 16),
-        nn.ReLU(),
-        nn.Linear(16, 1)
-    ) .to(device)
-    critic_parameters = list(critic.parameters())
-    parameters = actor_parameters + critic_parameters
-    optimizer = torch.optim.Adam(parameters, lr= lr)
 
     model_dict = {'name': model_name,
                   'input_size': input_size,
                   'hidden_size': hidden_size,
                   'output_size': output_size,
-                  'model': model,
-                  'critic': critic,
-                  'actor_parameters': actor_parameters,
-                  'critic_parameters': critic_parameters,
-                  'parameters': parameters,
-                  'optimizer': optimizer,
-                  'training_eps': training_eps}
-    if model_name in {'DisRNN', 'DisLRU'}:
-        model_dict['bottlenecks'] = ['h', 'x', 'z']
-        model_dict['beta'] = config['beta'][model_name]
+                  'model': model}
     if model_name == 'LSTM':
         model_dict['readout'] = readout
-    
+
+    if training:
+        critic = nn.Sequential(
+            nn.Linear(hidden_size + 1, 16),
+            nn.ReLU(),
+            nn.Linear(16, 1)
+        ) .to(device)
+        critic_parameters = list(critic.parameters())
+        parameters = actor_parameters + critic_parameters
+        optimizer = torch.optim.Adam(parameters, lr= lr)
+        training_eps = config['training_eps'][model_name]
+
+        model_dict['critic'] = critic
+        model_dict['actor_parameters'] = actor_parameters
+        model_dict['critic_parameters'] = critic_parameters
+        model_dict['parameters'] = parameters
+        model_dict['optimizer'] = optimizer
+        model_dict['training_eps'] = training_eps
+        if model_name in {'DisRNN', 'DisLRU'}:
+            model_dict['bottlenecks'] = ['h', 'x', 'z']
+            model_dict['beta'] = config['beta'][model_name]
+            
     return model_dict
 
 

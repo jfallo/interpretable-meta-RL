@@ -22,7 +22,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     sigma_min = torch.log(torch.tensor(0.01)).item()
 
     # initialize training models and optimizers
-    models = {model: model_constructor(model, lrs[model], config, device) 
+    models = {model: model_constructor(model, config, device, training= True, lr= lrs[model]) 
               for model in config['models']}
     env.build_models(models)
 

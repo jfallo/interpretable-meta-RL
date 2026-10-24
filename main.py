@@ -1,7 +1,7 @@
 from config import *
 
 from train import train
-from eval import test
+from test import evaluate
 
 torch.set_num_threads(1)
 
