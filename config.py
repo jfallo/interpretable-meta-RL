@@ -1,13 +1,7 @@
-import numpy as np
 import torch
-import matplotlib.pyplot as plt
-import os, random, copy
 
-from envs import *
-from helpers import *
-
-from agents.DisRNN import MyDisRNN
-from agents.DisLRU import MyDisLRU
+from envs import BanditsEnv
+from helpers import sample_independent
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -30,20 +24,21 @@ linestyles = {'DisRNN': '-',
 exps = {
     'bandits/independent/standard': {
         'name': 'standard independent bandits',
-        'env': BanditsEnv(
-            config= {'D': sample_independent,
-                     'num_arms': 2,
-                     'dependent_arms': False,
-                     'restless': False,
-                     'drift': 0.0,
-                     'num_trials': 100},
-            device= device
-        ),
-        'models': ['DisRNN', 'DisLRU'],
+        'env': {
+            'env': BanditsEnv,
+            'config': {'D': sample_independent,
+                       'num_arms': 2,
+                       'dependent_arms': False,
+                       'restless': False,
+                       'drift': 0.0,
+                       'num_trials': 100},
+            'device': device
+        },
+        'models': ['DisRNN', 'DisLRU', 'LSTM'],
         'input_size': {
-            'DisRNN': 2,
-            'DisLRU': 2,
-            'LSTM': 2,
+            'DisRNN': 3,
+            'DisLRU': 3,
+            'LSTM': 3,
             'Thompson': 2,
             'UCB': 2,
             'Gittins': 2
@@ -61,7 +56,7 @@ exps = {
         'gamma': {
             'DisRNN': 0.98,
             'DisLRU': 0.98,
-            'LSTM': 0.95,
+            'LSTM': 0.98,
             'Gittins': 0.99
         },
         'lr': {
@@ -71,29 +66,31 @@ exps = {
         },
         'batch_size': 256,
         'steps_unrolled': 100,
-        'beta_e_annealed': True,
-        'beta_e': 0.005,
+        'beta_e': {
+            'floor': 0.005,
+            'ceil': 0.1,
+            'anneal': {'start': 0,
+                       'end': 5_000},
+            'tau': 1_000
+        },
         'beta_v': 0.05,
         'beta': {
             'DisRNN': {
                 'ceil': 1e-4,
-                'warmup': {'start': 20_000,
-                           'end': 30_000}
+                'warmup': {'start': 10_000,
+                           'end': 20_000}
             },
             'DisLRU': {
                 'ceil': 1e-4,
-                'warmup': {'start': 20_000,
-                           'end': 30_000}
+                'warmup': {'start': 10_000,
+                           'end': 20_000}
             }
         },
-        'phase1_end': {
+        'training_eps': {
             'DisRNN': 400_000,
             'DisLRU': 400_000,
             'LSTM': 200_000,
         },
-        'eval_interval': 500,
-        'eval_episodes': 1000,
-        'search_episodes': 20_000,
         'c': 0.15,
         'color': colors,
         'linestyle': linestyles

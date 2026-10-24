@@ -1,7 +1,10 @@
-from config import *
+import torch
+import numpy as np
+import argparse, random, os
 
+from config import exps
 from train import train
-from test import evaluate
+
 
 torch.set_num_threads(1)
 
@@ -23,6 +26,7 @@ torch.manual_seed(seed)
 # experiment setup
 exp = 'bandits/independent/standard'
 config = exps[exp]
+device = config['env']['device']
 if args.models:
     config['models'] = args.models
 if args.lr:

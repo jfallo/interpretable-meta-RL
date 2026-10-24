@@ -1,4 +1,7 @@
-from config import *
+import torch
+import numpy as np
+
+from helpers import model_constructor, load_checkpoint, build_checkpoint, print_bottleneck_parameters, plot_regret_histories
 
 
 def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
@@ -6,6 +9,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
     env = config['env']['env'](config= config['env']['config'], 
                                device= config['env']['device'])
     env.set_batch_size(config['batch_size'])
+    device = config['env']['device']
 
     # training hyperparameters
     lrs = config['lr']
