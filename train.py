@@ -42,7 +42,7 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
         ep, regret_histories, models = load_checkpoint(checkpoint, models)
         ep += 1
  
-    active_models = sorted(model for model in models if ep <= models[model]['training_eps'])
+    active_models = sorted(model for model in models if ep < models[model]['training_eps'])
     while active_models:
         # reset active models
         for model in active_models:
@@ -122,11 +122,14 @@ def train(config, figs_dir, checkpoints_dir, checkpoint_path= None):
                        checkpoints_dir + f'checkpoint_ep{ep}.pt')
 
         # update training status
-        active_models = sorted(model for model in models if ep < models[model]['training_eps'])
+        active_models = sorted(model for model in models if ep + 1 < models[model]['training_eps'])
         ep += 1
 
+    torch.save(build_checkpoint(ep - 1, regret_histories, models), 
+               checkpoints_dir + f'checkpoint_ep{ep - 1}.pt')
     for model in models:
         if 'bottlenecks' in models[model]:
             print_bottleneck_parameters(models[model])
+        print(f'Final {model} mean regret: {np.mean(regret_histories[model][-500:]):.4f}')
     plot_regret_histories(regret_histories, figs_dir, config['color'])
     

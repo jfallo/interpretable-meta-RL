@@ -29,10 +29,10 @@ config = exps[exp]
 device = config['env']['device']
 if args.models:
     config['models'] = args.models
-if args.lr:
+if args.lr is not None:
     for model in config['models']:
         config['lr'][model] = args.lr
-if args.gamma:
+if args.gamma is not None:
     for model in config['models']:
         config['gamma'][model] = args.gamma
 if args.training_eps:
