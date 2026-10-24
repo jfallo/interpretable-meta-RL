@@ -1,5 +1,8 @@
-from config import *
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
 
+from helpers import model_constructor, plot_agent, optimal_arm_rate
 from agents.Thompson import Thompson
 from agents.UCB import UCB
 from agents.Gittins import compute_gittins_table, Gittins
@@ -11,6 +14,7 @@ def evaluate(config, checkpoints_path, figs_path):
     # build env
     env = config['env']['env'](config= config['env']['config'], 
                                device= config['env']['device'])
+    device = config['env']['device']
 
     # build Gittins index table
     gittins_table = compute_gittins_table(max_total= env.T+1, gamma= config['gamma']['Gittins'], N= 200, tol= 1e-4)
