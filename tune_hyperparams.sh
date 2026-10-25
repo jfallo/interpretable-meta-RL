@@ -1,8 +1,8 @@
 mkdir -p logs
 for seed in 40 42 44; do
   for model in 'DisRNN' 'DisLRU'; do
-    for lr in 1e-4 5e-4 1e-3 5e-3; do
-      for g in 0.9 0.95 0.98 0.995; do
+    for lr in 1e-4 5e-4 1e-3; do
+      for g in 0.917 0.933; do
         echo "$seed $model $lr $g"
       done
     done
