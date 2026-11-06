@@ -1,0 +1,4375 @@
+Device: cpu
+Beginning training for standard independent bandits experiment, seed 42, models ['DisLRU'].
+ep 0
+DisLRU total reward: 50.62
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.88  0.88  0.88  0.88  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.14  0.14  0.14  0.14  0.14
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  6.51  6.51  6.51  6.50  6.51
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.88  0.88  0.88
+lat 1 |  0.88  0.88  0.88
+lat 2 |  0.88  0.88  0.88
+lat 3 |  0.88  0.88  0.88
+lat 4 |  0.88  0.88  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.14  0.14  0.14
+lat 1 |  0.14  0.14  0.14
+lat 2 |  0.14  0.14  0.14
+lat 3 |  0.14  0.14  0.14
+lat 4 |  0.14  0.14  0.14
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  6.51  6.51  6.51
+lat 1 |  6.51  6.51  6.51
+lat 2 |  6.51  6.51  6.51
+lat 3 |  6.51  6.51  6.51
+lat 4 |  6.51  6.51  6.51
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.14  0.14  0.14  0.14  0.14
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  7.39  7.39  7.39  7.39  7.39
+
+
+ep 2500
+DisLRU total reward: 64.21
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.88  0.88  0.89  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.12  0.12  0.10  0.12  0.10
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  7.28  7.18  8.53  7.43  8.38
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.91  0.91  0.88
+lat 1 |  0.91  0.91  0.86
+lat 2 |  0.92  0.92  0.88
+lat 3 |  0.91  0.90  0.89
+lat 4 |  0.93  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.12  0.12  0.12
+lat 1 |  0.11  0.11  0.11
+lat 2 |  0.08  0.08  0.10
+lat 3 |  0.11  0.11  0.12
+lat 4 |  0.09  0.08  0.10
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  7.85  7.44  7.28
+lat 1 |  8.52  8.25  8.06
+lat 2 | 11.69 11.44  8.88
+lat 3 |  8.38  8.25  7.58
+lat 4 | 10.76 10.66  8.48
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.12  0.12  0.11  0.11  0.08
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.61  8.51  9.49  9.44 12.30
+
+
+ep 5000
+DisLRU total reward: 65.77
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.88  0.88  0.89  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.12  0.12  0.10  0.12  0.10
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  7.48  7.46  8.74  7.51  8.52
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.91  0.91  0.88
+lat 1 |  0.92  0.91  0.86
+lat 2 |  0.93  0.92  0.88
+lat 3 |  0.91  0.90  0.89
+lat 4 |  0.93  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.11  0.12  0.12
+lat 1 |  0.09  0.10  0.10
+lat 2 |  0.07  0.07  0.10
+lat 3 |  0.11  0.11  0.12
+lat 4 |  0.08  0.08  0.09
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  7.94  7.40  7.35
+lat 1 |  9.76  8.74  8.49
+lat 2 | 12.85 12.46  8.81
+lat 3 |  8.38  8.07  7.69
+lat 4 | 11.97 11.96  9.02
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.11  0.09  0.10  0.07
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.84  8.95 10.93  9.63 15.13
+
+
+ep 7500
+DisLRU total reward: 62.19
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.88  0.88  0.89  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.12  0.12  0.10  0.12  0.10
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  7.34  7.53  8.97  7.54  8.68
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.91  0.91  0.87
+lat 1 |  0.92  0.91  0.87
+lat 2 |  0.93  0.92  0.88
+lat 3 |  0.91  0.90  0.89
+lat 4 |  0.94  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.11  0.12  0.12
+lat 1 |  0.09  0.10  0.10
+lat 2 |  0.07  0.07  0.10
+lat 3 |  0.11  0.11  0.12
+lat 4 |  0.07  0.07  0.09
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  8.15  7.48  7.38
+lat 1 | 10.42  9.05  8.50
+lat 2 | 13.63 13.40  9.10
+lat 3 |  8.43  8.16  7.68
+lat 4 | 13.18 12.73  9.34
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.11  0.08  0.10  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.92  9.02 12.49  9.86 17.14
+
+
+ep 10000
+DisLRU total reward: 68.95
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.88  0.88  0.89  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.12  0.11  0.10  0.12  0.10
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  7.40  7.63  9.02  7.50  9.00
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.91  0.91  0.87
+lat 1 |  0.93  0.91  0.87
+lat 2 |  0.93  0.93  0.87
+lat 3 |  0.91  0.90  0.88
+lat 4 |  0.94  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.11  0.12  0.12
+lat 1 |  0.09  0.09  0.10
+lat 2 |  0.06  0.07  0.10
+lat 3 |  0.11  0.11  0.11
+lat 4 |  0.07  0.07  0.09
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  8.10  7.73  7.44
+lat 1 | 10.57  9.85  8.83
+lat 2 | 14.49 13.77  9.10
+lat 3 |  8.56  8.20  7.76
+lat 4 | 13.78 12.65  9.66
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.11  0.07  0.10  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  9.31  9.29 13.78 10.21 18.55
+
+
+ep 12500
+DisLRU total reward: 62.72
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.89  0.87  0.87  0.88  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.43  0.27  0.12  0.14  0.13
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  2.06  3.20  7.26  6.50  6.70
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.90  0.88  0.89
+lat 1 |  0.92  0.91  0.87
+lat 2 |  0.92  0.93  0.87
+lat 3 |  0.90  0.90  0.88
+lat 4 |  0.94  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.22  0.30  0.44
+lat 1 |  0.13  0.12  0.14
+lat 2 |  0.08  0.09  0.17
+lat 3 |  0.16  0.15  0.17
+lat 4 |  0.07  0.07  0.11
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  4.06  2.90  2.05
+lat 1 |  6.86  7.32  6.01
+lat 2 | 11.85 10.56  5.21
+lat 3 |  5.68  5.90  5.25
+lat 4 | 13.34 12.04  7.46
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.16  0.11  0.07  0.10  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  6.28  8.76 13.68 10.14 19.68
+
+
+ep 15000
+DisLRU total reward: 63.39
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.87  0.87  0.87  0.88  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.88  0.51  0.14  0.19  0.20
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.69  6.22  4.63  4.38
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.87  0.76  0.87
+lat 1 |  0.92  0.90  0.87
+lat 2 |  0.91  0.93  0.86
+lat 3 |  0.89  0.90  0.87
+lat 4 |  0.94  0.90  0.84
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.57  0.86  0.83
+lat 1 |  0.25  0.20  0.25
+lat 2 |  0.10  0.12  0.23
+lat 3 |  0.29  0.29  0.36
+lat 4 |  0.08  0.09  0.16
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.52  0.88  1.04
+lat 1 |  3.59  4.41  3.43
+lat 2 |  9.47  8.03  3.75
+lat 3 |  3.02  3.15  2.39
+lat 4 | 11.36  9.53  5.12
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.25  0.14  0.07  0.11  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  4.05  7.25 13.77  9.01 20.19
+
+
+ep 17500
+DisLRU total reward: 61.73
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.81  0.86  0.87  0.88  0.87
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.96  0.75  0.18  0.39  0.25
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.84  1.14  4.86  2.27  3.46
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.80  0.51  0.77
+lat 1 |  0.91  0.89  0.86
+lat 2 |  0.91  0.93  0.86
+lat 3 |  0.83  0.89  0.81
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.86  0.99  0.94
+lat 1 |  0.41  0.34  0.41
+lat 2 |  0.13  0.15  0.29
+lat 3 |  0.70  0.62  0.80
+lat 4 |  0.09  0.13  0.22
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.93  0.52  0.82
+lat 1 |  2.20  2.59  2.09
+lat 2 |  7.14  6.18  2.96
+lat 3 |  1.19  1.43  1.01
+lat 4 | 10.14  7.12  3.90
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.32  0.17  0.07  0.15  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  3.11  5.77 13.42  6.56 20.27
+
+
+ep 20000
+DisLRU total reward: 63.75
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.71  0.84  0.86  0.88  0.86
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.93  0.22  0.67  0.28
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.71  0.90  3.86  1.32  3.07
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.67  0.31  0.60
+lat 1 |  0.89  0.86  0.85
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.69  0.83  0.67
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.96  0.99  1.00
+lat 1 |  0.57  0.56  0.61
+lat 2 |  0.17  0.18  0.35
+lat 3 |  0.97  0.88  0.98
+lat 4 |  0.11  0.14  0.25
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.70  0.31  0.60
+lat 1 |  1.56  1.54  1.39
+lat 2 |  5.33  5.11  2.51
+lat 3 |  0.71  0.94  0.68
+lat 4 |  8.72  6.24  3.40
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.39  0.22  0.09  0.22  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  2.57  4.64 11.69  4.54 19.31
+
+
+ep 22500
+DisLRU total reward: 63.42
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.54  0.80  0.86  0.86  0.86
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  0.99  0.29  0.95  0.30
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.54  0.81  2.93  0.91  2.83
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.52  0.19  0.42
+lat 1 |  0.87  0.83  0.83
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.47  0.66  0.47
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.99  0.99  0.99
+lat 1 |  0.72  0.75  0.77
+lat 2 |  0.21  0.21  0.40
+lat 3 |  1.00  1.00  0.98
+lat 4 |  0.12  0.16  0.26
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.53  0.20  0.42
+lat 1 |  1.21  1.10  1.08
+lat 2 |  4.32  4.31  2.18
+lat 3 |  0.48  0.66  0.48
+lat 4 |  7.95  5.66  3.22
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.45  0.26  0.09  0.32  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  2.21  3.78 10.57  3.10 18.58
+
+
+ep 25000
+DisLRU total reward: 63.62
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.36  0.71  0.85  0.80  0.85
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.37  1.00  0.32
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.37  0.71  2.29  0.80  2.65
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.38  0.13  0.29
+lat 1 |  0.83  0.78  0.81
+lat 2 |  0.90  0.92  0.88
+lat 3 |  0.30  0.45  0.30
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  0.99
+lat 1 |  0.85  0.91  0.88
+lat 2 |  0.24  0.24  0.43
+lat 3 |  1.00  1.00  0.99
+lat 4 |  0.13  0.17  0.29
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.38  0.13  0.29
+lat 1 |  0.98  0.86  0.92
+lat 2 |  3.72  3.83  2.02
+lat 3 |  0.30  0.45  0.31
+lat 4 |  7.27  5.17  2.95
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.52  0.32  0.10  0.42  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.93  3.15  9.58  2.36 17.85
+
+
+ep 27500
+DisLRU total reward: 66.67
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.24  0.56  0.84  0.61  0.84
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.45  1.00  0.33
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.24  0.56  1.85  0.61  2.59
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.28  0.08  0.21
+lat 1 |  0.76  0.68  0.74
+lat 2 |  0.90  0.92  0.88
+lat 3 |  0.19  0.28  0.20
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  0.99
+lat 1 |  0.95  0.97  0.95
+lat 2 |  0.27  0.27  0.46
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.13  0.18  0.29
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.28  0.09  0.21
+lat 1 |  0.80  0.70  0.78
+lat 2 |  3.41  3.47  1.93
+lat 3 |  0.19  0.28  0.20
+lat 4 |  6.96  5.00  2.92
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.60  0.39  0.11  0.52  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.67  2.56  8.92  1.93 17.98
+
+
+ep 30000
+DisLRU total reward: 64.54
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.16  0.39  0.83  0.40  0.83
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.60  1.00  0.33
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.16  0.39  1.39  0.41  2.49
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.22  0.06  0.16
+lat 1 |  0.65  0.56  0.63
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.13  0.18  0.13
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.99  1.00  1.00
+lat 1 |  0.98  0.99  0.99
+lat 2 |  0.28  0.28  0.49
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.14  0.18  0.29
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.22  0.06  0.16
+lat 1 |  0.66  0.57  0.63
+lat 2 |  3.28  3.25  1.82
+lat 3 |  0.13  0.18  0.13
+lat 4 |  6.79  5.03  2.90
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.64  0.50  0.12  0.62  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.56  2.02  8.33  1.61 18.07
+
+
+ep 32500
+DisLRU total reward: 64.12
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.25  0.81  0.24  0.83
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.71  1.00  0.34
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.25  1.13  0.24  2.41
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.16  0.05  0.11
+lat 1 |  0.48  0.42  0.47
+lat 2 |  0.90  0.92  0.89
+lat 3 |  0.09  0.12  0.09
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  0.99
+lat 1 |  0.99  1.00  0.98
+lat 2 |  0.30  0.30  0.53
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.14  0.19  0.31
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.16  0.05  0.12
+lat 1 |  0.49  0.42  0.48
+lat 2 |  3.03  3.02  1.69
+lat 3 |  0.09  0.12  0.09
+lat 4 |  6.76  4.82  2.77
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.72  0.60  0.13  0.71  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.39  1.66  7.72  1.40 17.64
+
+
+ep 35000
+DisLRU total reward: 64.50
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.08  0.15  0.78  0.15  0.82
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.81  1.00  0.35
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.08  0.15  0.97  0.15  2.30
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.12  0.04  0.08
+lat 1 |  0.32  0.30  0.32
+lat 2 |  0.90  0.92  0.89
+lat 3 |  0.06  0.08  0.06
+lat 4 |  0.93  0.89  0.85
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  0.99  1.00
+lat 1 |  1.00  0.99  1.00
+lat 2 |  0.32  0.31  0.58
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.14  0.19  0.32
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.12  0.04  0.08
+lat 1 |  0.32  0.30  0.32
+lat 2 |  2.85  2.96  1.54
+lat 3 |  0.06  0.08  0.06
+lat 4 |  6.61  4.62  2.70
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.78  0.71  0.13  0.79  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.29  1.41  7.70  1.27 17.72
+
+
+ep 37500
+DisLRU total reward: 65.51
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.06  0.10  0.76  0.11  0.81
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.84  1.00  0.37
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.06  0.10  0.91  0.11  2.19
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.09  0.03  0.06
+lat 1 |  0.21  0.21  0.22
+lat 2 |  0.90  0.92  0.90
+lat 3 |  0.05  0.06  0.05
+lat 4 |  0.93  0.89  0.86
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.99  0.99  1.00
+lat 1 |  0.98  1.00  0.99
+lat 2 |  0.34  0.32  0.62
+lat 3 |  0.99  1.00  0.99
+lat 4 |  0.14  0.19  0.31
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.09  0.03  0.06
+lat 1 |  0.22  0.21  0.22
+lat 2 |  2.66  2.83  1.45
+lat 3 |  0.05  0.06  0.05
+lat 4 |  6.47  4.62  2.74
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.80  0.81  0.14  0.83  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.25  1.24  7.14  1.21 18.28
+
+
+ep 40000
+DisLRU total reward: 64.16
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.04  0.07  0.73  0.08  0.80
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.88  1.00  0.38
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.04  0.07  0.83  0.08  2.14
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.06  0.02  0.04
+lat 1 |  0.14  0.14  0.15
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.04  0.05  0.04
+lat 4 |  0.93  0.89  0.86
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  0.99  0.99  1.00
+lat 2 |  0.34  0.34  0.66
+lat 3 |  1.00  1.00  0.99
+lat 4 |  0.15  0.19  0.32
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.06  0.02  0.04
+lat 1 |  0.15  0.15  0.15
+lat 2 |  2.68  2.70  1.36
+lat 3 |  0.04  0.05  0.04
+lat 4 |  6.42  4.72  2.69
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.84  0.90  0.14  0.85  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.20  1.11  6.92  1.18 17.76
+
+
+ep 42500
+DisLRU total reward: 65.96
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.03  0.05  0.70  0.06  0.80
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.91  1.00  0.38
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.03  0.05  0.77  0.06  2.11
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.05  0.02  0.03
+lat 1 |  0.10  0.10  0.10
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.03  0.04  0.03
+lat 4 |  0.93  0.89  0.86
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.99  1.00  0.99
+lat 1 |  1.00  1.00  0.99
+lat 2 |  0.34  0.36  0.68
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.15  0.19  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.05  0.02  0.03
+lat 1 |  0.10  0.10  0.10
+lat 2 |  2.63  2.56  1.32
+lat 3 |  0.03  0.04  0.03
+lat 4 |  6.38  4.71  2.60
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.86  0.90  0.15  0.88  0.06
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.16  1.11  6.60  1.13 17.95
+
+
+ep 45000
+DisLRU total reward: 65.82
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.03  0.04  0.66  0.04  0.79
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.91  1.00  0.38
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.03  0.04  0.73  0.04  2.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.04  0.02  0.02
+lat 1 |  0.07  0.07  0.07
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.02  0.02  0.02
+lat 4 |  0.93  0.90  0.86
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.99  1.00  1.00
+lat 1 |  0.99  1.00  1.00
+lat 2 |  0.34  0.36  0.71
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.15  0.19  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.04  0.02  0.02
+lat 1 |  0.07  0.07  0.07
+lat 2 |  2.65  2.59  1.28
+lat 3 |  0.02  0.02  0.02
+lat 4 |  6.25  4.73  2.62
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.89  0.93  0.16  0.94  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.12  1.07  6.29  1.07 18.30
+
+
+ep 47500
+DisLRU total reward: 60.73
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.03  0.63  0.03  0.78
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.93  1.00  0.38
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.03  0.68  0.03  2.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.03  0.01  0.02
+lat 1 |  0.05  0.05  0.05
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.01  0.02  0.02
+lat 4 |  0.93  0.90  0.86
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.34  0.36  0.76
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.15  0.19  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.03  0.01  0.02
+lat 1 |  0.05  0.05  0.05
+lat 2 |  2.63  2.52  1.19
+lat 3 |  0.01  0.02  0.02
+lat 4 |  6.29  4.83  2.64
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.95  0.17  0.95  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.11  1.06  6.02  1.05 18.68
+
+
+ep 50000
+DisLRU total reward: 64.05
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.02  0.59  0.02  0.77
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.96  1.00  0.39
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.02  0.62  0.02  1.94
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.02
+lat 1 |  0.04  0.04  0.04
+lat 2 |  0.91  0.91  0.90
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.87
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.37  0.79
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.15  0.20  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.02
+lat 1 |  0.04  0.04  0.04
+lat 2 |  2.63  2.47  1.15
+lat 3 |  0.01  0.01  0.01
+lat 4 |  6.04  4.53  2.62
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.91  0.95  0.17  0.96  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.10  1.05  5.86  1.05 19.04
+
+
+ep 52500
+DisLRU total reward: 61.50
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.02  0.55  0.01  0.76
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.94  1.00  0.41
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.02  0.02  0.58  0.01  1.85
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.01
+lat 1 |  0.03  0.03  0.03
+lat 2 |  0.91  0.91  0.91
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.87
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.38  0.81
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.16  0.21  0.32
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.01
+lat 1 |  0.03  0.03  0.03
+lat 2 |  2.63  2.41  1.12
+lat 3 |  0.01  0.01  0.01
+lat 4 |  6.01  4.32  2.70
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.93  0.95  0.18  0.96  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.08  1.05  5.68  1.04 18.79
+
+
+ep 55000
+DisLRU total reward: 63.84
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.49  0.01  0.75
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.95  1.00  0.41
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.52  0.01  1.82
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.01
+lat 1 |  0.02  0.02  0.02
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.87
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.39  0.83
+lat 3 |  1.00  0.99  0.99
+lat 4 |  0.16  0.21  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.02  0.01  0.01
+lat 1 |  0.02  0.02  0.02
+lat 2 |  2.59  2.38  1.08
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.87  4.25  2.67
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.94  0.98  0.18  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.06  1.02  5.47  1.01 18.54
+
+
+ep 57500
+DisLRU total reward: 66.97
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.44  0.01  0.74
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.42
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.45  0.01  1.75
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.02
+lat 2 |  0.91  0.92  0.90
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.87
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  0.99
+lat 2 |  0.35  0.39  0.89
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.16  0.21  0.34
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.02
+lat 2 |  2.56  2.37  1.00
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.80  4.25  2.59
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.93  0.98  0.19  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.08  1.02  5.20  1.02 18.68
+
+
+ep 60000
+DisLRU total reward: 63.83
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.40  0.01  0.72
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.43
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.41  0.01  1.67
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.91  0.90
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.40  0.89
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.16  0.22  0.33
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.62  2.27  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.70  4.12  2.64
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.94  0.96  0.19  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.06  1.05  5.33  1.01 18.74
+
+
+ep 62500
+DisLRU total reward: 65.85
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.36  0.01  0.71
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.96  1.00  0.44
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.37  0.01  1.63
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.91  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.40  0.90
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.16  0.22  0.34
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.59  2.26  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.69  4.05  2.60
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.96  0.98  0.19  0.97  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.05  1.02  5.16  1.03 19.17
+
+
+ep 65000
+DisLRU total reward: 64.93
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.32  0.01  0.70
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.96  1.00  0.45
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.33  0.01  1.57
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.91  0.90
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.35  0.41  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.17  0.22  0.35
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.63  2.22  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.57  4.05  2.52
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.97  0.20  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.03  4.95  1.02 19.33
+
+
+ep 67500
+DisLRU total reward: 62.23
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.28  0.01  0.69
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.46
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.29  0.01  1.48
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.36  0.41  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.17  0.23  0.35
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.53  2.24  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.56  3.95  2.50
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  1.00  0.21  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.00  4.82  1.00 19.23
+
+
+ep 70000
+DisLRU total reward: 66.49
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.24  0.01  0.68
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.47
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.24  0.01  1.46
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.37  0.42  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.17  0.23  0.36
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.47  2.17  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.49  3.91  2.46
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.98  0.21  0.97  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.02  4.68  1.03 19.21
+
+
+ep 72500
+DisLRU total reward: 65.66
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.22  0.01  0.67
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.47
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.22  0.01  1.41
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.37  0.41  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.24  0.36
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.44  2.22  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.32  3.71  2.46
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.22  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.01  4.48  1.00 18.74
+
+
+ep 75000
+DisLRU total reward: 65.11
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.20  0.01  0.66
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.49
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.21  0.01  1.34
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.38  0.40  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.17  0.24  0.36
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.43  2.27  1.04
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.39  3.77  2.44
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.22  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  4.55  1.02 19.35
+
+
+ep 77500
+DisLRU total reward: 65.93
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.19  0.01  0.64
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.50
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.19  0.01  1.29
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.41  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.17  0.23  0.37
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.36  2.22  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.35  3.88  2.41
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.97  0.22  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.04  4.57  1.02 19.48
+
+
+ep 80000
+DisLRU total reward: 63.32
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.17  0.01  0.64
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.50
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.17  0.01  1.30
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.38  0.41  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.37
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.42  2.25  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.26  3.86  2.43
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.23  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  4.32  1.00 19.00
+
+
+ep 82500
+DisLRU total reward: 64.15
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.15  0.01  0.62
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.51
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.16  0.01  1.23
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.42  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.37
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.21  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.23  3.85  2.40
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.97  0.23  0.96  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.03  4.30  1.04 19.21
+
+
+ep 85000
+DisLRU total reward: 65.77
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.14  0.01  0.61
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.51
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.14  0.01  1.20
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.90
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.42  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.39
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.29  2.17  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.24  3.86  2.31
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  1.00  0.24  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.00  4.20  1.01 20.47
+
+
+ep 87500
+DisLRU total reward: 61.93
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.13  0.01  0.60
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.53
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.13  0.01  1.13
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.90
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.39
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.25  2.13  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.31  3.87  2.31
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.25  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.04  1.01  4.05  1.01 20.94
+
+
+ep 90000
+DisLRU total reward: 61.89
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.12  0.01  0.59
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.54
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.12  0.01  1.09
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.90
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.39
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.36  2.12  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.18  3.90  2.34
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.24  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.04  1.01  4.12  1.01 20.26
+
+
+ep 92500
+DisLRU total reward: 64.02
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.11  0.01  0.58
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.55
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.12  0.01  1.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.90
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.89
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.22  0.38
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.33  2.15  0.98
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.20  4.01  2.38
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  1.00  0.25  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.00  3.99  1.01 20.32
+
+
+ep 95000
+DisLRU total reward: 62.55
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.11  0.01  0.56
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.58
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.11  0.01  0.96
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.91
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.44  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.18  0.23  0.38
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.24  2.09  0.98
+lat 3 |  0.01  0.01  0.01
+lat 4 |  5.11  3.94  2.37
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.98  0.25  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.02  4.02  1.01 19.88
+
+
+ep 97500
+DisLRU total reward: 62.64
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.10  0.01  0.55
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.59
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.11  0.01  0.93
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.91
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.45  0.90
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.24  0.39
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.23  2.04  0.96
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.97  3.83  2.33
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.99  0.25  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.01  4.03  1.02 19.98
+
+
+ep 100000
+DisLRU total reward: 63.43
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.10  0.01  0.54
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.59
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.10  0.01  0.91
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.92
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.89
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.24  0.40
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.30  2.09  0.97
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.95  3.69  2.30
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.97  0.26  0.97  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.03  3.83  1.03 19.44
+
+
+ep 102500
+DisLRU total reward: 62.56
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.09  0.01  0.52
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.61
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.09  0.01  0.86
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.92
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.45  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.25  0.42
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.26  2.05  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.98  3.66  2.20
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.26  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.00  3.90  1.01 20.88
+
+
+ep 105000
+DisLRU total reward: 63.26
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.09  0.01  0.51
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.63
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.09  0.01  0.80
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.92
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.45  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.25  0.42
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.29  2.05  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.92  3.67  2.22
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.98  0.26  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.04  1.03  3.87  1.00 20.99
+
+
+ep 107500
+DisLRU total reward: 63.71
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.08  0.01  0.49
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.65
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.08  0.01  0.76
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.93
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.24  0.42
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.26  2.10  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.97  3.71  2.21
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.26  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  3.89  1.00 21.40
+
+
+ep 110000
+DisLRU total reward: 63.50
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.08  0.01  0.48
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.67
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.08  0.01  0.72
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.93
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.43  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.25  0.42
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.24  2.15  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.92  3.66  2.21
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.27  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.75  1.00 21.89
+
+
+ep 112500
+DisLRU total reward: 65.86
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.46
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.69
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.67
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.93
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.43  0.90
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.25  0.42
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.25  2.15  0.95
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.88  3.60  2.21
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.27  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.67  1.02 21.41
+
+
+ep 115000
+DisLRU total reward: 65.15
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.44
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.72
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.08  0.01  0.62
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.94
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.42  0.45  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.26  0.43
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.18  2.05  0.98
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.81  3.48  2.19
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.27  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.73  1.02 21.78
+
+
+ep 117500
+DisLRU total reward: 62.88
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.42
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.75
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.55
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.94
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.44  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.26  0.43
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.22  2.11  0.97
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.82  3.54  2.20
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.27  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  3.65  1.01 22.39
+
+
+ep 120000
+DisLRU total reward: 63.80
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.40
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.79
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.50
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.94
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.42  0.44  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.19  0.26  0.44
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.17  2.09  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.80  3.46  2.16
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.26  0.96  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.01  3.79  1.04 22.25
+
+
+ep 122500
+DisLRU total reward: 62.88
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.37
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.81
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.07  0.01  0.46
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.94
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.45  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.27  0.45
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.26  2.05  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.72  3.40  2.09
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.27  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  3.74  1.00 21.96
+
+
+ep 125000
+DisLRU total reward: 62.84
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.35
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.84
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.42
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.90  0.95
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.27  0.45
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.11  0.97
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.63  3.31  2.11
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.27  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.65  1.00 22.47
+
+
+ep 127500
+DisLRU total reward: 63.13
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.33
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.97  1.00  0.88
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.37
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.95
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.26  0.44
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.34  2.14  0.97
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.62  3.47  2.17
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.98  0.28  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.02  3.59  1.02 23.16
+
+
+ep 130000
+DisLRU total reward: 62.91
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.31
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.88
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.06  0.01  0.35
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.95
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.27  0.46
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.38  2.12  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.53  3.41  2.07
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.98  0.27  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.02  3.69  1.00 22.81
+
+
+ep 132500
+DisLRU total reward: 64.75
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.28
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.89
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.32
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.26  0.47
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.12  1.00
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.58  3.57  2.03
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.29  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.00  3.50  1.00 22.64
+
+
+ep 135000
+DisLRU total reward: 62.13
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.26
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.92
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.29
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.38  0.44  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.20  0.25  0.49
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.41  2.11  0.99
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.55  3.58  1.96
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.96  0.99  0.29  0.98  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.04  1.01  3.47  1.02 21.95
+
+
+ep 137500
+DisLRU total reward: 63.91
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.25
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.93
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.05  0.01  0.26
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.84
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.26  0.51
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.36  2.13  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.50  3.52  1.90
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.98  0.29  1.00  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.02  3.47  1.00 21.16
+
+
+ep 140000
+DisLRU total reward: 67.09
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.22
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.95
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.24
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.86
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.44  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.26  0.52
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.33  2.10  0.98
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.47  3.44  1.85
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.98  0.29  0.99  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.02  3.41  1.01 21.72
+
+
+ep 142500
+DisLRU total reward: 61.96
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.20
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.20
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.27  0.52
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.38  2.13  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.43  3.43  1.85
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.28  0.97  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.01  3.54  1.03 22.24
+
+
+ep 145000
+DisLRU total reward: 62.94
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.18
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.19
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.96
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.38  0.43  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.27  0.53
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.39  2.17  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.34  3.36  1.81
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.28  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  3.53  1.00 22.43
+
+
+ep 147500
+DisLRU total reward: 67.18
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.17
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.04  0.01  0.17
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.27  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.28  2.14  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.28  3.35  1.78
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.97  0.05
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.51  1.03 22.11
+
+
+ep 150000
+DisLRU total reward: 63.85
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.15
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.15
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.42  0.83
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.27  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.19  1.06
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.45  3.42  1.78
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.00  3.52  1.01 23.02
+
+
+ep 152500
+DisLRU total reward: 61.77
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.13
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  1.00
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.14
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.45  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.53
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.29  2.06  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.37  3.31  1.82
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.54  1.01 23.00
+
+
+ep 155000
+DisLRU total reward: 66.41
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.13
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.13
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.41  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.53
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.27  2.24  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.35  3.30  1.82
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.29  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.47  1.01 23.22
+
+
+ep 157500
+DisLRU total reward: 63.24
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.12
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.12
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.42  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.53
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.32  2.22  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.34  3.24  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.29  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.01  3.46  1.03 23.18
+
+
+ep 160000
+DisLRU total reward: 65.54
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.10
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.11
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.91  0.97
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.42  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.29  0.55
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.18  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.24  3.13  1.78
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.95  0.98  0.28  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.05  1.02  3.55  1.02 23.49
+
+
+ep 162500
+DisLRU total reward: 63.57
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.09
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.09
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.29  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.23  2.15  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.32  3.15  1.80
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.98  0.29  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.02  3.42  1.02 23.74
+
+
+ep 165000
+DisLRU total reward: 65.22
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.09
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.09
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.87
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.53
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.17  1.00
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.41  3.28  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.98  0.29  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.02  3.39  1.02 23.71
+
+
+ep 167500
+DisLRU total reward: 63.91
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.08
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.08
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.43  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.33  2.16  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.36  3.29  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.98  0.28  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.02  3.55  1.00 24.63
+
+
+ep 170000
+DisLRU total reward: 64.00
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.08
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.08
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.91  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.43  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.24  2.16  1.04
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.32  3.28  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.29  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.50  1.00 24.20
+
+
+ep 172500
+DisLRU total reward: 63.41
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.07
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.07
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.92  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.27  2.16  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.28  3.24  1.82
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.57  1.01 25.46
+
+
+ep 175000
+DisLRU total reward: 62.86
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.07
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.03  0.01  0.07
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.92  0.92  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.30  2.10  1.03
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.24  3.23  1.82
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.01  3.62  1.01 24.28
+
+
+ep 177500
+DisLRU total reward: 62.34
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.07
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.07
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.87
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.55
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.31  2.11  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.32  3.27  1.80
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.01  3.51  1.01 23.89
+
+
+ep 180000
+DisLRU total reward: 63.79
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.06
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.07
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.98
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.44  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.30  2.10  1.01
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.40  3.30  1.82
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.54  1.01 24.75
+
+
+ep 182500
+DisLRU total reward: 61.36
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.06
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.98  1.00  0.97
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.06
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.88
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.45  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.27  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.27  2.07  1.04
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.34  3.38  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.98  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.02  3.62  1.01 24.74
+
+
+ep 185000
+DisLRU total reward: 62.72
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.06
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.06
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.44  0.83
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.27  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.25  2.11  1.08
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.30  3.37  1.83
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  1.00  0.28  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.00  3.59  1.02 24.52
+
+
+ep 187500
+DisLRU total reward: 63.48
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.43  0.83
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.28  0.56
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.25  2.13  1.08
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.29  3.30  1.76
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.99  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.53  1.01 24.53
+
+
+ep 190000
+DisLRU total reward: 63.38
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.92  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.39  0.41  0.84
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.28  0.55
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.33  2.24  1.06
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.26  3.30  1.80
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.28  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.53  1.02 25.20
+
+
+ep 192500
+DisLRU total reward: 64.95
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.98
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.40  0.43  0.85
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.29  0.55
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.29  2.13  1.05
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.26  3.17  1.80
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.99  0.99  0.29  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.01  1.02  3.46  1.02 24.28
+
+
+ep 195000
+DisLRU total reward: 63.64
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.04
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.05
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.42  0.88
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.54
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.24  2.18  1.02
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.35  3.23  1.84
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  0.99  0.30  1.00  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.01  3.35  1.00 24.06
+
+
+ep 197500
+DisLRU total reward: 65.16
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.04
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.04
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.93  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.41  0.40  0.86
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.22  0.29  0.55
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.24  2.32  1.04
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.23  3.20  1.78
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.98  1.00  0.29  0.98  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.02  1.00  3.39  1.02 24.00
+
+
+
+DisLRU
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.04
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  0.99  1.00  0.99
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.01  0.01  0.02  0.01  0.04
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  0.91  0.92  0.89
+lat 3 |  0.01  0.01  0.01
+lat 4 |  0.93  0.92  0.99
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  1.00  1.00  1.00
+lat 1 |  1.00  1.00  1.00
+lat 2 |  0.42  0.42  0.84
+lat 3 |  1.00  1.00  1.00
+lat 4 |  0.21  0.28  0.56
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.01  0.01  0.01
+lat 1 |  0.01  0.01  0.01
+lat 2 |  2.20  2.21  1.06
+lat 3 |  0.01  0.01  0.01
+lat 4 |  4.33  3.23  1.77
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.00  1.00  1.00  1.00  1.00
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.97  0.99  0.29  0.97  0.04
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  1.03  1.01  3.40  1.03 24.55
+
+
+Final DisLRU mean regret: 0.0260

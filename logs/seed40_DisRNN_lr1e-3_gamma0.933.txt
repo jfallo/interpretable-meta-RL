@@ -1,0 +1,560 @@
+Device: cpu
+Beginning training for standard independent bandits experiment, seed 40, models ['DisRNN'].
+ep 0
+DisRNN total reward: 50.32
+
+DisRNN
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.88  0.88  0.88  0.88  0.88
+lat 1 |  0.88  0.88  0.88  0.88  0.88
+lat 2 |  0.88  0.88  0.88  0.88  0.88
+lat 3 |  0.88  0.88  0.88  0.88  0.88
+lat 4 |  0.88  0.88  0.88  0.88  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.14  0.14  0.14  0.14  0.14
+lat 1 |  0.14  0.14  0.14  0.14  0.14
+lat 2 |  0.14  0.14  0.14  0.14  0.14
+lat 3 |  0.14  0.14  0.14  0.14  0.14
+lat 4 |  0.14  0.14  0.14  0.14  0.14
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  6.50  6.50  6.51  6.50  6.51
+lat 1 |  6.51  6.51  6.51  6.51  6.51
+lat 2 |  6.52  6.51  6.51  6.52  6.50
+lat 3 |  6.51  6.50  6.52  6.51  6.50
+lat 4 |  6.51  6.51  6.51  6.50  6.50
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.88  0.88  0.88
+lat 1 |  0.88  0.88  0.88
+lat 2 |  0.88  0.88  0.88
+lat 3 |  0.88  0.88  0.88
+lat 4 |  0.88  0.88  0.88
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.14  0.14  0.14
+lat 1 |  0.14  0.14  0.14
+lat 2 |  0.14  0.14  0.14
+lat 3 |  0.14  0.14  0.14
+lat 4 |  0.14  0.14  0.14
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  6.51  6.51  6.51
+lat 1 |  6.50  6.50  6.51
+lat 2 |  6.50  6.51  6.50
+lat 3 |  6.52  6.50  6.51
+lat 4 |  6.51  6.50  6.51
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.88  0.88  0.88  0.88  0.88
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.14  0.14  0.14  0.14  0.14
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  6.51  6.50  6.52  6.50  6.51
+
+
+ep 2500
+DisRNN total reward: 62.69
+
+DisRNN
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.86  0.89  0.90  0.86
+lat 1 |  0.90  0.90  0.90  0.89  0.88
+lat 2 |  0.89  0.90  0.89  0.85  0.87
+lat 3 |  0.90  0.90  0.89  0.89  0.89
+lat 4 |  0.92  0.89  0.90  0.90  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.12  0.12  0.09  0.13
+lat 1 |  0.11  0.11  0.09  0.10  0.10
+lat 2 |  0.11  0.11  0.10  0.12  0.11
+lat 3 |  0.11  0.12  0.11  0.11  0.11
+lat 4 |  0.11  0.14  0.12  0.13  0.13
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.36  7.16  7.40  9.62  6.78
+lat 1 |  8.31  8.28  9.62  8.93  8.39
+lat 2 |  8.22  8.34  8.59  7.40  7.85
+lat 3 |  7.95  7.70  8.12  7.77  8.06
+lat 4 |  7.99  6.19  7.63  6.80  6.91
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.92  0.92  0.87
+lat 1 |  0.91  0.91  0.90
+lat 2 |  0.93  0.92  0.90
+lat 3 |  0.92  0.92  0.88
+lat 4 |  0.90  0.89  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.07  0.07  0.11
+lat 1 |  0.09  0.08  0.09
+lat 2 |  0.09  0.09  0.10
+lat 3 |  0.10  0.10  0.11
+lat 4 |  0.11  0.11  0.11
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 | 13.06 14.03  8.18
+lat 1 | 10.38 11.36  9.82
+lat 2 | 10.61  9.95  8.87
+lat 3 |  8.94  9.20  8.32
+lat 4 |  7.90  8.09  7.93
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.92  0.92  0.92  0.89  0.90
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.08  0.07  0.09  0.09  0.10
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 | 11.81 12.61 10.65 10.20  9.03
+
+
+ep 5000
+DisRNN total reward: 57.93
+
+DisRNN
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.86  0.89  0.90  0.86
+lat 1 |  0.90  0.90  0.90  0.89  0.88
+lat 2 |  0.90  0.89  0.89  0.85  0.87
+lat 3 |  0.91  0.89  0.89  0.88  0.89
+lat 4 |  0.92  0.88  0.90  0.90  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.10  0.12  0.12  0.09  0.12
+lat 1 |  0.11  0.11  0.09  0.09  0.10
+lat 2 |  0.12  0.11  0.10  0.12  0.12
+lat 3 |  0.11  0.12  0.11  0.11  0.11
+lat 4 |  0.11  0.14  0.12  0.14  0.12
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.79  7.26  7.45 10.16  7.19
+lat 1 |  8.55  8.22 10.00 10.18  9.23
+lat 2 |  7.76  8.27  8.98  7.05  7.57
+lat 3 |  8.16  7.47  8.39  7.73  8.02
+lat 4 |  8.44  6.52  7.50  6.55  7.03
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.93  0.92  0.87
+lat 1 |  0.91  0.91  0.90
+lat 2 |  0.93  0.92  0.90
+lat 3 |  0.93  0.92  0.89
+lat 4 |  0.89  0.89  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.07  0.06  0.11
+lat 1 |  0.09  0.07  0.09
+lat 2 |  0.09  0.09  0.10
+lat 3 |  0.10  0.11  0.10
+lat 4 |  0.12  0.12  0.10
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 | 12.74 14.89  8.11
+lat 1 | 10.49 12.65  9.72
+lat 2 | 10.57  9.99  8.87
+lat 3 |  9.60  8.50  8.55
+lat 4 |  7.21  7.75  8.63
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.92  0.92  0.92  0.89  0.90
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.08  0.06  0.08  0.08  0.11
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 | 11.38 14.23 12.05 11.06  8.56
+
+
+ep 7500
+DisRNN total reward: 60.34
+
+DisRNN
+
+M_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.90  0.86  0.89  0.89  0.86
+lat 1 |  0.90  0.90  0.90  0.89  0.88
+lat 2 |  0.90  0.90  0.90  0.85  0.87
+lat 3 |  0.91  0.89  0.89  0.89  0.89
+lat 4 |  0.92  0.88  0.90  0.90  0.88
+
+sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.11  0.12  0.12  0.08  0.12
+lat 1 |  0.10  0.10  0.09  0.09  0.09
+lat 2 |  0.12  0.11  0.10  0.12  0.13
+lat 3 |  0.11  0.12  0.10  0.11  0.11
+lat 4 |  0.10  0.14  0.12  0.14  0.12
+
+M_h/sigma_h:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  8.47  7.46  7.74 10.77  7.36
+lat 1 |  8.77  8.89 10.39  9.94  9.35
+lat 2 |  7.70  8.52  9.41  7.12  6.80
+lat 3 |  8.45  7.18  8.56  8.29  7.90
+lat 4 |  8.91  6.48  7.71  6.30  7.18
+
+M_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.93  0.92  0.87
+lat 1 |  0.91  0.91  0.90
+lat 2 |  0.93  0.92  0.90
+lat 3 |  0.93  0.93  0.89
+lat 4 |  0.89  0.89  0.89
+
+sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 |  0.07  0.06  0.11
+lat 1 |  0.09  0.07  0.09
+lat 2 |  0.09  0.09  0.10
+lat 3 |  0.10  0.11  0.10
+lat 4 |  0.12  0.11  0.10
+
+M_x/sigma_x:
+        lat 0 lat 1 lat 2
+lat 0 | 13.22 14.72  7.99
+lat 1 | 10.07 13.14 10.14
+lat 2 | 10.32 10.47  8.94
+lat 3 |  9.22  8.50  8.57
+lat 4 |  7.65  8.07  8.61
+
+M_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.92  0.92  0.93  0.89  0.90
+
+sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 |  0.08  0.06  0.07  0.08  0.11
+
+M_z/sigma_z:
+        lat 0 lat 1 lat 2 lat 3 lat 4
+lat 0 | 11.64 16.59 13.18 11.69  8.06
+
+
+Traceback (most recent call last):
+  File "/home/ubuntu/projects/interpretable-meta-RL/main.py", line 52, in <module>
+    train(config, figs_dir, checkpoints_dir, checkpoint_path= args.resume)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/train.py", line 54, in train
+    rewards, expected_returns, log_probs, entropies, regrets, bottleneck_losses = env.training_episode(active_models, steps_unrolled)
+                                                                                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/envs.py", line 163, in training_episode
+    pi, a, r = self.sample(active_models, logits)
+               ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/envs.py", line 109, in sample
+    pi[model] = torch.distributions.Categorical(logits= logits[model])
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/venv/lib/python3.14/site-packages/torch/distributions/categorical.py", line 85, in __init__
+    super().__init__(batch_shape, validate_args=validate_args)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/venv/lib/python3.14/site-packages/torch/distributions/distribution.py", line 77, in __init__
+    raise ValueError(
+    ...<5 lines>...
+    )
+ValueError: Expected parameter logits (Tensor of shape (256, 2)) of distribution Categorical(logits: torch.Size([256, 2])) to satisfy the constraint IndependentConstraint(Real(), 1), but found invalid values:
+tensor([[nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan],
+        [nan, nan]], grad_fn=<SubBackward0>)
+Device: cpu
+Beginning training for standard independent bandits experiment, seed 40, models ['DisRNN'].
+Traceback (most recent call last):
+  File "/home/ubuntu/projects/interpretable-meta-RL/main.py", line 52, in <module>
+    train(config, figs_dir, checkpoints_dir, checkpoint_path= args.resume)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/train.py", line 41, in train
+    checkpoint = torch.load(checkpoint_path, map_location= device)
+  File "/home/ubuntu/projects/interpretable-meta-RL/venv/lib/python3.14/site-packages/torch/serialization.py", line 1565, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ubuntu/projects/interpretable-meta-RL/venv/lib/python3.14/site-packages/torch/serialization.py", line 795, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/home/ubuntu/projects/interpretable-meta-RL/venv/lib/python3.14/site-packages/torch/serialization.py", line 776, in __init__
+    super().__init__(open(name, mode))  # noqa: SIM115
+                     ~~~~^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'checkpoints/bandits/independent/standard/DisRNN/lr0.001_gamma0.933/seed40/checkpoint_ep49999.pt'
